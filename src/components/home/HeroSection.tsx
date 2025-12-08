@@ -38,47 +38,30 @@ const HeroSection = () => {
   return (
     <section className="bg-gray-50 py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          <div className="flex flex-col gap-4 md:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+          {/* Left Banner - 30% */}
+          <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
             {banners.slice(0, 2).map((banner) => (
               <div
                 key={banner.id}
-                className="relative bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg h-48 md:h-[280px] flex items-center justify-between px-6 md:px-12"
+                className="relative rounded-lg overflow-hidden h-48 md:h-[280px]"
               >
-                <div className="z-10">
-                  <p className="text-gray-700 text-sm md:text-lg font-medium mb-1 md:mb-2">
-                    Offer
-                  </p>
-                  <h2 className="text-black text-2xl md:text-4xl font-bold">
-                    {banner.slider_title || "Collection"}
-                  </h2>
-                </div>
-
                 <img
                   src={`${IMAGE_BASE}${banner.slider_image}`}
-                  alt="Banner"
-                  className="w-40 md:w-72 h-32 md:h-48 object-contain absolute right-4 md:right-8"
+                  alt={banner.slider_title || "Banner"}
+                  className="w-full h-full object-cover"
                 />
               </div>
             ))}
           </div>
-          {banners[2] && (
-            <div className="relative bg-gradient-to-br from-teal-300 to-teal-400 rounded-lg h-96 md:h-full flex items-center justify-between px-6 md:px-12 overflow-hidden">
-              <div className="z-10 max-w-md">
-                <p className="text-gray-800 text-base md:text-xl font-medium mb-2">
-                  Special Offer
-                </p>
-                <h2 className="text-black text-3xl md:text-5xl font-bold mb-6">
-                  {banners[2].slider_title || "Reading Day"}
-                </h2>
-                <button className="px-6 py-3 border-2 border-black rounded">
-                  Shop Now
-                </button>
-              </div>
 
+          {/* Right Banner - 70% */}
+          {banners[2] && (
+            <div className="lg:col-span-8 relative rounded-lg overflow-hidden h-96 md:h-full min-h-[400px] lg:min-h-[600px]">
               <img
                 src={`${IMAGE_BASE}${banners[2].slider_image}`}
-                className="absolute right-0 bottom-0 h-full w-1/2 object-cover hidden md:block"
+                alt={banners[2].slider_title || "Special Offer"}
+                className="w-full h-full object-cover"
               />
             </div>
           )}
