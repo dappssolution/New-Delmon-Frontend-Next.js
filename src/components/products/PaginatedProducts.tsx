@@ -1,24 +1,28 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import ProductCard, { Product } from "../common/ProductCard";
 import { homeApi } from "../../service/homeApi";
 import { ProductData, ProductResponse } from "../../types/product.types";
-import { ArrowRight } from "lucide-react";
+import Pagination from "../common/Pagination";
 
-const ProductsGrid = () => {
+const PaginatedProducts = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
 
     useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
             try {
-                // Fetch only 12 products for the home page
-                const response: ProductResponse = await homeApi.getPaginatedProducts(1, 8);
+                const response: ProductResponse = await homeApi.getPaginatedProducts(currentPage, 12);
 
                 if (response.success && response.data?.products?.data) {
-                    const mappedProducts: Product[] = response.data.products.data.map((item: ProductData) => {
+                    const productDataList = response.data.products.data;
+                    setLastPage(response.data.products.last_page);
+
+                    const mappedProducts: Product[] = productDataList.map((item: ProductData) => {
                         let finalPrice = item.selling_price;
                         let oldPrice = undefined;
                         let badge = undefined;
@@ -55,46 +59,39 @@ const ProductsGrid = () => {
         };
 
         fetchProducts();
-    }, []);
+    }, [currentPage]);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        const gridElement = document.getElementById('products-grid-top');
+        if (gridElement) {
+            gridElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     if (loading) {
         return (
-            <section className="py-6 md:py-12 bg-gray-50">
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0d6838]"></div>
-                    </div>
-                </div>
-            </section>
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0d6838]"></div>
+            </div>
         );
     }
 
     return (
-        <section className="py-6 md:py-12 bg-gray-50">
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
-                    <Link href="/products" className="hidden md:flex items-center text-[#0d6838] hover:text-[#0b5c31] font-medium">
-                        View All Products
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                    </Link>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
-                    {products.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-
-                <div className="flex md:hidden justify-center">
-                    <Link href="/products" className="flex items-center justify-center w-full max-w-xs bg-white border border-[#0d6838] text-[#0d6838] py-3 rounded-md font-medium hover:bg-gray-50 transition-colors">
-                        View All Products
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Link>
-                </div>
+        <div id="products-grid-top">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
             </div>
-        </section>
+
+            <Pagination
+                currentPage={currentPage}
+                lastPage={lastPage}
+                onPageChange={handlePageChange}
+            />
+        </div>
     );
 };
 
-export default ProductsGrid;
+export default PaginatedProducts;

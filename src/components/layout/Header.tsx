@@ -13,6 +13,8 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   { name: "SCHOOL ITEMS", hasDropdown: true },
@@ -28,6 +30,7 @@ const menuItems = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <header className="w-full">
@@ -94,7 +97,7 @@ export default function Header() {
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between py-4">
             <div className="flex-shrink-0">
-              <div className="w-48 h-14 bg-white rounded-md flex items-center justify-center border border-gray-200">
+              <div onClick={() => router.push('/')} className="w-48 h-14 bg-white rounded-md flex items-center justify-center border border-gray-200">
                 <Image
                   src="/delmon-logo-only.png"
                   alt="Delmon"
@@ -141,10 +144,10 @@ export default function Header() {
                 <Heart className="w-6 h-6" />
                 <span className="text-xs font-medium">Wishlist</span>
               </button>
-              <button className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[60px]">
-                <User className="w-6 h-6" />
-                <span className="text-xs font-medium">Account</span>
-              </button>
+         <Link href="/account" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[60px]">
+  <User className="w-6 h-6" />
+  <span className="text-xs font-medium">Account</span>
+</Link>
               <button className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 relative min-w-[60px]">
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
