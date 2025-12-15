@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Scale,
@@ -15,22 +15,39 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { homeApi } from "@/src/service/homeApi";
 
-const menuItems = [
-  { name: "SCHOOL ITEMS", hasDropdown: true },
-  { name: "HAND WASH", hasDropdown: false },
-  { name: "FIRE PROOF", hasDropdown: false },
-  { name: "BRANDS", hasDropdown: true },
-  { name: "ART & ARCHITECTURE", hasDropdown: false },
-  { name: "ACCESSORIES", hasDropdown: true },
-  { name: "EQUIPMENT", hasDropdown: false },
-  { name: "ELECTRONICS", hasDropdown: true },
-];
+interface Category {
+  id: number;
+  main_category_name: string;
+  main_category_slug: string;
+  main_category_image?: string;
+  created_at: string;
+  updated_at?: string;
+  main_category_title: string;
+  main_category_desc: string;
+}
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchMainCategories = async () => {
+      try {
+        const res = await homeApi.getCategories("main-category", 8);
+        console.log("response here:", res);
+        if (res.success && res.data?.data) {
+          setCategories(res.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchMainCategories();
+  }, []);
 
   return (
     <header className="w-full">
@@ -97,7 +114,7 @@ export default function Header() {
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between py-4">
             <div className="flex-shrink-0">
-              <div onClick={() => router.push('/')} className="w-48 h-14 bg-white rounded-md flex items-center justify-center border border-gray-200">
+              <div onClick={() => router.push('/')} className="w-48 h-14 bg-white rounded-md flex items-center justify-center border border-gray-200 cursor-pointer">
                 <Image
                   src="/delmon-logo-only.png"
                   alt="Delmon"
@@ -144,10 +161,10 @@ export default function Header() {
                 <Heart className="w-6 h-6" />
                 <span className="text-xs font-medium">Wishlist</span>
               </button>
-         <Link href="/account" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[60px]">
-  <User className="w-6 h-6" />
-  <span className="text-xs font-medium">Account</span>
-</Link>
+              <Link href="/account" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[60px]">
+                <User className="w-6 h-6" />
+                <span className="text-xs font-medium">Account</span>
+              </Link>
               <button className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 relative min-w-[60px]">
                 <div className="relative">
                   <ShoppingCart className="w-6 h-6" />
@@ -165,16 +182,21 @@ export default function Header() {
       {/* Desktop Navigation */}
       <nav className="hidden lg:block bg-[#0d6838]">
         <div className="max-w-[1400px] mx-auto px-6">
-          <div className="flex items-center justify-center overflow-x-auto">
-            {menuItems.map((item, idx) => (
-              <button
-                key={idx}
-                className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap"
-              >
-                <span>{item.name}</span>
-                {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
-              </button>
-            ))}
+          <div className="flex items-center justify-center flex-wrap">
+            {categories.length > 0 ? (
+              categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => router.push(`/category/${category.main_category_slug}`)}
+                  className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap"
+                >
+                  <span>{category.main_category_name}</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              ))
+            ) : (
+              <div className="text-white py-3.5 text-[13px]">Loading categories...</div>
+            )}
           </div>
         </div>
       </nav>
@@ -183,15 +205,23 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2">
-            {menuItems.map((item, idx) => (
-              <button
-                key={idx}
-                className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-medium border-b border-gray-100 last:border-0"
-              >
-                <span>{item.name}</span>
-                {item.hasDropdown && <ChevronDown className="w-4 h-4" />}
-              </button>
-            ))}
+            {categories.length > 0 ? (
+              categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => {
+                    router.push(`/category/${category.main_category_slug}`);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-medium border-b border-gray-100 last:border-0"
+                >
+                  <span>{category.main_category_name}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              ))
+            ) : (
+              <div className="py-3 text-gray-500 text-sm">Loading categories...</div>
+            )}
             
             <div className="flex items-center gap-4 py-4 border-t border-gray-200 mt-2">
               <button className="flex items-center gap-2 text-gray-700">

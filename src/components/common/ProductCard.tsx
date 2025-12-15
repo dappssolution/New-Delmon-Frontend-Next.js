@@ -31,8 +31,8 @@ export default function ProductCard({
                         {product.badge}
                     </span>
                 )}
-                <button className="absolute top-3 md:top-4 right-3 md:right-4 w-8 h-8 md:w-9 md:h-9 bg-white rounded-full flex items-center justify-center shadow-sm hover:bg-green-700 hover:text-white z-10">
-                    <Heart className="w-4 h-4 md:w-5 md:h-5" />
+                <button className="absolute top-3 md:top-4 right-3 md:right-4 w-8 h-8 md:w-9 md:h-9 bg-white rounded-full flex items-center justify-center shadow-sm border hover:border-green-700 hover:text-white z-10">
+                    <Heart className="w-4 h-4 md:w-5 md:h-5 text-green-700" />
                 </button>
                 <Link href={`/product/${product.id}`} className="block w-full h-full">
                     <img
@@ -64,10 +64,10 @@ export default function ProductCard({
                         Add To Cart
                     </button>
                     <button className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-300 rounded flex items-center justify-center hover:border-green-700 hover:text-green-700">
-                        <Scale className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <Scale className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-700" />
                     </button>
                     <button className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-300 rounded flex items-center justify-center hover:border-green-700 hover:text-green-700">
-                        <Eye className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-700" />
                     </button>
                 </div>
             </div>

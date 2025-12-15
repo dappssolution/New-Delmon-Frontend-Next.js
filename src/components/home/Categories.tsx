@@ -1,76 +1,124 @@
-import React from 'react';
+"use client";
 
-const BookCategories = () => {
-  const categories = [
-    {
-      name: 'History',
-      bgColor: 'bg-red-100',
-      image: 'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Science Fiction',
-      bgColor: 'bg-green-100',
-      image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Literature',
-      bgColor: 'bg-yellow-100',
-      image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Novel',
-      bgColor: 'bg-gray-200',
-      image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Travelogue',
-      bgColor: 'bg-green-50',
-      image: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Comics',
-      bgColor: 'bg-cyan-100',
-      image: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'Coloring',
-      bgColor: 'bg-pink-100',
-      image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=300&h=300&fit=crop'
-    },
-    {
-      name: 'History',
-      bgColor: 'bg-orange-100',
-      image: 'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=300&h=300&fit=crop'
-    }
-  ];
+import React, { useEffect, useState } from "react";
+import { homeApi } from "../../service/homeApi";
+import Link from "next/link";
 
-  return (
-    <section className="py-6 md:py-12">
+const bgColors = [
+  "bg-red-100",
+  "bg-green-100",
+  "bg-yellow-100",
+  "bg-gray-200",
+  "bg-green-50",
+  "bg-cyan-100",
+  "bg-pink-100",
+  "bg-orange-100",
+];
+
+export interface Category {
+  id: number
+  main_category_id: number
+  category_name: string
+  category_slug: string
+  category_image?: string
+  created_at: string
+  updated_at: string
+  meta_title: string
+  meta_description: string
+  meta_keywords: string
+}
+
+export interface Link {
+  url?: string
+  label: string
+  active: boolean
+}
+const Categories = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await homeApi.getCategories("category");
+
+        // ✅ FIX: paginated response → extract inner data
+        setCategories(res.data.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  console.log("cateogeissss:", categories);
+  
+
+  if (loading) {
+    return (
+      <section className="py-6 md:py-12">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-4 md:gap-8 overflow-x-auto pb-4">
-            {categories.map((cat, idx) => (
-              <div
-                key={idx}
-                className="flex flex-col items-center gap-2 md:gap-4 flex-shrink-0 cursor-pointer group"
-              >
-                <div
-                  className={`w-24 h-24 md:w-36 md:h-36 rounded-full ${cat.bgColor} flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105`}
-                >
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-14 h-20 md:w-20 md:h-28 object-cover shadow-lg"
-                  />
-                </div>
-                <p className="text-gray-900 font-medium text-xs md:text-base text-center">
-                  {cat.name}
-                </p>
+          <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-gray-100 animate-pulse" />
+                <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
               </div>
             ))}
           </div>
         </div>
       </section>
+    );
+  }
+
+  if (!categories.length) return null;
+
+  return (
+    <section className="py-6 md:py-12">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4 scrollbar-hide">
+          {categories.map((cat, idx) => {
+            const bgColor = bgColors[idx % bgColors.length];
+
+            const imageUrl = cat.category_image
+              ? cat.category_image.startsWith("http")
+                ? cat.category_image
+                : `https://palegoldenrod-wombat-569197.hostingersite.com/${cat.category_image}`
+              : "https://placehold.co/150x150?text=No+Image";
+
+            return (
+              <Link
+                key={cat.id}
+                href={`/products?category=${cat.category_slug}`}
+                className="flex flex-col items-center gap-2 md:gap-4 flex-shrink-0 group"
+              >
+                <div
+                  className={`w-24 h-24 md:w-36 md:h-36 rounded-full ${bgColor} flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105`}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={cat.category_name}
+                    className="w-14 h-20 md:w-20 md:h-28 object-contain mix-blend-multiply"
+                    onError={(e) => {
+                      (e.currentTarget.src =
+                        "https://placehold.co/150x150?text=No+Image");
+                    }}
+                  />
+                </div>
+
+                <p className="text-gray-900 font-medium text-xs md:text-base text-center max-w-[100px] line-clamp-2">
+                  {cat.category_name}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 };
 
-export default BookCategories;
+export default Categories;
