@@ -1,52 +1,78 @@
-import React from "react";
+"use client";
+
+import { homeApi } from "@/src/service/homeApi";
+import { Brand } from "@/src/types/home.types";
+import { useEffect, useState } from "react";
 
 const BrandsSection = () => {
-  const brands = [
-    {
-      name: "Brand 1",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 2",
-      logo: "https://images.unsplash.com/photo-1611329857570-f02f340e7378?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 3",
-      logo: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 4",
-      logo: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 5",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 6",
-      logo: "https://images.unsplash.com/photo-1611329857570-f02f340e7378?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 7",
-      logo: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?w=200&h=200&fit=crop",
-    },
-    {
-      name: "Brand 8",
-      logo: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&h=200&fit=crop",
-    },
-  ];
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await homeApi.getBrands();
+        if (res.success && res.data?.brands) {
+          setBrands(res.data.brands);
+        }
+      } catch (error) {
+        console.error("Error fetching brands:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBrands();
+  }, []);
+
+  const duplicatedBrands = [...brands, ...brands, ...brands];
+
+  if (loading) {
+    return (
+      <section className="py-6 md:py-8 bg-gray-50">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-700"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-6 md:py-8 bg-gray-50">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-center gap-8 md:gap-16 flex-wrap">
-          {brands.map((brand, idx) => (
-            <img
-              key={idx}
-              src={brand.logo}
-              alt={brand.name}
-              className="h-8 md:h-10 object-contain opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-            />
+      <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 overflow-hidden">
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes scroll {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(calc(-100% / 3));
+            }
+          }
+          
+          .animate-scroll {
+            animation: scroll 40s linear infinite;
+          }
+          
+          .animate-scroll:hover {
+            animation-play-state: paused;
+          }
+        `}} />
+        <div className="flex items-center animate-scroll">
+          {duplicatedBrands.map((brand, idx) => (
+            <div
+              key={`${brand.id}-${idx}`}
+              className="flex-shrink-0 px-6 md:px-10"
+            >
+              <img
+                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
+                alt={brand.brand_name}
+                className="h-8 md:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer grayscale hover:grayscale-0"
+              />
+            </div>
           ))}
         </div>
       </div>

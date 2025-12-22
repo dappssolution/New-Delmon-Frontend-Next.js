@@ -90,7 +90,7 @@ const Categories = () => {
             return (
               <Link
                 key={cat.id}
-                href={`/products?category=${cat.category_slug}`}
+                href={`/category/${cat.category_slug}`}
                 className="flex flex-col items-center gap-2 md:gap-4 flex-shrink-0 group"
               >
                 <div

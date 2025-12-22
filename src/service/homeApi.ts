@@ -1,4 +1,5 @@
 import api from "../lib/axios";
+import { SliderResponse } from "../types/home.types";
 
 export const homeApi = {
   async getBanners() {
@@ -47,5 +48,38 @@ export const homeApi = {
   async getAllCategories(perPage: number = 10, page: number = 1) {
     const res = await api.get(`/all-categories?per_page=${perPage}&page=${page}`);
     return res.data;
+  },
+  async getProductsByCategorySlug(
+    categoryType: "main-category" | "category" | "sub-category",
+    slug: string,
+    params?: {
+      per_page?: number;
+      simple?: boolean;
+      page: number;
+    }
+  ) {
+    const res = await api.get(
+      `/${categoryType}/${slug}/products`,
+      {
+        params: {
+          simple: params?.simple ?? true,
+          per_page: params?.per_page ?? 10,
+          page: params?.page ?? 1,
+        },
+      }
+    );
+
+    return res.data;
+  },
+
+  async getBrands() {
+    const res = await api.get('/brands');
+    return res.data;
+  },
+
+  async getSlider() {
+    const res = await api.get<SliderResponse>('/get-sliders');
+    return res.data;
   }
+
 };

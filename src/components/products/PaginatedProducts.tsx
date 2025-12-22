@@ -40,6 +40,9 @@ const PaginatedProducts = () => {
                             }
                         }
 
+                        const colors = item.product_color ? item.product_color.split(',').map(c => c.trim()).filter(Boolean) : [];
+                        const sizes = item.product_size ? item.product_size.split(',').map(s => s.trim()).filter(Boolean) : [];
+
                         return {
                             id: item.id,
                             slug: item.product_slug,
@@ -48,7 +51,9 @@ const PaginatedProducts = () => {
                             price: `AED${finalPrice}`,
                             oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
                             image: `https://palegoldenrod-wombat-569197.hostingersite.com/${item.product_thambnail}`,
-                            badge: badge
+                            badge: badge,
+                            colors: colors.length > 0 ? colors : undefined,
+                            sizes: sizes.length > 0 ? sizes : undefined
                         };
                     });
                     setProducts(mappedProducts);

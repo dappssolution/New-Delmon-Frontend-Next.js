@@ -173,9 +173,9 @@ export default function ShoppingCart() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Cart Items Section */}
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-lg border-2 border-blue-500 p-6">
-                                {/* Table Header */}
-                                <div className="grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 font-semibold text-gray-700">
+                            <div className="bg-white rounded-lg border-2 border-blue-500 p-4 sm:p-6">
+                                {/* Table Header - Desktop Only */}
+                                <div className="hidden md:grid grid-cols-12 gap-4 pb-4 border-b border-gray-200 font-semibold text-gray-700">
                                     <div className="col-span-4">Product Name</div>
                                     <div className="col-span-2 text-center">Size</div>
                                     <div className="col-span-2 text-center">Color</div>
@@ -187,80 +187,144 @@ export default function ShoppingCart() {
                                 {/* Cart Items */}
                                 <div className="divide-y divide-gray-200">
                                     {cartItems.map((item) => (
-                                        <div
-                                            key={item.id}
-                                            className="grid grid-cols-12 gap-4 py-6 items-center"
-                                        >
-                                            {/* Product Info */}
-                                            <div className="col-span-4 flex items-center gap-4">
-                                                <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden relative shrink-0">
+                                        <div key={item.id} className="py-6">
+                                            {/* Mobile View */}
+                                            <div className="flex gap-4 md:hidden">
+                                                {/* Image */}
+                                                <div className="w-24 h-24 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden relative shrink-0">
                                                     <Image
                                                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.img}`}
                                                         alt={item.name}
-                                                        width={50}
-                                                        height={50}
+                                                        width={60}
+                                                        height={60}
                                                         className="object-contain"
                                                     />
                                                 </div>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
-                                                        {item.name}
-                                                    </h3>
-                                                </div>
-                                            </div>
 
-                                            {/* Size */}
-                                            <div className="col-span-2 text-center font-medium text-gray-900 text-sm">
-                                                {item.size || "-"}
-                                            </div>
-
-                                            {/* Color */}
-                                            <div className="col-span-2 text-center font-medium text-gray-900 text-sm">
-                                                {item.color || "-"}
-                                            </div>
-
-                                            {/* Quantity Controls */}
-                                            <div className="col-span-2 flex justify-center">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="flex items-center border border-gray-300 rounded-full overflow-hidden h-8">
+                                                {/* Content */}
+                                                <div className="flex-1 flex flex-col justify-between">
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <div>
+                                                            <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
+                                                                {item.name}
+                                                            </h3>
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                {item.size || "-"} | {item.color || "-"}
+                                                            </p>
+                                                        </div>
                                                         <button
-                                                            onClick={() => updateQuantity(item.id, -1)}
-                                                            className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600"
-                                                            disabled={localQuantities[item.id] <= 1}
+                                                            onClick={() => handleRemoveItem(item.id)}
+                                                            className="p-1.5 -mr-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                            disabled={loading}
                                                         >
-                                                            -
-                                                        </button>
-                                                        <span className="w-10 text-center text-sm font-medium">
-                                                            {localQuantities[item.id] ?? item.qty}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => updateQuantity(item.id, 1)}
-                                                            className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600"
-                                                        >
-                                                            +
+                                                            <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    {updatingItems.has(item.id) && (
-                                                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                                    )}
+
+                                                    <div className="flex justify-between items-end mt-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex items-center border border-gray-300 rounded-md h-8 bg-white">
+                                                                <button
+                                                                    onClick={() => updateQuantity(item.id, -1)}
+                                                                    className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                                                    disabled={localQuantities[item.id] <= 1}
+                                                                >
+                                                                    -
+                                                                </button>
+                                                                <span className="w-8 text-center text-sm font-medium">
+                                                                    {localQuantities[item.id] ?? item.qty}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => updateQuantity(item.id, 1)}
+                                                                    className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                            {updatingItems.has(item.id) && (
+                                                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                                            )}
+                                                        </div>
+                                                        <div className="font-bold text-gray-900">
+                                                            {item.total.toFixed(2)}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            {/* Total Price */}
-                                            <div className="col-span-1 text-center font-semibold text-gray-900 text-sm">
-                                                {item.total.toFixed(2)}
-                                            </div>
+                                            {/* Desktop View */}
+                                            <div className="hidden md:grid grid-cols-12 gap-4 items-center">
+                                                {/* Product Info */}
+                                                <div className="col-span-4 flex items-center gap-4">
+                                                    <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden relative shrink-0">
+                                                        <Image
+                                                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.img}`}
+                                                            alt={item.name}
+                                                            width={50}
+                                                            height={50}
+                                                            className="object-contain"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
+                                                            {item.name}
+                                                        </h3>
+                                                    </div>
+                                                </div>
 
-                                            {/* Delete Button */}
-                                            <div className="col-span-1 flex justify-center">
-                                                <button
-                                                    onClick={() => handleRemoveItem(item.id)}
-                                                    className="p-1.5 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors disabled:opacity-50 text-gray-400"
-                                                    aria-label="Remove item"
-                                                    disabled={loading}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {/* Size */}
+                                                <div className="col-span-2 text-center font-medium text-gray-900 text-sm">
+                                                    {item.size || "-"}
+                                                </div>
+
+                                                {/* Color */}
+                                                <div className="col-span-2 text-center font-medium text-gray-900 text-sm">
+                                                    {item.color || "-"}
+                                                </div>
+
+                                                {/* Quantity Controls */}
+                                                <div className="col-span-2 flex justify-center">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex items-center border border-gray-300 rounded-full overflow-hidden h-8">
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, -1)}
+                                                                className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600"
+                                                                disabled={localQuantities[item.id] <= 1}
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span className="w-10 text-center text-sm font-medium">
+                                                                {localQuantities[item.id] ?? item.qty}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, 1)}
+                                                                className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                        {updatingItems.has(item.id) && (
+                                                            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Total Price */}
+                                                <div className="col-span-1 text-center font-semibold text-gray-900 text-sm">
+                                                    {item.total.toFixed(2)}
+                                                </div>
+
+                                                {/* Delete Button */}
+                                                <div className="col-span-1 flex justify-center">
+                                                    <button
+                                                        onClick={() => handleRemoveItem(item.id)}
+                                                        className="p-1.5 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors disabled:opacity-50 text-gray-400"
+                                                        aria-label="Remove item"
+                                                        disabled={loading}
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}

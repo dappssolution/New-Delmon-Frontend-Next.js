@@ -2,7 +2,7 @@ import api from "../lib/axios";
 import { CartResponse, UpdateCartResponse, RemoveCartResponse } from "../types/cart.types";
 
 export interface AddToCartPayload {
-  quantity?: number;
+  qty?: number;
   color?: string;
   size?: string;
 }

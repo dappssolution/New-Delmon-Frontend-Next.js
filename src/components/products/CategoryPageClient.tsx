@@ -2,32 +2,84 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import ProductCard, { Product } from "../common/ProductCard";
 import Pagination from "../common/Pagination";
 import { homeApi } from "../../service/homeApi";
 
+export interface CategoryProductResponse {
+    success: boolean
+    message: string
+    data: CategoryProductData[]
+    meta: Meta
+}
+
+export interface CategoryProductData {
+    id: number
+    product_name: string
+    product_slug: string
+    product_thambnail: string
+    selling_price: string
+    discount_price: any
+    product_size?: string
+    product_color?: string
+    brand_id: number
+    category_id: number
+    brand: Brand
+    category: Category
+}
+
+export interface Brand {
+    id: number
+    brand_name: string
+    brand_slug: string
+}
+
+export interface Category {
+    id: number
+    category_name: string
+    category_slug: string
+}
+
+export interface Meta {
+    total: number
+    current_loaded: number
+    loaded: number
+    prev_page: any
+    next_page: number
+    current_page: number
+    last_page: number
+}
 
 interface CategoryPageClientProps {
     slug: string;
+    categoryType: "main-category" | "category" | "sub-category";
 }
 
-const CategoryPageClient = ({ slug }: CategoryPageClientProps) => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [newProducts, setNewProducts] = useState<Product[]>([]);
+const CategoryPageClient = ({ slug, categoryType }: CategoryPageClientProps) => {
+    const [products, setProducts] = useState<CategoryProductData[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [categoryName, setCategoryName] = useState("");
 
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await homeApi.getPaginatedProducts(currentPage, 12, { category: slug });
-                if (res.success && res.data?.products?.data) {
-                    setLastPage(res.data.products.last_page);
-                    const mapped = mapProducts(res.data.products.data);
-                    setProducts(mapped);
+                const res: CategoryProductResponse = await homeApi.getProductsByCategorySlug(
+                    categoryType,
+                    slug,
+                    {
+                        per_page: 12,
+                        simple: true,
+                        page: currentPage,
+                    }
+                );
+
+                if (res.success && res?.data) {
+                    setLastPage(res.meta.last_page || 1);
+                    setProducts(res?.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch products", error);
@@ -36,49 +88,29 @@ const CategoryPageClient = ({ slug }: CategoryPageClientProps) => {
             }
         };
         if (slug) fetchProducts();
-    }, [slug, currentPage]);
+    }, [slug, categoryType, currentPage]);
 
-    useEffect(() => {
-        const fetchGlobalNew = async () => {
-            try {
-                const res = await homeApi.getPaginatedProducts(1, 4, { new_product: 1 });
-                if (res.success && res.data?.products?.data) {
-                    setNewProducts(mapProducts(res.data.products.data));
-                }
-            } catch (e) { }
+    const transformProduct = (apiProduct: CategoryProductData): Product => {
+        const hasDiscount = apiProduct.discount_price && parseFloat(apiProduct.discount_price) > 0;
+        const discountPercent = hasDiscount
+            ? Math.round(((parseFloat(apiProduct.selling_price) - parseFloat(apiProduct.discount_price)) / parseFloat(apiProduct.selling_price)) * 100)
+            : null;
+
+        const colors = apiProduct.product_color ? apiProduct.product_color.split(',').map(c => c.trim()).filter(Boolean) : [];
+        const sizes = apiProduct.product_size ? apiProduct.product_size.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+        return {
+            id: apiProduct.id,
+            slug: apiProduct.product_slug,
+            category: apiProduct.category?.category_name || "Product",
+            title: apiProduct.product_name,
+            price: hasDiscount ? `AED ${apiProduct.discount_price}` : `AED ${apiProduct.selling_price}`,
+            oldPrice: hasDiscount ? `AED ${apiProduct.selling_price}` : undefined,
+            image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${apiProduct.product_thambnail}`,
+            discount: discountPercent ? `-${discountPercent}%` : undefined,
+            colors: colors.length > 0 ? colors : undefined,
+            sizes: sizes.length > 0 ? sizes : undefined
         };
-        fetchGlobalNew();
-    }, []);
-
-
-    const mapProducts = (data: any[]): Product[] => {
-        return data.map((item: any) => {
-            let finalPrice = item.selling_price;
-            let oldPrice = undefined;
-            let badge = undefined;
-
-            if (item.discount_price) {
-                finalPrice = item.discount_price;
-                oldPrice = item.selling_price;
-                const sell = parseFloat(item.selling_price);
-                const disc = parseFloat(item.discount_price);
-                if (sell > 0) {
-                    const percent = Math.round(((sell - disc) / sell) * 100);
-                    badge = `${percent}% Off`;
-                }
-            }
-
-            return {
-                id: item.id,
-                slug: item.product_slug,
-                category: item.category?.category_name || "Uncategorized",
-                title: item.product_name,
-                price: `AED ${finalPrice}`, // Added space
-                oldPrice: oldPrice ? `AED ${oldPrice}` : undefined,
-                image: item.product_thambnail.startsWith('http') ? item.product_thambnail : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
-                badge: badge
-            };
-        });
     };
 
     const handlePageChange = (page: number) => {
@@ -86,29 +118,51 @@ const CategoryPageClient = ({ slug }: CategoryPageClientProps) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const getCategoryTypeLabel = () => {
+        switch (categoryType) {
+            case "main-category":
+                return "Main Category";
+            case "category":
+                return "Category";
+            case "sub-category":
+                return "Sub Category";
+            default:
+                return "Category";
+        }
+    };
+
     return (
         <div className="bg-white min-h-screen pb-12">
             {/* Header / Breadcrumb area */}
             <div className="bg-gray-50 border-b border-gray-100">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
-                    {/* Back button or Breadcrumb */}
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                         <Link href="/" className="hover:text-green-700">Delmon</Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href="/products" className="hover:text-green-700">Home</Link>
+                        <Link href="/all-categories" className="hover:text-green-700">All Categories</Link>
                         <ChevronRight className="w-4 h-4" />
+                        <span className="text-gray-900">{categoryName || slug}</span>
                     </div>
+                    {categoryName && (
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">{categoryName}</h1>
+                            <p className="text-gray-600">{getCategoryTypeLabel()}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
+                <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
                     {/* Main Content */}
-                    <div className="lg:col-span-3">
+                    <div>
                         {/* Header for grid */}
                         <div className="mb-6">
-                            <h2 className="text-gray-500 text-sm font-normal">Showing Some Products</h2>
+                            <h2 className="text-gray-500 text-sm font-normal">
+                                {products.length > 0
+                                    ? `Showing ${products.length} Products`
+                                    : "No Products Found"}
+                            </h2>
                         </div>
 
                         {loading ? (
@@ -117,64 +171,40 @@ const CategoryPageClient = ({ slug }: CategoryPageClientProps) => {
                             </div>
                         ) : products.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {products.map(p => (
-                                        <ProductCard key={p.id} product={p} backgroundColor="bg-gray-50" />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {products.map(apiProduct => (
+                                        <ProductCard
+                                            key={apiProduct.id}
+                                            product={transformProduct(apiProduct)}
+                                            backgroundColor="bg-white"
+                                        />
                                     ))}
                                 </div>
-                                <Pagination
-                                    currentPage={currentPage}
-                                    lastPage={lastPage}
-                                    onPageChange={handlePageChange}
-                                />
+                                {lastPage > 1 && (
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        lastPage={lastPage}
+                                        onPageChange={handlePageChange}
+                                    />
+                                )}
                             </>
                         ) : (
-                            <div className="py-12 text-center text-gray-500">
-                                No products found in this category.
+                            <div className="py-12 text-center">
+                                <div className="text-gray-400 text-6xl mb-4">📦</div>
+                                <p className="text-gray-500 text-lg">No products found in this category.</p>
+                                <Link
+                                    href="/all-categories"
+                                    className="inline-block mt-4 text-green-700 hover:text-green-800 font-medium"
+                                >
+                                    Browse All Categories
+                                </Link>
                             </div>
                         )}
-
-                        {/* New Products Section */}
-                        {newProducts.length > 0 && (
-                            <div className="mt-16">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6">New Products</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {newProducts.map(p => (
-                                        <ProductCard key={p.id} product={p} backgroundColor="bg-gray-50" />
-                                    ))}
-                                </div>
-                                <div className="flex justify-center mt-8">
-                                    {/* Mock pagination or view all for new products if needed, utilizing standard pagination style arrows just for visual matching */}
-                                    <div className="flex gap-2">
-                                        <ArrowLeft className="w-6 h-6 text-green-700 cursor-pointer" />
-                                        <div className="w-8 h-8 rounded-full bg-green-200 text-green-800 flex items-center justify-center font-bold">1</div>
-                                        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-600 flex items-center justify-center">2</div>
-                                        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-600 flex items-center justify-center">3</div>
-                                        <ArrowRight className="w-6 h-6 text-green-700 cursor-pointer" />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Bottom Features (extracted) - Placing it here as requested 'downside feature is created ... use in the footer above section' */}
-                        {/* Actually user said "use in the footer above section" which implies globally, but also said "createa this category detailed page, that downside feature is crated in cart..." */}
-                        {/* I will add it here as per the design mock which likely has it at the bottom, AND I already added it to Cart page. */}
                     </div>
                 </div>
             </div>
-
-            {/* Using the component globally? The user said "use in the footer above section". 
-                If I put it here, it matches the context of "category detailed page".
-                I will put it just above the footer in layout if requested, but for this page specifically, I'll let it be part of the layout if I modify layout, or include here.*/}
-
-            {/* The request implies the feature section should be *moved* or reused. I made it reusable. */}
         </div>
     );
 };
-
-// Simple ArrowRight component for the mock pagination below new products
-const ArrowRight = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-);
 
 export default CategoryPageClient;

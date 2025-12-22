@@ -69,7 +69,7 @@ export default function Header() {
               )}
             </button>
 
-            <div className="flex-shrink-0">
+            <div onClick={() => router.push('/')} className="flex-shrink-0">
               <div className="w-32 h-10 bg-white rounded-md flex items-center justify-center">
                 <Image
                   src="/delmon-logo-only.png"
@@ -185,15 +185,23 @@ export default function Header() {
       <nav className="hidden lg:block bg-[#0d6838]">
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="flex items-center justify-center flex-wrap">
+            {/* View All Categories Button */}
+            <button
+              onClick={() => router.push('/all-categories')}
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700"
+            >
+              <span>View All Categories</span>
+            </button>
+
+            {/* Category Links */}
             {categories.length > 0 ? (
               categories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => router.push(`/category/${category.main_category_slug}`)}
+                  onClick={() => router.push(`/main-category/${category.main_category_slug}`)}
                   className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap"
                 >
                   <span>{category.main_category_name}</span>
-                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               ))
             ) : (
@@ -207,18 +215,29 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2">
+            {/* View All Categories - Mobile */}
+            <button
+              onClick={() => {
+                router.push('/all-categories');
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+            >
+              <span>View All Categories</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
             {categories.length > 0 ? (
               categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => {
-                    router.push(`/category/${category.main_category_slug}`);
+                    router.push(`/main-category/${category.main_category_slug}`);
                     setMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-medium border-b border-gray-100 last:border-0"
                 >
                   <span>{category.main_category_name}</span>
-                  <ChevronDown className="w-4 h-4" />
                 </button>
               ))
             ) : (

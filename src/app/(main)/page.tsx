@@ -1,6 +1,4 @@
 import ProductsGrid from "@/src/components/home/ProductGrid";
-import ArtBanner from "../../components/home/ArtBanner";
-import BottomBadges from "../../components/home/Badges";
 import BrandsSection from "../../components/home/Brands";
 import BookCategories from "../../components/home/Categories";
 import CategoryPills from "../../components/home/CategoryPills";
@@ -23,12 +21,8 @@ export default function Home() {
       <BrandsSection />
       {/* More Products */}
       <MoreProducts />
-      {/* Art Banner */}
-      <ArtBanner />
       {/* Category Pills */}
       <CategoryPills />
-      {/* Bottom Badges */}
-      <BottomBadges />
     </div>
   );
 }

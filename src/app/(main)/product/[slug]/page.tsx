@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, ArrowRightLeft, Star, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { homeApi } from "../../../../service/homeApi";
 import ProductCard, { Product as ProductCardType } from "../../../../components/common/ProductCard";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
@@ -242,6 +243,9 @@ export default function ProductDetailsPage() {
                                 }
                             }
 
+                            const colors = item.product_color ? item.product_color.split(',').map(c => c.trim()).filter(Boolean) : [];
+                            const sizes = item.product_size ? item.product_size.split(',').map(s => s.trim()).filter(Boolean) : [];
+
                             return {
                                 id: item.id,
                                 slug: item.product_slug,
@@ -250,7 +254,9 @@ export default function ProductDetailsPage() {
                                 price: `AED${finalPrice}`,
                                 oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
                                 image: `https://palegoldenrod-wombat-569197.hostingersite.com/${item.product_thambnail}`,
-                                badge: badge
+                                badge: badge,
+                                colors: colors.length > 0 ? colors : undefined,
+                                sizes: sizes.length > 0 ? sizes : undefined
                             };
                         });
                         setRelatedProducts(mappedRelated);
@@ -269,6 +275,7 @@ export default function ProductDetailsPage() {
 
     useEffect(() => {
         if (cartMessage) {
+            toast.success(cartMessage);
             const timer = setTimeout(() => {
                 dispatch(clearCartMessage());
             }, 3000);
@@ -278,6 +285,7 @@ export default function ProductDetailsPage() {
 
     useEffect(() => {
         if (cartError) {
+            toast.error(cartError);
             const timer = setTimeout(() => {
                 dispatch(clearCartError());
             }, 5000);
@@ -339,7 +347,6 @@ export default function ProductDetailsPage() {
     const colors = product.product_color ? product.product_color.split(',').map(c => c.trim()) : [];
     const sizes = product.product_size ? product.product_size.split(',').map(s => s.trim()) : [];
 
-    // Toggle accordion logic
     const toggleAccordion = (section: string) => {
         setOpenAccordion(openAccordion === section ? null : section);
     };
@@ -363,23 +370,7 @@ export default function ProductDetailsPage() {
                 </div>
             </div>
 
-            {/* Success Message */}
-            {cartMessage && (
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 mb-4">
-                    <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                        {cartMessage}
-                    </div>
-                </div>
-            )}
 
-            {/* Error Message */}
-            {cartError && (
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 mb-4">
-                    <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        {cartError}
-                    </div>
-                </div>
-            )}
 
             <main className="max-w-[1400px] mx-auto px-4 sm:px-6 mt-4">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -482,8 +473,8 @@ export default function ProductDetailsPage() {
                                                     key={size}
                                                     onClick={() => setSelectedSize(size)}
                                                     className={`px-4 py-2 rounded-lg border transition-all focus:outline-none ${selectedSize === size
-                                                            ? 'border-gray-900 bg-gray-900 text-white'
-                                                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                                                        ? 'border-gray-900 bg-gray-900 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                                                         }`}
                                                 >
                                                     {size}

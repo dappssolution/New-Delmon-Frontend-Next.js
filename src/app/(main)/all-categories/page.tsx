@@ -1,224 +1,288 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import Pagination from "@/src/components/common/Pagination";
 import { homeApi } from "@/src/service/homeApi";
-import { AllCategoriesResponse, MainCategory } from "@/src/types/category.types";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { CategoryCard } from "@/src/components/common";
+import { AllCategoriesResponse } from "@/src/types/category.types";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import React, { useState, useEffect } from "react";
 
-export default function AllCategoriesPage() {
-    const [categoriesData, setCategoriesData] = useState<AllCategoriesResponse | null>(null);
+export default function CategoriesPage() {
+    const [categoriesData, setCategoriesData] =
+        useState<AllCategoriesResponse | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
-    const perPage = 10;
+    const [expandedCategories, setExpandedCategories] = useState<{
+        [key: number]: boolean;
+    }>({});
+    const [expandedSubCategories, setExpandedSubCategories] = useState<{
+        [key: number]: boolean;
+    }>({});
 
     useEffect(() => {
         fetchCategories(currentPage);
     }, [currentPage]);
 
     const fetchCategories = async (page: number) => {
+        setLoading(true);
         try {
-            setLoading(true);
-            setError(null);
-            const response = await homeApi.getAllCategories(perPage, page);
-            setCategoriesData(response);
-
-            // Set first main category as selected by default
-            if (response.data.length > 0 && !selectedMainCategory) {
-                setSelectedMainCategory(response.data[0].main_category_slug);
-            }
-        } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to fetch categories");
+            const data = await homeApi.getAllCategories(10, page);
+            setCategoriesData(data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+    const toggleCategory = (categoryId: number) => {
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [categoryId]: !prev[categoryId],
+        }));
     };
 
-    const getSelectedMainCategoryData = (): MainCategory | null => {
-        if (!categoriesData || !selectedMainCategory) return null;
-        return categoriesData.data.find(
-            (cat) => cat.main_category_slug === selectedMainCategory
-        ) || null;
+    const toggleSubCategory = (subCategoryId: number) => {
+        setExpandedSubCategories((prev) => ({
+            ...prev,
+            [subCategoryId]: !prev[subCategoryId],
+        }));
     };
 
-    const selectedCategoryData = getSelectedMainCategoryData();
-    console.log("categoriesss:", selectedCategoryData);
-
-    if (loading && !categoriesData) {
+    if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
             </div>
         );
     }
 
-    if (error) {
+    if (!categoriesData) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-red-600 mb-4">{error}</p>
-                    <button
-                        onClick={() => fetchCategories(currentPage)}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                        Retry
-                    </button>
-                </div>
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <p className="text-gray-500">No categories found</p>
             </div>
         );
     }
+
+    const isAnyCategoryExpanded = Object.values(expandedCategories).some(Boolean);
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 text-black">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Breadcrumb */}
-                <div className="mb-6 text-sm text-gray-600">
-                    <span>Delmon</span>
-                    <span className="mx-2">›</span>
-                    <span>Home</span>
-                    <span className="mx-2">›</span>
-                    <span className="text-gray-900 font-medium">All Categories</span>
-                </div>
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Sidebar - Hidden on mobile, efficient on desktop */}
+                    <aside className="hidden lg:block w-64 flex-shrink-0">
+                        <div className="bg-white rounded-lg shadow-sm overflow-hidden sticky top-4">
+                            {/* Main Categories Header */}
+                            <div className="bg-green-700 text-white p-4">
+                                <h2 className="font-semibold text-lg flex items-center gap-2">
+                                    <span className="text-xl">☰</span>
+                                    All Categories
+                                </h2>
+                                <p className="text-xs text-green-100 mt-1">
+                                    Welcome to our office supplies
+                                </p>
+                            </div>
 
-                {/* Page Title */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold mb-2">All Categories</h1>
-                    <p className="text-gray-600">
-                        Office supplies for work, school and business
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Sidebar - Main Categories */}
-                    <aside className="lg:col-span-3">
-                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden sticky top-8">
+                            {/* Categories List */}
                             <div className="divide-y divide-gray-200">
-                                {categoriesData?.data.map((mainCategory) => (
-                                    <button
-                                        key={mainCategory.id}
-                                        onClick={() => setSelectedMainCategory(mainCategory.main_category_slug)}
-                                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${selectedMainCategory === mainCategory.main_category_slug
-                                            ? "bg-blue-50 text-blue-600 font-medium border-l-4 border-blue-600"
-                                            : "text-gray-700"
-                                            }`}
-                                    >
-                                        {mainCategory.main_category_name}
-                                    </button>
-                                ))}
-                            </div>
+                                {categoriesData.data.map((mainCategory) => (
+                                    <div key={mainCategory.id}>
+                                        {/* Main Category */}
+                                        <button
+                                            onClick={() => toggleCategory(mainCategory.id)}
+                                            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+                                        >
+                                            <span className="font-medium text-gray-900 text-sm">
+                                                {mainCategory.main_category_name}
+                                            </span>
+                                            <ChevronDown
+                                                className={`w-4 h-4 text-gray-400 transition-transform ${expandedCategories[mainCategory.id]
+                                                        ? "rotate-180"
+                                                        : ""
+                                                    }`}
+                                            />
+                                        </button>
 
-                            {/* More link */}
-                            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                    More
-                                </button>
-                            </div>
-                        </div>
-                    </aside>
+                                        {/* Categories */}
+                                        {expandedCategories[mainCategory.id] && (
+                                            <div className="bg-gray-50">
+                                                {mainCategory.categories.map((category) => (
+                                                    <div key={category.id}>
+                                                        {/* Category */}
+                                                        <button
+                                                            onClick={() => category.sub_categories.length > 0 && toggleSubCategory(category.id)}
+                                                            className={`w-full px-6 py-2.5 flex items-center justify-between hover:bg-gray-100 transition-colors text-left ${category.sub_categories.length === 0 ? 'cursor-default' : ''}`}
+                                                        >
+                                                            <span className="text-gray-700 text-sm">
+                                                                {category.category_name}
+                                                            </span>
+                                                            {category.sub_categories.length > 0 && (
+                                                                <ChevronRight
+                                                                    className={`w-3 h-3 text-gray-400 transition-transform ${expandedSubCategories[category.id]
+                                                                            ? "rotate-90"
+                                                                            : ""
+                                                                        }`}
+                                                                />
+                                                            )}
+                                                        </button>
 
-                    {/* Main Content - Categories and Products */}
-                    <main className="lg:col-span-9">
-                        {selectedCategoryData ? (
-                            <div className="space-y-12">
-                                {selectedCategoryData.categories.map((category) => (
-                                    <div key={category.id}>
-                                        {/* Category Header */}
-                                        <div className="mb-6">
-                                            <h2 className="text-2xl font-bold text-gray-900">
-                                                {category.category_name}
-                                            </h2>
-                                        </div>
-
-                                        {/* Subcategories Grid */}
-                                        {category.sub_categories && category.sub_categories.length > 0 ? (
-                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                                {category.sub_categories.slice(0, 4).map((subCategory) => (
-                                                    <CategoryCard
-                                                        key={subCategory.id}
-                                                        name={subCategory.subcategory_name}
-                                                        slug={subCategory.subcategory_slug}
-                                                        type="subcategory"
-                                                    />
+                                                        {/* Sub Categories */}
+                                                        {expandedSubCategories[category.id] &&
+                                                            category.sub_categories.length > 0 && (
+                                                                <div className="bg-white">
+                                                                    {category.sub_categories.map((subCategory) => (
+                                                                        <Link
+                                                                            key={subCategory.id}
+                                                                            href={`/category/${subCategory.subcategory_slug}`}
+                                                                            className="w-full px-8 py-2 flex items-center hover:bg-gray-50 transition-colors text-left block"
+                                                                        >
+                                                                            <span className="text-gray-600 text-xs">
+                                                                                {subCategory.subcategory_name}
+                                                                            </span>
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                    </div>
                                                 ))}
-                                            </div>
-                                        ) : (
-                                            // Show category card when no subcategories
-                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                                <CategoryCard
-                                                    name={category.category_name}
-                                                    slug={category.category_slug}
-                                                    image={category.category_image}
-                                                    type="category"
-                                                />
                                             </div>
                                         )}
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </aside>
 
-                                {/* Single Category Items (like Fire Proof Bag, Tissue Roll, etc.) */}
-                                <div className="space-y-4">
-                                    {["Fire Proof Bag", "Tissue Roll", "Dettol Hand Wash", "Fairy Liquid", "Ball Pen", "ID Carde Holder"].map((item, index) => (
-                                        <Link
-                                            key={index}
-                                            href="#"
-                                            className="block bg-white rounded-lg border border-gray-200 px-6 py-4 hover:shadow-md hover:border-blue-300 transition-all duration-300"
-                                        >
-                                            <h3 className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors">
-                                                {item}
+                    {/* Main Content */}
+                    <main className="flex-1">
+                        {!isAnyCategoryExpanded ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {categoriesData.data.map((mainCategory) => (
+                                    <Link href={`/main-category/${mainCategory.main_category_slug}`}
+                                        key={mainCategory.id}
+                                        className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                                    >
+                                        <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                                            {mainCategory.main_category_image ? (
+                                                <img
+                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${mainCategory.main_category_image}`}
+                                                    alt={mainCategory.main_category_name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="text-6xl">📦</div>
+                                            )}
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="font-semibold text-gray-900 mb-1">
+                                                {mainCategory.main_category_name}
                                             </h3>
-                                        </Link>
-                                    ))}
-                                </div>
+                                            <p className="text-sm text-gray-500">
+                                                {mainCategory.categories.length}{" "}
+                                                {mainCategory.categories.length === 1
+                                                    ? "category"
+                                                    : "categories"}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         ) : (
-                            <div className="text-center py-20">
-                                <p className="text-gray-600">No categories available</p>
+                            <div className="space-y-6">
+                                {categoriesData.data.map((mainCategory) => {
+                                    if (!expandedCategories[mainCategory.id]) return null;
+
+                                    return (
+                                        <div key={mainCategory.id}>
+                                            {!mainCategory.categories.some(
+                                                (cat) => expandedSubCategories[cat.id]
+                                            ) ? (
+                                                <div>
+                                                    <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                                                        {mainCategory.main_category_name}
+                                                    </h2>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                        {mainCategory.categories.map((category) => (
+                                                            <Link
+                                                                key={category.id}
+                                                                href={`/category/${category.category_slug}`}
+                                                                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                                                            >
+                                                                <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                                                                    {category.category_image ? (
+                                                                        <img
+                                                                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${category.category_image}`}
+                                                                            alt={category.category_name}
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    ) : (
+                                                                        <div className="text-6xl">📂</div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="p-4">
+                                                                    <h3 className="font-semibold text-gray-900 mb-1">
+                                                                        {category.category_name}
+                                                                    </h3>
+                                                                    <p className="text-sm text-gray-500">
+                                                                        {category.sub_categories.length}{" "}
+                                                                        {category.sub_categories.length === 1
+                                                                            ? "subcategory"
+                                                                            : "subcategories"}
+                                                                    </p>
+                                                                </div>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                mainCategory.categories.map((category) => {
+                                                    if (!expandedSubCategories[category.id]) return null;
+
+                                                    return (
+                                                        <div key={category.id}>
+                                                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                                                {category.category_name}
+                                                            </h2>
+                                                            <p className="text-gray-600 mb-6">
+                                                                {mainCategory.main_category_name}
+                                                            </p>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                                {category.sub_categories.map((subCategory) => (
+                                                                    <Link
+                                                                        key={subCategory.id}
+                                                                        href={`/sub-category/${subCategory.subcategory_slug}`}
+                                                                        className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                                                                    >
+                                                                        <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                                                                            <div className="text-6xl">📄</div>
+                                                                        </div>
+                                                                        <div className="p-4">
+                                                                            <h3 className="font-semibold text-gray-900">
+                                                                                {subCategory.subcategory_name}
+                                                                            </h3>
+                                                                        </div>
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
 
                         {/* Pagination */}
-                        {categoriesData && categoriesData.meta.last_page > 1 && (
-                            <div className="mt-12 flex items-center justify-center gap-2">
-                                <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1 || loading}
-                                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-
-                                <div className="flex gap-2">
-                                    {Array.from({ length: categoriesData.meta.last_page }, (_, i) => i + 1).map((page) => (
-                                        <button
-                                            key={page}
-                                            onClick={() => handlePageChange(page)}
-                                            disabled={loading}
-                                            className={`px-4 py-2 rounded-lg border transition-colors ${currentPage === page
-                                                ? "bg-blue-600 text-white border-blue-600"
-                                                : "border-gray-300 hover:bg-gray-50"
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === categoriesData.meta.last_page || loading}
-                                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
+                        {categoriesData.meta.last_page > 1 && (
+                            <Pagination
+                                currentPage={categoriesData.meta.current_page}
+                                lastPage={categoriesData.meta.last_page}
+                                onPageChange={setCurrentPage}
+                            />
                         )}
                     </main>
                 </div>

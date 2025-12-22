@@ -71,25 +71,29 @@ const Pagination: React.FC<PaginationProps> = ({
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      {pages.map((page, index) =>
-        page === "..." ? (
-          <span key={index} className="px-3 py-2 text-gray-400">
-            ...
-          </span>
-        ) : (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`min-w-[40px] h-10 rounded-md border ${
-              currentPage === page
-                ? "bg-[#0d6838] border-[#0d6838] text-white"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          >
-            {page}
-          </button>
-        )
-      )}
+     {pages.map((page, index) =>
+  page === "..." ? (
+    <span
+      key={`ellipsis-${index}`}
+      className="px-3 py-2 text-gray-400"
+    >
+      ...
+    </span>
+  ) : (
+    <button
+      key={`page-${page}`}
+      onClick={() => onPageChange(page)}
+      className={`min-w-[40px] h-10 rounded-md border ${
+        currentPage === page
+          ? "bg-[#0d6838] border-[#0d6838] text-white"
+          : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+      }`}
+    >
+      {page}
+    </button>
+  )
+)}
+
 
       {/* Next */}
       <button
