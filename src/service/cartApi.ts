@@ -36,12 +36,12 @@ export const cartApi = {
     return res.data.data;
   },
 
-  async applyCoupon(code: string) {
+  async applyCoupon(couponName: string) {
     const res = await api.post<CartResponse>(
-      `/cart/coupon`,
-      { code }
+      "/coupon/apply",
+      { coupon_name: couponName }
     );
-    return res.data.data;
+    return res.data;
   },
 
   async removeCoupon() {

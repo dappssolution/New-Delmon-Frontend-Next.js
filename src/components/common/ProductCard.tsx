@@ -157,12 +157,12 @@ export default function ProductCard({
         <>
             <div className={`${backgroundColor} rounded-lg overflow-hidden w-full h-full flex flex-col relative`}>
                 {/* Image Section */}
-                <div className="relative bg-gray-100 aspect-square flex items-center justify-center p-8 shrink-0">
+                <div className="relative bg-gray-100 aspect-square flex items-center justify-center shrink-0">
                     <Link href={`/product/${encodeURIComponent(product.slug)}`} className="block w-full h-full">
                         <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-full object-contain"
+                            className="w-full h-full object-cover"
                         />
                     </Link>
                 </div>

@@ -27,16 +27,16 @@ const HeroSection = () => {
   }, []);
   if (!banners.length) {
     return (
-      <section className="bg-gray-50 py-8">
+      <section className="bg-white py-8">
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="animate-pulse h-72 bg-gray-200 rounded-lg" />
         </div>
       </section>
     );
   }
-  
+
   return (
-    <section className="bg-gray-50 py-4 md:py-8">
+    <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Left Banner - 30% */}
@@ -57,11 +57,11 @@ const HeroSection = () => {
 
           {/* Right Banner - 70% */}
           {banners[2] && (
-            <div className="lg:col-span-8 relative rounded-lg overflow-hidden h-96 md:h-full min-h-[400px] lg:min-h-[600px]">
+            <div className="lg:col-span-8 relative rounded-lg overflow-hidden h-auto md:h-full lg:min-h-[600px]">
               <img
                 src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[2].banner_image}`}
                 alt={banners[2].banner_title || "Special Offer"}
-                className="w-full h-full object-cover"
+                className="w-full h-auto md:h-full md:object-cover"
               />
             </div>
           )}

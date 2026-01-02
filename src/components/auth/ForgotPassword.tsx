@@ -3,15 +3,30 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import FormInput from "@/src/components/common/FormInput";
+import { authApi } from "@/src/service/authApi";
+import { toast } from "sonner";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Send OTP to:", email);
-    // call forgot-password API here
+    setIsLoading(true);
+
+    try {
+      await authApi.forgotPassword(email);
+      toast.success("OTP sent successfully to your email!");
+      router.push(`/otp?email=${encodeURIComponent(email)}`);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || "Failed to send OTP";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,15 +66,16 @@ export default function ForgotPasswordPage() {
                   placeholder="Email *"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 border-[#8fccab] focus:ring-black"
+                  className="h-12 border-[#8fccab] text-black focus:ring-black"
                   required
                 />
 
                 <button
                   type="submit"
-                  className="w-full h-12 rounded-full bg-[#114f30] text-white font-semibold hover:bg-[#0d3d25] transition"
+                  disabled={isLoading}
+                  className="w-full h-12 rounded-full bg-[#114f30] text-white font-semibold hover:bg-[#0d3d25] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send
+                  {isLoading ? "Sending..." : "Send"}
                 </button>
               </form>
 

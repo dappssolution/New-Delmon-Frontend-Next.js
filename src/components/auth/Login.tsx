@@ -16,8 +16,12 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const { loading, error, token } = useSelector(
+  const { loading, error, token, user, verified } = useSelector(
     (state: RootState) => state.auth
+  );
+
+  const { profile } = useSelector(
+    (state: RootState) => state.user
   );
 
   const [form, setForm] = useState({
@@ -34,24 +38,30 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(loginUser(form));
+
+
   };
 
   useEffect(() => {
-    if (token) {
+    if (token && user && verified) {
       toast.success("Login Successful!");
 
       const searchParams = new URLSearchParams(window.location.search);
       const redirectPath = searchParams.get("redirect");
-
       const storedRedirect = sessionStorage.getItem("redirectAfterLogin");
 
-      const destination = redirectPath || storedRedirect || "/";
+      let destination = redirectPath || storedRedirect || "/";
+
+      if (user.role === "vendor") {
+        if (!destination.startsWith("/vendor")) {
+          destination = "/vendor";
+        }
+      }
 
       sessionStorage.removeItem("redirectAfterLogin");
-
       router.push(destination);
     }
-  }, [token, router]);
+  }, [token, user, verified, profile, router]);
 
   useEffect(() => {
     if (error) {

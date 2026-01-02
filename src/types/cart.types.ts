@@ -27,6 +27,8 @@ export interface Cart {
   currency: string;
   tax_percentage: number;
   shipping_config: ShippingConfig;
+  coupon_code?: string;
+  discount_amount?: number;
 }
 
 export interface CartItem {

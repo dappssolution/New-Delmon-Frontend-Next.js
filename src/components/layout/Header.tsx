@@ -201,7 +201,15 @@ export default function Header() {
               onClick={() => router.push('/all-categories')}
               className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700"
             >
-              <span>View All Categories</span>
+              <span>All Categories</span>
+            </button>
+
+            {/* All Brands */}
+            <button
+              onClick={() => router.push('/all-brands')}
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700"
+            >
+              <span>All Brands</span>
             </button>
 
             {/* Category Links */}
@@ -234,7 +242,19 @@ export default function Header() {
               }}
               className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
             >
-              <span>View All Categories</span>
+              <span>All Categories</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {/* All Brands - mobile */}
+            <button
+              onClick={() => {
+                router.push('/all-brands');
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+            >
+              <span>All Brands</span>
               <ChevronDown className="w-4 h-4" />
             </button>
 

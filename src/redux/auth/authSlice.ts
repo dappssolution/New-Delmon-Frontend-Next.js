@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loginUser, registerUser, resendVerificationEmail } from "./authThunk";
+import { loginUser, registerUser, resendVerificationEmail, fetchUserProfile } from "./authThunk";
 import { getAuthToken, removeAuthToken, setAuthToken } from "@/src/utils/authCookies";
 import { removeGuestId } from "@/src/utils/guestId";
 
@@ -9,6 +9,7 @@ interface User {
   email: string;
   phone: string;
   role: string;
+  status: string;
 }
 
 interface AuthState {
@@ -17,6 +18,7 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   message: string | null;
+  verified?: boolean | null;
 }
 
 const initialState: AuthState = {
@@ -25,6 +27,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   message: null,
+  verified: null,
 };
 
 
@@ -74,6 +77,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.message = action.payload.message;
+        state.verified = action.payload.verified;
         setAuthToken(action.payload.token);
         removeGuestId();
       })
@@ -93,6 +97,17 @@ const authSlice = createSlice({
       .addCase(resendVerificationEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+      })
+      .addCase(fetchUserProfile.rejected, (state) => {
+        state.loading = false;
+        state.user = null;
       });
 
   },

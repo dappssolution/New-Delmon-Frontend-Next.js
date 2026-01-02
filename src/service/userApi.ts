@@ -1,13 +1,10 @@
 import api from "../lib/axios";
+import { GetProfileResponse } from "../types/user.types";
 
-/**
- * User API Service
- * All requests automatically include Authorization header via axios interceptor
- */
 
 // Get current user profile
 export const getUserProfile = () => {
-    return api.get("/profile");
+    return api.get<GetProfileResponse>("/profile");
 };
 
 // Update user profile

@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchUserProfile, updateUserPassword } from "./userThunk";
+import { fetchUserProfile as fetchAuthProfile } from "../auth/authThunk";
 import { UserData } from "@/src/types/user.types";
 
 interface UserState {
@@ -33,9 +34,23 @@ const userSlice = createSlice({
         });
         builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
             state.loading = false;
-            state.profile = action.payload.user;
+            state.profile = action.payload.data;
         });
         builder.addCase(fetchUserProfile.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        });
+
+        // Handle Auth Fetch Profile
+        builder.addCase(fetchAuthProfile.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        });
+        builder.addCase(fetchAuthProfile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.profile = action.payload.data;
+        });
+        builder.addCase(fetchAuthProfile.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         });

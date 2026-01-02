@@ -1,45 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Trash2, Loader2 } from "lucide-react";
-
-// Mock data - replace with your actual Redux selectors
-const mockCartItems = [
-  {
-    id: 1,
-    name: "Adidas School bags",
-    img: "product1.jpg",
-    size: "Medium",
-    color: "Yellow",
-    price: 57,
-    qty: 1,
-    total: 57
-  },
-  {
-    id: 2,
-    name: "Adidas School bags",
-    img: "product2.jpg",
-    size: "Medium",
-    color: "Yellow",
-    price: 57,
-    qty: 1,
-    total: 57
-  },
-  {
-    id: 3,
-    name: "Adidas School bags",
-    img: "product3.jpg",
-    size: "Medium",
-    color: "Yellow",
-    price: 57,
-    qty: 1,
-    total: 57
-  }
-];
+import { cartApi } from "@/src/service/cartApi";
+import { checkoutApi } from "@/src/service/checkoutApi";
+import { Cart, CartItem } from "@/src/types/cart.types";
+import { DivisionData, DistrictData, StateData } from "@/src/types/checkout.types";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
-  const [cartItems, setCartItems] = useState(mockCartItems);
+  const router = useRouter();
+  const [cart, setCart] = useState<Cart | null>(null);
+  const [divisions, setDivisions] = useState<DivisionData[]>([]);
+  const [districts, setDistricts] = useState<DistrictData[]>([]);
+  const [states, setStates] = useState<StateData[]>([]);
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -51,51 +27,192 @@ export default function CheckoutPage() {
     zipCode: "",
     additionalAddress: ""
   });
-  const [paymentMethod, setPaymentMethod] = useState("TAP");
+  const [paymentMethod, setPaymentMethod] = useState("tap");
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
-  // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.total, 0);
-  const taxRate = 0.05; // 5%
-  const tax = subtotal * taxRate;
-  const shipping = 67;
-  const grandTotal = subtotal + tax + shipping;
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      setInitialLoading(true);
+      const [cartData, divisionsData] = await Promise.all([
+        cartApi.getCart(),
+        checkoutApi.getDivisions()
+      ]);
+      setCart(cartData);
+      setDivisions(divisionsData);
+    } catch (error) {
+      console.error("Error fetching initial data:", error);
+      toast.error("Failed to load checkout data");
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.division) {
+      fetchDistricts(Number(formData.division));
+    } else {
+      setDistricts([]);
+      setStates([]);
+    }
+  }, [formData.division]);
+
+  useEffect(() => {
+    if (formData.district) {
+      fetchStates(Number(formData.district));
+    } else {
+      setStates([]);
+    }
+  }, [formData.district]);
+
+  const fetchDistricts = async (divisionId: number) => {
+    try {
+      const data = await checkoutApi.getDistricts(divisionId);
+      setDistricts(data);
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
+  const fetchStates = async (districtId: number) => {
+    try {
+      const data = await checkoutApi.getStates(districtId);
+      setStates(data);
+    } catch (error) {
+      console.error("Error fetching states:", error);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const updateQuantity = (id: number, delta: number) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(1, item.qty + delta);
-        return {
-          ...item,
-          qty: newQty,
-          total: item.price * newQty
-        };
+    setFormData(prev => {
+      const newState = { ...prev, [name]: value };
+      if (name === "division") {
+        newState.district = "";
+        newState.state = "";
+      } else if (name === "district") {
+        newState.state = "";
       }
-      return item;
-    }));
+      return newState;
+    });
   };
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const updateQuantity = async (id: number, delta: number) => {
+    if (!cart) return;
+    const item = cart.cart_items.find((i: CartItem) => i.id === id);
+    if (!item) return;
+
+    const newQty = item.qty + delta;
+    if (newQty < 1) return;
+
+    try {
+      await cartApi.updateCartItem(id, newQty);
+      const updatedCart = await cartApi.getCart();
+      setCart(updatedCart);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      toast.error("Failed to update quantity");
+    }
+  };
+
+  const handleRemoveItem = async (id: number) => {
+    try {
+      await cartApi.removeFromCart(id);
+      const updatedCart = await cartApi.getCart();
+      setCart(updatedCart);
+      toast.success("Item removed from cart");
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Failed to remove item");
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    setCouponLoading(true);
+    try {
+      const response = await cartApi.applyCoupon(couponCode);
+      if (response.success) {
+        setCart(response.data);
+        toast.success(response.message || "Coupon applied successfully!");
+        setCouponCode("");
+      } else {
+        toast.error(response.message || "Failed to apply coupon");
+      }
+    } catch (error: any) {
+      console.error("Error applying coupon:", error);
+      toast.error(error.response?.data?.message || "Invalid coupon code");
+    } finally {
+      setCouponLoading(false);
+    }
   };
 
   const handlePlaceOrder = async () => {
-    // Add your order placement logic here
+    if (!formData.name || !formData.phone || !formData.email || !formData.address) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const payload = {
+        shipping_name: formData.name,
+        shipping_phone: formData.phone,
+        shipping_email: formData.email,
+        shipping_address: formData.address,
+        division_id: formData.division ? Number(formData.division) : undefined,
+        district_id: formData.district ? Number(formData.district) : undefined,
+        state_id: formData.state ? Number(formData.state) : undefined,
+        post_code: formData.zipCode,
+        payment_method: paymentMethod
+      };
+
+      const response = await checkoutApi.placeOrder(payload);
+      if (response.success) {
+        toast.success("Order placed successfully!");
+        // router.push(`/order-success?order_id=${response.data.order_id}`);
+      } else {
+        toast.error(response.message || "Failed to place order");
+      }
+    } catch (error: any) {
+      console.error("Error placing order:", error);
+      toast.error(error.response?.data?.message || "Something went wrong while placing the order");
+    } finally {
       setLoading(false);
-      alert("Order placed successfully!");
-    }, 2000);
+    }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (!cart || cart.cart_items.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+        <button
+          onClick={() => router.push("/")}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -120,11 +237,19 @@ export default function CheckoutPage() {
             {/* Cart Items */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="space-y-4">
-                {cartItems.map((item) => (
+                {cart.cart_items.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-0">
                     {/* Product Image */}
                     <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded"></div>
+                      {item.img ? (
+                        <img
+                          src={item.img.startsWith('http') ? item.img : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.img}`}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded"></div>
+                      )}
                     </div>
 
                     {/* Product Info */}
@@ -133,14 +258,18 @@ export default function CheckoutPage() {
                         {item.name}
                       </h3>
                       <div className="flex items-center gap-4 text-xs text-gray-600">
-                        <div>
-                          <span className="font-medium">Size</span>
-                          <p className="text-gray-900">{item.size}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium">Color</span>
-                          <p className="text-gray-900">{item.color}</p>
-                        </div>
+                        {item.size && (
+                          <div>
+                            <span className="font-medium">Size</span>
+                            <p className="text-gray-900">{item.size}</p>
+                          </div>
+                        )}
+                        {item.color && (
+                          <div>
+                            <span className="font-medium">Color</span>
+                            <p className="text-gray-900">{item.color}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -165,7 +294,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Price */}
-                    <div className="w-20 text-right font-semibold text-gray-900">
+                    <div className="w-20 text-right font-semibold text-gray-900 whitespace-nowrap">
                       AED {item.total}
                     </div>
 
@@ -185,7 +314,7 @@ export default function CheckoutPage() {
             {/* Address Form */}
             <div className="bg-white rounded-lg border-2 border-blue-500 p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-900">Address</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <input
@@ -198,7 +327,7 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <input
                     type="tel"
@@ -210,7 +339,7 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <input
                     type="email"
@@ -222,7 +351,7 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <input
                     type="text"
@@ -234,7 +363,7 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <select
                     name="division"
@@ -243,38 +372,48 @@ export default function CheckoutPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
                   >
                     <option value="">Division</option>
-                    <option value="dubai">Dubai</option>
-                    <option value="abudhabi">Abu Dhabi</option>
-                    <option value="sharjah">Sharjah</option>
+                    {divisions.map((div) => (
+                      <option key={div.id} value={div.id}>
+                        {div.devision_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                
-                <div>
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
-                  >
-                    <option value="">State</option>
-                    <option value="state1">State 1</option>
-                    <option value="state2">State 2</option>
-                  </select>
-                </div>
-                
+
                 <div>
                   <select
                     name="district"
                     value={formData.district}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
+                    disabled={!formData.division}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white disabled:bg-gray-50"
                   >
                     <option value="">District</option>
-                    <option value="district1">District 1</option>
-                    <option value="district2">District 2</option>
+                    {districts.map((dist) => (
+                      <option key={dist.id} value={dist.id}>
+                        {dist.district_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                
+
+                <div>
+                  <select
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    disabled={!formData.district}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white disabled:bg-gray-50"
+                  >
+                    <option value="">State</option>
+                    {states.map((st) => (
+                      <option key={st.id} value={st.id}>
+                        {st.state_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div>
                   <input
                     type="text"
@@ -285,7 +424,7 @@ export default function CheckoutPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2">
                   <textarea
                     name="additionalAddress"
@@ -302,20 +441,20 @@ export default function CheckoutPage() {
             {/* Payment Method */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-900">Payment</h2>
-              
+
               <div className="space-y-3 mb-6">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="radio"
                     name="payment"
-                    value="TAP"
-                    checked={paymentMethod === "TAP"}
+                    value="tap"
+                    checked={paymentMethod === "tap"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                     className="w-4 h-4 text-blue-600"
                   />
                   <span className="text-gray-900 font-medium">TAP</span>
                 </label>
-                
+
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="radio"
@@ -361,26 +500,54 @@ export default function CheckoutPage() {
           {/* Right Section - Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-gray-100 rounded-lg p-6 sticky top-8">
+              {/* Coupon Section */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">Have a coupon?</h3>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-gray-900"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center min-w-[80px]"
+                  >
+                    {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="flex justify-between text-gray-700">
                   <span>Sub Total</span>
-                  <span className="font-semibold">AED {subtotal}</span>
+                  <span className="font-semibold">AED {cart.cart_total}</span>
                 </div>
-                
+
+                {cart.discount_amount && cart.discount_amount > 0 && (
+                  <div className="flex justify-between text-gray-700">
+                    <span>Discount</span>
+                    <span className="font-semibold text-green-600">-AED {cart.discount_amount}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-gray-700">
                   <span>Tax</span>
-                  <span className="font-semibold">{(taxRate * 100).toFixed(0)}%</span>
+                  <span className="font-semibold">{cart.tax_percentage}%</span>
                 </div>
-                
+
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span className="font-semibold">AED {shipping}</span>
+                  <span className="font-semibold">AED {cart.shipping_config.cost}</span>
                 </div>
-                
+
                 <div className="border-t border-gray-300 pt-4">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Grand Total</span>
-                    <span>AED {grandTotal}</span>
+                    <span>AED {cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0)}</span>
                   </div>
                 </div>
               </div>

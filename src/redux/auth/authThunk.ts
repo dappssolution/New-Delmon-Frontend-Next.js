@@ -1,6 +1,8 @@
 import api from "@/src/lib/axios";
-import { RegisterResponse } from "@/src/types/auth.types";
+import { LoginResponse, RegisterResponse } from "@/src/types/auth.types";
+import { GetProfileResponse } from "@/src/types/user.types";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getUserProfile } from "@/src/service/userApi";
 
 export const registerUser = createAsyncThunk(
   "auth/register",
@@ -11,6 +13,9 @@ export const registerUser = createAsyncThunk(
       contact_no: string;
       password: string;
       password_confirmation: string;
+      role?: string;
+      username?: string;
+      vendor_join?: string;
     },
     { rejectWithValue }
   ) => {
@@ -33,7 +38,7 @@ export const loginUser = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await api.post("/login", data);
+      const res = await api.post<LoginResponse>("/login", data);
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
@@ -49,6 +54,18 @@ export const resendVerificationEmail = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Failed to resend verification email");
+    }
+  }
+);
+
+export const fetchUserProfile = createAsyncThunk(
+  "auth/fetchUserProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getUserProfile();
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch user profile");
     }
   }
 );

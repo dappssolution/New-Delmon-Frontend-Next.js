@@ -98,7 +98,7 @@ export default function PromoBanner() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="relative group">
 
-          <div className="relative h-[25rem] md:h-64 w-full">
+          <div className="relative h-[27rem] md:h-64 w-full">
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
                 key={page}
@@ -128,11 +128,7 @@ export default function PromoBanner() {
                 {currentSliders.map((slider, index) => (
                   <div
                     key={slider.id}
-                    className={`relative rounded-lg h-48 md:h-64 flex items-center px-6 md:px-12 overflow-hidden
-                    ${index === 0
-                        ? "bg-gradient-to-br from-cyan-200 to-cyan-300"
-                        : "bg-gradient-to-br from-orange-100 to-orange-200"
-                      }`}
+                    className={`relative rounded-lg h-48 md:h-64 flex items-center px-6 md:px-12 overflow-hidden bg-white`}
                   >
                     {/* Text */}
                     <div className="z-10 relative">
@@ -157,7 +153,7 @@ export default function PromoBanner() {
                       transition={{ delay: 0.3, duration: 0.5 }}
                       src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${slider.slider_image}`}
                       alt={slider.slider_title}
-                      className="absolute right-4 md:right-8 h-40 md:h-56 w-auto object-contain"
+                      className="absolute right-4 md:right-8 h-40 md:h-56 w-auto object-fill"
                     />
                   </div>
                 ))}

@@ -99,7 +99,7 @@ const Categories = () => {
                   <img
                     src={imageUrl}
                     alt={cat.category_name}
-                    className="w-14 h-20 md:w-20 md:h-28 object-contain mix-blend-multiply"
+                    className="w-14 h-20 md:w-20 md:h-28 object-cover mix-blend-multiply"
                     onError={(e) => {
                       (e.currentTarget.src =
                         "https://placehold.co/150x150?text=No+Image");

@@ -1,6 +1,7 @@
 import React from "react";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -15,12 +16,12 @@ const Footer = () => {
               <div className="mb-6">
                 <div className="w-44 h-16 rounded-md flex items-center justify-center">
                   <Image
-                  src="/delmon white.png"
-                  alt="Delmon"
-                  width={170}
-                  height={60}
-                  priority
-                />
+                    src="/delmon white.png"
+                    alt="Delmon"
+                    width={170}
+                    height={60}
+                    priority
+                  />
                 </div>
               </div>
 
@@ -57,20 +58,20 @@ const Footer = () => {
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/terms-and-conditions"
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/privacy-policy"
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a
@@ -155,20 +156,20 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 md:space-y-3">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/register?role=vendor"
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Become a Vendor
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/login"
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Login to Vendor Panel
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a

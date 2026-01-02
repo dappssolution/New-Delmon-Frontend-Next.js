@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useRouter, usePathname } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import { getAuthToken } from "@/src/utils/authCookies";
+import { fetchUserProfile } from "@/src/redux/auth/authThunk";
 import Loading from "@/src/components/common/Loading";
+import { UserData } from "@/src/types/user.types";
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -29,29 +31,52 @@ export default function ProtectedRoute({
     children,
     redirectTo = "/login",
 }: ProtectedRouteProps) {
+
     const router = useRouter();
-    const { token } = useSelector((state: RootState) => state.auth);
+    const pathname = usePathname();
+    const dispatch = useAppDispatch();
+    const { token, user, loading: authLoading } = useAppSelector((state: RootState) => state.auth);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
         const cookieToken = getAuthToken();
         const hasToken = Boolean(token || cookieToken);
 
-        if (!hasToken) {
-            const currentPath = window.location.pathname;
-            sessionStorage.setItem("redirectAfterLogin", currentPath);
+        const checkAuth = async () => {
+            if (!hasToken) {
+                const currentPath = window.location.pathname;
+                sessionStorage.setItem("redirectAfterLogin", currentPath);
 
-            router.replace(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
-            setIsAuthenticated(false);
-        } else {
-            setIsAuthenticated(true);
-        }
+                router.replace(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
+                setIsAuthenticated(false);
+                setIsChecking(false);
+            } else {
+                if (!user && !authLoading) {
+                    try {
+                        await dispatch(fetchUserProfile()).unwrap();
+                    } catch (error) {
+                        console.error("Failed to fetch profile:", error);
+                    }
+                }
 
-        setIsLoading(false);
-    }, [token, router, redirectTo]);
+                if (user) {
+                    const currentUser = user as unknown as UserData;
+                    if (currentUser.email_verified_at === null && pathname !== "/verify-email") {
+                        router.replace("/verify-email/0/0");
+                        return;
+                    }
+                }
 
-    if (isLoading || isAuthenticated === null) {
+                setIsAuthenticated(true);
+                setIsChecking(false);
+            }
+        };
+
+        checkAuth();
+    }, [token, user, router, redirectTo, dispatch, authLoading]);
+
+    if (isChecking || (isAuthenticated && !user && authLoading)) {
         return <Loading fullScreen />;
     }
 

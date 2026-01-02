@@ -126,7 +126,7 @@ export default function ShoppingCart() {
     const cartItems = cart?.cart_items || [];
     const subtotal = cart?.cart_total || 0;
     const shippingCost = cart?.shipping_config?.cost || cart?.shipping_config?.custom_cost || 0;
-    const discount = 0;
+    const discount = cart?.discount_amount || 0;
     const deliveryFee = shippingCost;
     const total = subtotal + shippingCost;
 

@@ -4,6 +4,10 @@ import authSlice from "./auth/authSlice";
 import userSlice from "./user/userSlice";
 import cartSlice from "./cart/cartSlice";
 import wishlistSlice from "./wishlist/wishlistSlice";
+import brandSlice from "./brand/brandSlice";
+import categorySlice from "./category/categorySlice";
+import subCategorySlice from "./subCategory/subcategorySlice";
+import vendorSlice from "./vendor/vendorSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +16,10 @@ export const store = configureStore({
     user: userSlice,
     cart: cartSlice,
     wishlist: wishlistSlice,
+    brand: brandSlice,
+    category: categorySlice,
+    subCategory: subCategorySlice,
+    vendor: vendorSlice,
   },
 });
 

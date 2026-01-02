@@ -81,8 +81,8 @@ export const applyCoupon = createAsyncThunk(
     "cart/applyCoupon",
     async (code: string, { rejectWithValue }) => {
         try {
-            const data = await cartApi.applyCoupon(code);
-            return data;
+            const response = await cartApi.applyCoupon(code);
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(
                 error.response?.data?.message || "Failed to apply coupon"

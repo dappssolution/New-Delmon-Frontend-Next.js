@@ -49,7 +49,7 @@ export default function VerifyEmailPage() {
       {/* Outer Border */}
       <div className="w-full max-w-6xl border border-[#8fccab] rounded-[28px] p-6">
         {/* Card */}
-        <div className="flex min-h-[600px] rounded-[22px] shadow-xl overflow-hidden bg-white">
+        <div className="flex min-h-[600px] overflow-hidden bg-white">
 
           {/* Left Illustration */}
           <div className="hidden lg:flex w-1/2 items-center justify-center">

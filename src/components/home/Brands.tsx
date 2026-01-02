@@ -69,7 +69,7 @@ const BrandsSection = () => {
                 <img
                   src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                   alt={brand.brand_name}
-                  className="h-8 md:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer grayscale hover:grayscale-0"
+                  className="h-8 md:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
                 />
               </Link>
             </div>
