@@ -20,6 +20,8 @@ import { homeApi } from "@/src/service/homeApi";
 import { useAppSelector, useAppDispatch } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import { logout } from "@/src/redux/auth/authSlice";
+import { resetCart } from "@/src/redux/cart/cartSlice";
+import { resetWishlist } from "@/src/redux/wishlist/wishlistSlice";
 
 interface Category {
   id: number;
@@ -41,6 +43,10 @@ export default function Header() {
   const { wishlist } = useAppSelector((state: RootState) => state.wishlist);
   const { cart } = useAppSelector((state: RootState) => state.cart);
   const { token } = useAppSelector((state: RootState) => state.auth);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     const fetchMainCategories = async () => {
@@ -60,7 +66,49 @@ export default function Header() {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(resetCart());
+    dispatch(resetWishlist());
     router.push("/login");
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        setIsSearching(true);
+        try {
+          const res = await homeApi.searchProducts(searchQuery);
+          if (res.success && res.data?.products) {
+            setSuggestions(res.data.products);
+            setShowSuggestions(true);
+          } else {
+            setSuggestions([]);
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          setSuggestions([]);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = () => setShowSuggestions(false);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleSuggestionClick = (slug: string) => {
+    router.push(`/product/${encodeURIComponent(slug)}`);
+    setSearchQuery("");
+    setShowSuggestions(false);
+    setSearchOpen(false);
   };
 
 
@@ -82,7 +130,7 @@ export default function Header() {
               )}
             </button>
 
-            <div onClick={() => router.push('/')} className="flex-shrink-0">
+            <div onClick={() => router.push('/')} className="shrink-0">
               <div className="w-32 h-10 bg-white rounded-md flex items-center justify-center">
                 <Image
                   src="/delmon-logo-only.png"
@@ -113,15 +161,59 @@ export default function Header() {
           {/* Mobile Search Bar */}
           {searchOpen && (
             <div className="lg:hidden pb-3">
-              <div className="relative">
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
                   placeholder="Search For Products"
-                  className="w-full h-10 px-4 pr-10 bg-white border border-gray-300 rounded-md text-sm placeholder-gray-400"
+                  className="w-full h-10 px-4 pr-10 bg-white border text-gray-900 border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-700"
                 />
                 <button className="absolute right-0 top-0 h-10 w-10 flex items-center justify-center">
-                  <Search className="w-5 h-5 text-gray-400" />
+                  {isSearching ? (
+                    <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Search className="w-5 h-5 text-gray-400" />
+                  )}
                 </button>
+
+                {/* Mobile Suggestions Dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-100 z-50 max-h-[60vh] overflow-y-auto overflow-x-hidden">
+                    {suggestions.map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => handleSuggestionClick(product.product_slug)}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0"
+                      >
+                        <div className="w-12 h-12 shrink-0 bg-gray-50 rounded-md overflow-hidden relative">
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${product.product_thambnail}`}
+                            alt={product.product_name}
+                            fill
+                            className="object-contain p-1"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {product.product_name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-sm font-bold text-green-700">
+                              AED {product.discount_price || product.selling_price}
+                            </span>
+                            {product.discount_price && (
+                              <span className="text-xs text-gray-400 line-through">
+                                AED {product.selling_price}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -129,7 +221,7 @@ export default function Header() {
           {/* Desktop Header */}
           <div className="hidden lg:flex items-center justify-between py-4 gap-4">
             {/* Logo with Border */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <div onClick={() => router.push('/')} className="rounded-lg p-2 cursor-pointer">
                 <Image
                   src="/delmon-logo-only.png"
@@ -144,13 +236,23 @@ export default function Header() {
 
             {/* Phone Info */}
             <div className="hidden xl:flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+              <a
+                href="tel:+97142881400"
+                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                title="Call Us"
+              >
                 <Phone className="w-5 h-5 text-green-700" />
-              </div>
+              </a>
               <div className="flex flex-col">
-                <span className="text-gray-900 font-semibold text-sm leading-tight">
+                <a
+                  href="tel:+97142881400"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-900 font-semibold text-sm leading-tight hover:text-green-700 transition-colors"
+                  title="Call Us"
+                >
                   +971 42 88 1400
-                </span>
+                </a>
                 <span className="text-gray-500 text-xs leading-tight">
                   24/7 Support Center
                 </span>
@@ -158,17 +260,88 @@ export default function Header() {
             </div>
 
             {/* Search Bar - Centered */}
-            <div className="flex-1 max-w-xl mx-4">
+            <div className="flex-1 max-w-xl mx-4 relative" onClick={(e) => e.stopPropagation()}>
               <div className="relative">
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
                   placeholder="Search For Products"
-                  className="w-full h-11 px-5 pr-12 bg-gray-50 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
+                  className="w-full h-11 px-5 text-gray-900 pr-12 bg-gray-50 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
                 />
                 <button className="absolute right-0 top-0 h-11 w-11 flex items-center justify-center">
-                  <Search className="w-5 h-5 text-gray-400" />
+                  {isSearching ? (
+                    <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Search className="w-5 h-5 text-gray-400" />
+                  )}
                 </button>
               </div>
+
+              {/* Desktop Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 max-h-[400px] overflow-y-auto overflow-x-hidden py-2">
+                  <div className="px-4 py-2 border-b border-gray-50">
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Search Results</span>
+                  </div>
+                  {suggestions.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleSuggestionClick(product.product_slug)}
+                      className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors group"
+                    >
+                      <div className="w-14 h-14 shrink-0 bg-gray-50 rounded-lg overflow-hidden relative border border-gray-100">
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${product.product_thambnail}`}
+                          alt={product.product_name}
+                          fill
+                          className="object-contain p-1 group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-green-700 transition-colors">
+                          {product.product_name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-sm font-bold text-green-700">
+                            AED {product.discount_price || product.selling_price}
+                          </span>
+                          {product.discount_price && (
+                            <span className="text-xs text-gray-400 line-through">
+                              AED {product.selling_price}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                        <ChevronDown className="w-4 h-4 text-gray-300 -rotate-90" />
+                      </div>
+                    </div>
+                  ))}
+                  {suggestions.length >= 5 && (
+                    <div className="px-4 py-3 border-t border-gray-50 text-center">
+                      <button
+                        onClick={() => router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
+                        className="text-xs font-semibold text-green-700 hover:text-green-800"
+                      >
+                        View all results for "{searchQuery}"
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* No results state */}
+              {showSuggestions && searchQuery.length >= 2 && !isSearching && suggestions.length === 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-gray-300" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-1">No products found</h3>
+                  <p className="text-xs text-gray-500">We couldn't find any products matching your search.</p>
+                </div>
+              )}
             </div>
 
             {/* Right Icons */}
@@ -311,10 +484,20 @@ export default function Header() {
             )}
 
             <div className="flex items-center gap-4 py-4 border-t border-gray-200 mt-2">
-              <button className="flex items-center gap-2 text-gray-700">
+              <a
+                href="tel:+97142881400"
+                className="p-2 rounded-full bg-gray-50 text-green-700"
+              >
                 <Phone className="w-5 h-5" />
-                <span className="text-sm">+971 42 88 1400</span>
-              </button>
+              </a>
+              <a
+                href="https://wa.me/97142881400"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-gray-700 hover:text-green-700"
+              >
+                +971 42 88 1400
+              </a>
             </div>
           </div>
         </div>

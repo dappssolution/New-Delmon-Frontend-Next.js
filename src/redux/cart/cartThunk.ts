@@ -24,10 +24,11 @@ export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (
         { productId, payload }: { productId: number; payload?: AddToCartPayload },
-        { rejectWithValue }
+        { rejectWithValue, dispatch }
     ) => {
         try {
             const data = await cartApi.addToCart(productId, payload);
+            dispatch(fetchCart());
             return data;
         } catch (error: any) {
             return rejectWithValue(
@@ -44,10 +45,11 @@ export const updateCartItem = createAsyncThunk(
     "cart/updateCartItem",
     async (
         { itemId, quantity }: { itemId: number; quantity: number },
-        { rejectWithValue }
+        { rejectWithValue, dispatch }
     ) => {
         try {
             const data = await cartApi.updateCartItem(itemId, quantity);
+            dispatch(fetchCart());
             return data;
         } catch (error: any) {
             return rejectWithValue(
@@ -62,9 +64,10 @@ export const updateCartItem = createAsyncThunk(
  */
 export const removeFromCart = createAsyncThunk(
     "cart/removeFromCart",
-    async (itemId: number, { rejectWithValue }) => {
+    async (itemId: number, { rejectWithValue, dispatch }) => {
         try {
             const data = await cartApi.removeFromCart(itemId);
+            dispatch(fetchCart());
             return data;
         } catch (error: any) {
             return rejectWithValue(

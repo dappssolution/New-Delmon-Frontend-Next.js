@@ -62,7 +62,9 @@ const cartSlice = createSlice({
             })
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload;
+                if (action.payload && action.payload.cart_items) {
+                    state.cart = action.payload;
+                }
                 state.message = "Item added to cart successfully";
             })
             .addCase(addToCart.rejected, (state, action) => {
@@ -142,7 +144,9 @@ const cartSlice = createSlice({
             })
             .addCase(applyCoupon.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload;
+                if (action.payload && action.payload.cart_items) {
+                    state.cart = action.payload;
+                }
                 state.message = "Coupon applied successfully";
             })
             .addCase(applyCoupon.rejected, (state, action) => {
@@ -157,7 +161,9 @@ const cartSlice = createSlice({
             })
             .addCase(removeCoupon.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cart = action.payload;
+                if (action.payload && action.payload.cart_items) {
+                    state.cart = action.payload;
+                }
                 state.message = "Coupon removed";
             })
             .addCase(removeCoupon.rejected, (state, action) => {

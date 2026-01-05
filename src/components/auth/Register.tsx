@@ -51,19 +51,24 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-  const payload: any = {
-    name: form.name,
-    email: form.email,
-    contact_no: form.contact_no,
-    password: form.password,
-    password_confirmation: form.password_confirmation,
-    role: form.role,
-  };
+const payload: any = {
+  email: form.email,
+  contact_no: form.contact_no,
+  password: form.password,
+  password_confirmation: form.password_confirmation,
+  role: form.role,
+};
 
-  if (form.role === "vendor") {
-    payload.username = form.username;
-    payload.vendor_join = form.vendor_join;
-  }
+if (form.role === "user") {
+  payload.username = form.username;
+}
+
+if (form.role === "vendor") {
+  payload.name = form.name;
+  payload.username = form.username;
+  payload.vendor_join = form.vendor_join;
+}
+
 
   const result = await dispatch(registerUser(payload));
 
@@ -101,42 +106,34 @@ export default function RegisterPage() {
                         <div className="w-full max-w-md">
 
                             {/* Header */}
-                            <div className="text-center mb-8">
-                                <h1 className="text-3xl font-bold text-gray-900">
-                                    {form.role === "vendor" ? "Create a Vendor Account" : "Create an Account"}
-                                </h1>
-                                <p className="text-sm text-gray-500 mt-2">
-                                    Already Have an Account ?{" "}
-                                    <Link
-                                        href={loginUrl}
-                                        className="font-semibold text-gray-900 hover:text-green-700"
-                                    >
-                                        Login
-                                    </Link>
-                                </p>
-                            </div>
+<div className="text-center mb-8">
+  <h1 className="text-3xl font-bold text-gray-900">
+    {form.role === "vendor" ? "Create a Vendor Account" : "Create an Account"}
+  </h1>
+</div>
+
 
                             {/* Form */}
                             <form onSubmit={handleSubmit} className="space-y-4">
+
+                                {form.role === "vendor" && (
                                 <input
                                     name="name"
-                                    placeholder={form.role === "vendor" ? "Shop Name*" : "Username *"}
+                                    placeholder="Shop Name*"
                                     value={form.name}
                                     onChange={handleChange}
                                     className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
                                     required
                                 />
-
-                                {form.role === "vendor" && (
-                                    <input
-                                        name="username"
-                                        placeholder="Username*"
-                                        value={form.username}
-                                        onChange={handleChange}
-                                        className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
-                                        required
-                                    />
                                 )}
+                                <input
+                                    name="username"
+                                    placeholder="Username*"
+                                    value={form.username}
+                                    onChange={handleChange}
+                                    className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
+                                    required
+                                />
 
                                 <input
                                     name="email"
@@ -203,14 +200,30 @@ export default function RegisterPage() {
                                     I Agree to know Terms & Policy
                                 </label>
 
-                                {/* Button */}
-                                <button
-                                    type="submit"
-                                    disabled={loading || !agreeTerms}
-                                    className="w-full lg:w-fit px-8 h-12 rounded-full bg-[#035b31] hover:bg-[#0d3d25] text-white font-semibold transition"
-                                >
-                                    {loading ? "Registering..." : (form.role === "vendor" ? "Submit & Register" : "Register")}
-                                </button>
+                                <div className="flex justify-center">
+  <button
+    type="submit"
+    disabled={loading || !agreeTerms}
+    className="w-full sm:w-auto px-10 h-12 rounded-full bg-[#035b31] hover:bg-[#0d3d25] text-white font-semibold transition disabled:opacity-60"
+  >
+    {loading
+      ? "Registering..."
+      : form.role === "vendor"
+        ? "Submit & Register"
+        : "Register"}
+  </button>
+</div>
+
+
+                                <div className="mt-3 text-center text-sm text-gray-600">
+  Already have an account?{" "}
+  <Link
+    href={form.role === "vendor" ? "/login?role=vendor" : "/login"}
+    className="font-medium text-[#114f30] hover:underline"
+  >
+    Login
+  </Link>
+</div>
 
                                 {form.role !== "vendor" && (
                                     <>
@@ -223,17 +236,6 @@ export default function RegisterPage() {
 
                                         {/* Social */}
                                         <div className="flex gap-4 justify-center">
-                                            <button
-                                                type="button"
-                                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 hover:shadow-md hover:bg-gray-50 transition-all"
-                                            >
-                                                <svg className="w-6 h-6" viewBox="0 0 24 24">
-                                                    <path
-                                                        fill="#1877F2"
-                                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-                                                    />
-                                                </svg>
-                                            </button>
                                             <button
                                                 type="button"
                                                 className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 hover:shadow-md hover:bg-gray-50 transition-all"

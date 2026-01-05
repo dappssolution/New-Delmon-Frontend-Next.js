@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import ProtectedRoute from "@/src/components/auth/ProtectedRoute";
 
 export default function ContractSuccessPage() {
     return (
+        <ProtectedRoute>
         <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
             <div className="max-w-[1400px] w-full border border-[#8fccab] rounded-[20px] p-8 md:p-12">
 
@@ -47,5 +49,6 @@ export default function ContractSuccessPage() {
                 </div>
             </div>
         </div>
+        </ProtectedRoute>
     );
 }

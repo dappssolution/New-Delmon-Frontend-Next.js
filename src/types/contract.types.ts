@@ -24,8 +24,7 @@ export interface ContractRequestData {
   created_at: string
   id: number
 }
-
-export interface GetContractProductResponse {
+export interface ContractProductResponse {
   status: boolean
   message: string
   data: ContractProductData
@@ -33,7 +32,7 @@ export interface GetContractProductResponse {
 
 export interface ContractProductData {
   contract: Contract
-  products: Products
+  products: ContractProducts
   count: number
 }
 
@@ -50,9 +49,9 @@ export interface Contract {
   updated_at: string
 }
 
-export interface Products {
+export interface ContractProducts {
   current_page: number
-  data: ProductData[]
+  data: Daum[]
   first_page_url: string
   from: number
   last_page: number
@@ -66,14 +65,32 @@ export interface Products {
   total: number
 }
 
-export interface ProductData {
+export interface Daum {
+  contract_item_id: number
   id: number
-  contract_id: number
-  user_id: number
-  product_id: number
-  price: string
-  created_at: string
-  updated_at: any
+  product_name: string
+  product_slug: string
+  product_thambnail: string
+  selling_price: string
+  discount_price?: string
+  brand_id: number
+  category_id: number
+  product_size: string
+  product_color: string
+  brand: Brand
+  category: Category
+}
+
+export interface Brand {
+  id: number
+  brand_name: string
+  brand_slug: string
+}
+
+export interface Category {
+  id: number
+  category_name: string
+  category_slug: string
 }
 
 export interface Link {

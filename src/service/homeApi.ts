@@ -101,6 +101,13 @@ export const homeApi = {
   async getVendorById(id: string | number) {
     const res = await api.get(`/vendor/${id}`);
     return res.data;
+  },
+
+  async searchProducts(query: string) {
+    const res = await api.get(`/search-products`, {
+      params: { query }
+    });
+    return res.data;
   }
 
 };

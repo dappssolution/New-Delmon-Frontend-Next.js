@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { ContractRequestPayload, ContractRequestResponse, GetContractProductResponse } from "../types/contract.types";
+import { ContractRequestPayload, ContractRequestResponse, ContractProductResponse } from "../types/contract.types";
 
 
 export const contractApi = {
@@ -9,7 +9,7 @@ export const contractApi = {
     },
 
     getContractProducts: async () => {
-        const res = await api.get<GetContractProductResponse>("/user/contract-products");
+        const res = await api.get<ContractProductResponse>("/user/contract-products");
         return res.data;
     },
 }

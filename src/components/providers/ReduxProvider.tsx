@@ -23,14 +23,17 @@ function InitAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     dispatch(hydrateAuth());
-    if(user?.role === 'user') {
-      dispatch(fetchCart());
-    }
   }, [dispatch]);
 
   useEffect(() => {
-    if (token ) {
-      if(user?.role === 'user') {
+    if (!user || user.role === 'user') {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, user?.role]);
+
+  useEffect(() => {
+    if (token) {
+      if (user?.role === 'user') {
         dispatch(fetchWishlist());
       }
       if (!user) {

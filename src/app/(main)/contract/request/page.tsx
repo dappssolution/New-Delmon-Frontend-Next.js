@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { contractApi } from "@/src/service/contractApi";
 import FormInput from "@/src/components/common/FormInput";
+import ProtectedRoute from "@/src/components/auth/ProtectedRoute";
 
 export default function ContractRequestPage() {
     const router = useRouter();
@@ -54,6 +55,8 @@ export default function ContractRequestPage() {
     };
 
     return (
+        <ProtectedRoute>
+            
         <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-[1400px] mx-auto border border-[#8fccab] rounded-[20px] p-8 md:p-12">
                 <div className="text-center mb-10">
@@ -152,5 +155,6 @@ export default function ContractRequestPage() {
                 </form>
             </div>
         </div>
+        </ProtectedRoute>
     );
 }
