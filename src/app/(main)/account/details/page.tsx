@@ -40,6 +40,10 @@ export default function AccountDetailsPage() {
     apiFormData.append("name", formData.get("fullname") as string);
     apiFormData.append("phone", formData.get("phone") as string);
     apiFormData.append("address", formData.get("address") as string);
+    if (profile?.email) {
+  apiFormData.append("email", profile.email);
+}
+
 
     const photoFile = formData.get("photo");
     if (photoFile && (photoFile as File).size > 0) {

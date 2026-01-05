@@ -74,6 +74,8 @@ export default function PromoBanner() {
     sliderIndex * itemsPerPage + itemsPerPage
   );
 
+  const whatsappUrl = "https://wa.me/971559817240";
+
   if (loading) {
     return (
       <section className="py-6">
@@ -126,9 +128,12 @@ export default function PromoBanner() {
                 className="absolute w-full h-full grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
               >
                 {currentSliders.map((slider, index) => (
-                  <div
+                  <a
                     key={slider.id}
-                    className={`relative rounded-lg h-48 md:h-64 flex items-center px-6 md:px-12 overflow-hidden bg-white`}
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`relative rounded-lg h-48 md:h-64 flex items-center px-6 md:px-12 overflow-hidden bg-white cursor-pointer group/promo`}
                   >
                     {/* Text */}
                     <div className="z-10 relative">
@@ -153,9 +158,9 @@ export default function PromoBanner() {
                       transition={{ delay: 0.3, duration: 0.5 }}
                       src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${slider.slider_image}`}
                       alt={slider.slider_title}
-                      className="absolute right-4 md:right-8 h-40 md:h-56 w-auto object-fill"
+                      className="absolute right-4 md:right-8 h-40 md:h-56 w-auto object-fill transition-transform duration-500 group-hover/promo:scale-105"
                     />
-                  </div>
+                  </a>
                 ))}
               </motion.div>
             </AnimatePresence>

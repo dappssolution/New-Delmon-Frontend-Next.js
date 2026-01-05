@@ -51,26 +51,26 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-const payload: any = {
-  email: form.email,
-  contact_no: form.contact_no,
-  password: form.password,
-  password_confirmation: form.password_confirmation,
-  role: form.role,
-};
+        const payload: any = {
+            email: form.email,
+            contact_no: form.contact_no,
+            password: form.password,
+            password_confirmation: form.password_confirmation,
+            role: form.role,
+        };
 
-if (form.role === "user") {
-  payload.username = form.username;
-}
+        if (form.role === "user") {
+            payload.name = form.username;
+        }
 
-if (form.role === "vendor") {
-  payload.name = form.name;
-  payload.username = form.username;
-  payload.vendor_join = form.vendor_join;
-}
+        if (form.role === "vendor") {
+            payload.name = form.name;
+            payload.username = form.username;
+            payload.vendor_join = form.vendor_join;
+        }
 
 
-  const result = await dispatch(registerUser(payload));
+        const result = await dispatch(registerUser(payload));
 
         if (registerUser.fulfilled.match(result)) {
             toast.success("Registration successful! Please check your email to verify your account.");
@@ -106,25 +106,25 @@ if (form.role === "vendor") {
                         <div className="w-full max-w-md">
 
                             {/* Header */}
-<div className="text-center mb-8">
-  <h1 className="text-3xl font-bold text-gray-900">
-    {form.role === "vendor" ? "Create a Vendor Account" : "Create an Account"}
-  </h1>
-</div>
+                            <div className="text-center mb-8">
+                                <h1 className="text-3xl font-bold text-gray-900">
+                                    {form.role === "vendor" ? "Create a Vendor Account" : "Create an Account"}
+                                </h1>
+                            </div>
 
 
                             {/* Form */}
                             <form onSubmit={handleSubmit} className="space-y-4">
 
                                 {form.role === "vendor" && (
-                                <input
-                                    name="name"
-                                    placeholder="Shop Name*"
-                                    value={form.name}
-                                    onChange={handleChange}
-                                    className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
-                                    required
-                                />
+                                    <input
+                                        name="name"
+                                        placeholder="Shop Name*"
+                                        value={form.name}
+                                        onChange={handleChange}
+                                        className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
+                                        required
+                                    />
                                 )}
                                 <input
                                     name="username"
@@ -201,29 +201,29 @@ if (form.role === "vendor") {
                                 </label>
 
                                 <div className="flex justify-center">
-  <button
-    type="submit"
-    disabled={loading || !agreeTerms}
-    className="w-full sm:w-auto px-10 h-12 rounded-full bg-[#035b31] hover:bg-[#0d3d25] text-white font-semibold transition disabled:opacity-60"
-  >
-    {loading
-      ? "Registering..."
-      : form.role === "vendor"
-        ? "Submit & Register"
-        : "Register"}
-  </button>
-</div>
+                                    <button
+                                        type="submit"
+                                        disabled={loading || !agreeTerms}
+                                        className="w-full sm:w-auto px-10 h-12 rounded-full bg-[#035b31] hover:bg-[#0d3d25] text-white font-semibold transition disabled:opacity-60"
+                                    >
+                                        {loading
+                                            ? "Registering..."
+                                            : form.role === "vendor"
+                                                ? "Submit & Register"
+                                                : "Register"}
+                                    </button>
+                                </div>
 
 
                                 <div className="mt-3 text-center text-sm text-gray-600">
-  Already have an account?{" "}
-  <Link
-    href={form.role === "vendor" ? "/login?role=vendor" : "/login"}
-    className="font-medium text-[#114f30] hover:underline"
-  >
-    Login
-  </Link>
-</div>
+                                    Already have an account?{" "}
+                                    <Link
+                                        href={form.role === "vendor" ? "/login?role=vendor" : "/login"}
+                                        className="font-medium text-[#114f30] hover:underline"
+                                    >
+                                        Login
+                                    </Link>
+                                </div>
 
                                 {form.role !== "vendor" && (
                                     <>
