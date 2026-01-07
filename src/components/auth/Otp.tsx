@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
 import { authApi } from "@/src/service/authApi";
 import { useRouter, useSearchParams } from "next/navigation";
 import FormInput from "@/src/components/common/FormInput";
@@ -17,7 +16,6 @@ export default function EnterOtpPage() {
     const [email, setEmail] = useState(emailFromUrl);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -157,49 +155,35 @@ export default function EnterOtpPage() {
                                 </div>
 
                                 {/* New Password */}
-                                <div className="relative text-left">
+                                <div className="text-left">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         New Password
                                     </label>
                                     <FormInput
                                         name="password"
-                                        type={showPassword ? "text" : "password"}
+                                        type="password"
                                         placeholder="New Password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="h-12 border-[#8fccab] text-black pr-12 focus:ring-black"
+                                        className="h-12 border-[#8fccab] text-black focus:ring-black"
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-[42px] text-gray-500"
-                                    >
-                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                    </button>
                                 </div>
 
                                 {/* Confirm Password */}
-                                <div className="relative text-left">
+                                <div className="text-left">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Confirm Password
                                     </label>
                                     <FormInput
                                         name="confirmPassword"
-                                        type={showPassword ? "text" : "password"}
+                                        type="password"
                                         placeholder="Confirm Password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="h-12 border-[#8fccab] text-black pr-12 focus:ring-black"
+                                        className="h-12 border-[#8fccab] text-black focus:ring-black"
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-[42px] text-gray-500"
-                                    >
-                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                    </button>
                                 </div>
 
                                 <button

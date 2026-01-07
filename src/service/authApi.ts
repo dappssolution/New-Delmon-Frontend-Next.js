@@ -21,4 +21,9 @@ export const authApi = {
         const res = await api.post("/logout");
         return res.data;
     },
+
+    async getGoogleAuthUrl() {
+        const res = await api.get("/auth/google/url");
+        return res.data;
+    },
 }

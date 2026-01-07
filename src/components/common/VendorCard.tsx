@@ -27,11 +27,11 @@ export default function VendorCard({
             <div className="bg-linear-to-r from-[#5fae87] to-[#4a9b70] h-32 flex items-center justify-center relative">
                 {photo ? (
                     <Image
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${photo}`}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${photo}`}
                         alt={name}
-                        width={80}
-                        height={80}
-                        className="rounded-full object-cover"
+                        width={150}
+                        height={150}
+                        className="rounded-full mt-6 object-cover"
                     />
                 ) : (
                     <Image
@@ -49,7 +49,6 @@ export default function VendorCard({
                 <p className="text-xs text-gray-500">Since {new Date(vendor_join).getFullYear()}</p>
                 <h3 className="font-semibold text-gray-900 text-base">{name}</h3>
                 <p className="text-sm text-gray-600">Call Us: {phone}</p>
-                <p className="text-xs text-gray-500">{productCount} Products</p>
 
                 {/* Visit Store Button */}
                 <Link

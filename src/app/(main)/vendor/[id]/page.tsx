@@ -1,35 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { homeApi } from "@/src/service/homeApi";
-import { VendorDetailedResponse, Vendor } from "@/src/types/vendor.types";
-import { ProductData, Category } from "@/src/types/product.types";
-import ProductCard from "@/src/components/common/ProductCard";
-import { Mail, MapPin, Phone, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Store, MapPin, Calendar, Phone, Mail, Package, Grid3x3, ChevronRight, Heart, ShoppingCart, Loader2 } from "lucide-react";
+import { homeApi } from "@/src/service/homeApi";
+import Loading from "@/src/components/common/Loading";
+import ProductCard, { Product } from "@/src/components/common/ProductCard";
+import { Meta, Vendor, VendorDetailedResponse } from "@/src/types/home.types";
+import { ProductData } from "@/src/types/product.types";
+import { CategoryData } from "@/src/types/vendor.types";
 
-export default function VendorDetailPage() {
+
+export default function VendorDetailView() {
     const params = useParams();
-    const vendorId = params.id as string;
+    const vendorId = params?.id as string;
 
     const [vendor, setVendor] = useState<Vendor | null>(null);
     const [products, setProducts] = useState<ProductData[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<CategoryData[]>([]);
+    const [meta, setMeta] = useState<Meta | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [currentPage, setCurrentPage] = useState(1);
-    const [meta, setMeta] = useState<any>(null);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
     useEffect(() => {
-        fetchVendorData();
+        if (vendorId) {
+            fetchVendorData();
+        }
     }, [vendorId, currentPage, selectedCategory]);
 
     const fetchVendorData = async () => {
         setLoading(true);
         try {
-            const res: VendorDetailedResponse = await homeApi.getVendorById(vendorId);
+            const res: VendorDetailedResponse = await homeApi.getVendorById(vendorId, {
+                page: currentPage,
+                category_id: selectedCategory === "all" ? undefined : Number(selectedCategory)
+            });
             setVendor(res.data.vendor);
             setProducts(res.data.products || []);
             setCategories(res.data.category_data || []);
@@ -41,260 +49,295 @@ export default function VendorDetailPage() {
         }
     };
 
+    const transformToProductCard = (product: ProductData): Product => {
+        const finalPrice = product.discount_price || product.selling_price;
+        const oldPrice = product.discount_price ? product.selling_price : undefined;
+
+        let badge = undefined;
+        if (product.discount_price) {
+            const sell = parseFloat(product.selling_price);
+            const disc = parseFloat(product.discount_price);
+            if (sell > 0) {
+                const percent = Math.round(((sell - disc) / sell) * 100);
+                badge = `${percent}% Off`;
+            }
+        }
+
+        return {
+            id: product.id,
+            slug: product.product_slug,
+            category: product.category?.category_name || "Product",
+            title: product.product_name,
+            price: `AED ${finalPrice}`,
+            oldPrice: oldPrice ? `AED ${oldPrice}` : undefined,
+            image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${product.product_thambnail}`,
+            badge,
+            colors: product.product_color ? product.product_color.split(',').map(c => c.trim()) : undefined,
+            sizes: product.product_size ? product.product_size.split(',').map(s => s.trim()) : undefined
+        };
+    };
+
+    const handleCategoryChange = (categoryId: string) => {
+        setSelectedCategory(categoryId);
+        setCurrentPage(1);
+    };
+
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
-        window.scrollTo({ top: 400, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const renderPagination = () => {
-        if (!meta || meta.last_page <= 1) return null;
-
-        const pages = [];
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(meta.last_page, startPage + maxVisiblePages - 1);
-
-        if (endPage - startPage < maxVisiblePages - 1) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
-
-        return (
-            <div className="flex items-center justify-center gap-2 mt-8">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ChevronLeft size={20} />
-                </button>
-
-                {startPage > 1 && (
-                    <>
-                        <button
-                            onClick={() => handlePageChange(1)}
-                            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
-                        >
-                            1
-                        </button>
-                        {startPage > 2 && <span className="px-2">...</span>}
-                    </>
-                )}
-
-                {pages.map((page) => (
-                    <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`px-4 py-2 rounded-md border ${
-                            currentPage === page
-                                ? "bg-green-700 text-white border-green-700"
-                                : "border-gray-300 hover:bg-gray-50"
-                        }`}
-                    >
-                        {page}
-                    </button>
-                ))}
-
-                {endPage < meta.last_page && (
-                    <>
-                        {endPage < meta.last_page - 1 && <span className="px-2">...</span>}
-                        <button
-                            onClick={() => handlePageChange(meta.last_page)}
-                            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
-                        >
-                            {meta.last_page}
-                        </button>
-                    </>
-                )}
-
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === meta.last_page}
-                    className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ChevronRight size={20} />
-                </button>
-            </div>
-        );
-    };
-
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-white">
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
-                    <div className="h-64 bg-gray-100 rounded-2xl animate-pulse mb-8" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[...Array(8)].map((_, idx) => (
-                            <div key={idx} className="h-80 bg-gray-100 rounded-lg animate-pulse" />
-                        ))}
-                    </div>
-                </div>
-            </div>
-        );
+    if (loading && !vendor) {
+        return <Loading className="min-h-screen" />;
     }
 
     if (!vendor) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Vendor Not Found</h2>
-                    <p className="text-gray-600 mb-4">The vendor you're looking for doesn't exist.</p>
-                    <Link href="/vendors" className="text-green-700 hover:text-green-800 font-medium">
-                        ← Back to Vendors
-                    </Link>
-                </div>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+                <p className="text-gray-500 mb-4">Vendor not found</p>
+                <Link href="/" className="text-green-700 underline font-medium">Back to Home</Link>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
-                {/* Vendor Header */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-                    {/* Banner with gradient */}
-                    <div className="bg-linear-to-r from-[#5fae87] to-[#4a9b70] h-32 md:h-40 relative">
-                        <div className="absolute -bottom-12 md:-bottom-16 left-6 md:left-8">
+        <div className="bg-white min-h-screen">
+            {/* Breadcrumb */}
+            <div className="bg-gray-50 border-b border-gray-100">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4">
+                    <nav className="flex items-center text-xs md:text-sm text-gray-500 font-medium">
+                        <Link href="/" className="hover:text-green-700 transition-colors">Delmon</Link>
+                        <ChevronRight className="w-3 h-3 mx-2" />
+                        <Link href="/vendors" className="hover:text-green-700 transition-colors">Vendors</Link>
+                        <ChevronRight className="w-3 h-3 mx-2" />
+                        <span className="text-gray-900">{vendor.name}</span>
+                    </nav>
+                </div>
+            </div>
+
+            {/* Vendor Header Section */}
+            <div className="bg-gradient-to-br from-[#E8F3ED] to-white border-b border-gray-100">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
+                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                        {/* Vendor Avatar */}
+                        <div className="w-32 h-32 bg-white rounded-2xl border-2 border-green-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {vendor.photo ? (
                                 <Image
-                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${vendor.photo}`}
+                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${vendor.photo}`}
                                     alt={vendor.name}
-                                    width={120}
-                                    height={120}
-                                    className="rounded-full border-4 border-white object-cover w-24 h-24 md:w-32 md:h-32"
+                                    width={128}
+                                    height={128}
+                                    className="object-cover w-full h-full"
                                 />
                             ) : (
-                                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-white flex items-center justify-center">
-                                    <Image
-                                        src="/delmon white.png"
-                                        alt={vendor.name}
-                                        width={80}
-                                        height={50}
-                                        className="object-contain"
-                                    />
-                                </div>
+                                <Store className="w-16 h-16 text-green-600" strokeWidth={1.5} />
                             )}
                         </div>
-                    </div>
 
-                    {/* Vendor Info */}
-                    <div className="pt-16 md:pt-20 px-6 md:px-8 pb-6">
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                            <div className="flex-1">
-                                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                                    {vendor.name}
-                                </h1>
-                                <p className="text-gray-600 mb-4">@{vendor.username}</p>
-                                
-                                {vendor.vendor_short_info && (
-                                    <p className="text-gray-700 mb-4">{vendor.vendor_short_info}</p>
-                                )}
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Phone size={16} className="text-green-700" />
-                                        <span>{vendor.phone}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Mail size={16} className="text-green-700" />
-                                        <span>{vendor.email}</span>
-                                    </div>
-                                    {vendor.address && (
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <MapPin size={16} className="text-green-700" />
-                                            <span>{vendor.address}</span>
-                                        </div>
-                                    )}
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Calendar size={16} className="text-green-700" />
-                                        <span>Joined {new Date(vendor.vendor_join).getFullYear()}</span>
-                                    </div>
+                        {/* Vendor Info */}
+                        <div className="flex-1">
+                            <div className="flex items-start justify-between flex-wrap gap-4 mb-4">
+                                <div>
+                                    <h1 className="text-3xl md:text-4xl font-bold text-[#114f30] mb-2">
+                                        {vendor.name}
+                                    </h1>
+                                    <p className="text-gray-600 text-sm">@{vendor.username}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${vendor.status === 'active'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                        {vendor.status === 'active' ? 'Active' : 'Inactive'}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-start md:items-end gap-2">
-                                <div className="bg-green-50 px-4 py-2 rounded-lg">
-                                    <p className="text-sm text-gray-600">Total Products</p>
-                                    <p className="text-2xl font-bold text-green-700">{meta?.total || 0}</p>
+                            {/* Contact Information Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                                <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
+                                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Phone className="w-5 h-5 text-green-600" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs text-gray-500 mb-1">Phone</p>
+                                        <p className="text-sm font-medium text-gray-900 truncate">{vendor.phone}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
+                                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Mail className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs text-gray-500 mb-1">Email</p>
+                                        <p className="text-sm font-medium text-gray-900 truncate">{vendor.email}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
+                                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <Calendar className="w-5 h-5 text-purple-600" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs text-gray-500 mb-1">Joined</p>
+                                        <p className="text-sm font-medium text-gray-900">{vendor.vendor_join}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Category Filter */}
-                {categories.length > 0 && (
-                    <div className="mb-6">
-                        <div className="flex flex-wrap gap-2">
+            {/* Stats Bar */}
+            <div className="bg-white border-b border-gray-100">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="text-center">
+                            <div className="text-2xl md:text-3xl font-bold text-[#114f30] mb-1">
+                                {meta?.total || 0}
+                            </div>
+                            <div className="text-sm text-gray-500">Total Products</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl md:text-3xl font-bold text-[#114f30] mb-1">
+                                {categories.length}
+                            </div>
+                            <div className="text-sm text-gray-500">Categories</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl md:text-3xl font-bold text-[#114f30] mb-1">
+                                {products.filter(p => p.featured).length}
+                            </div>
+                            <div className="text-sm text-gray-500">Featured Items</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl md:text-3xl font-bold text-[#114f30] mb-1">
+                                {products.filter(p => p.hot_deals).length}
+                            </div>
+                            <div className="text-sm text-gray-500">Hot Deals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Sidebar - Categories */}
+                    <aside className="lg:w-72 flex-shrink-0">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-6">
+                            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <Grid3x3 className="w-5 h-5 text-green-600" />
+                                Categories
+                            </h2>
+
                             <button
-                                onClick={() => setSelectedCategory(null)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                    selectedCategory === null
-                                        ? "bg-green-700 text-white"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                            >
-                                All Products
-                            </button>
-                            {categories.map((category) => (
-                                <button
-                                    key={category.id}
-                                    onClick={() => setSelectedCategory(category.id)}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        selectedCategory === category.id
-                                            ? "bg-green-700 text-white"
-                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                onClick={() => handleCategoryChange("all")}
+                                className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${selectedCategory === "all"
+                                        ? "bg-green-50 text-green-700 font-medium"
+                                        : "hover:bg-gray-50 text-gray-700"
                                     }`}
-                                >
-                                    {category.category_name}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span>All Products</span>
+                                    <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                                        {meta?.total || 0}
+                                    </span>
+                                </div>
+                            </button>
 
-                {/* Products Section */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        Products {meta && `(${meta.total})`}
-                    </h2>
+                            <div className="space-y-1 mt-4">
+                                {categories.map((category) => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => handleCategoryChange(category.id.toString())}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === category.id.toString()
+                                                ? "bg-green-50 text-green-700 font-medium"
+                                                : "hover:bg-gray-50 text-gray-700"
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm truncate">{category.category_name}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Products Grid */}
+                    <main className="flex-1">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {selectedCategory === "all" ? "All Products" :
+                                    categories.find(c => c.id.toString() === selectedCategory)?.category_name}
+                            </h2>
+                            <p className="text-sm text-gray-500">
+                                {products.length} {products.length === 1 ? 'product' : 'products'}
+                            </p>
+                        </div>
+
+                        {loading ? (
+                            <div className="flex items-center justify-center py-20">
+                                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="text-center py-20 bg-gray-50 rounded-2xl">
+                                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                <p className="text-gray-500">No products found in this category</p>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {products.map((product) => (
+                                        <ProductCard
+                                            key={product.id}
+                                            product={transformToProductCard(product)}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Pagination */}
+                                {meta && meta.last_page > 1 && (
+                                    <div className="flex items-center justify-center gap-2 mt-12">
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={!meta.prev_page}
+                                            className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Previous
+                                        </button>
+
+                                        <div className="flex items-center gap-2">
+                                            {Array.from({ length: meta.last_page }, (_, i) => i + 1).map((page) => (
+                                                <button
+                                                    key={page}
+                                                    onClick={() => handlePageChange(page)}
+                                                    className={`w-10 h-10 rounded-lg font-medium transition-colors ${currentPage === page
+                                                            ? 'bg-green-600 text-white'
+                                                            : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                                        }`}
+                                                >
+                                                    {page}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={!meta.next_page}
+                                            className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </main>
                 </div>
-
-                {products.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg">
-                        <p className="text-gray-500 text-lg">No products found</p>
-                    </div>
-                ) : (
-                    <>
-                        {/* Products Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {products.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={{
-                                        id: product.id,
-                                        slug: product.product_slug,
-                                        category: product.category_name || "",
-                                        title: product.product_name,
-                                        price: product.selling_price,
-                                        oldPrice: product.discount_price || undefined,
-                                        image: product.product_thambnail,
-                                        discount: product.discount_price ? `${Math.round(((parseFloat(product.discount_price) - parseFloat(product.selling_price)) / parseFloat(product.discount_price)) * 100)}%` : undefined,
-                                        badge: product.product_qty === "0" ? "Out of Stock" : undefined,
-                                        colors: product.product_color ? JSON.parse(product.product_color) : undefined,
-                                        sizes: product.product_size ? JSON.parse(product.product_size) : undefined,
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Pagination */}
-                        {renderPagination()}
-                    </>
-                )}
             </div>
         </div>
     );

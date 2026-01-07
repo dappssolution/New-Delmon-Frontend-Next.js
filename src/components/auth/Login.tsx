@@ -10,6 +10,7 @@ import { useAppDispatch } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import { loginUser } from "@/src/redux/auth/authThunk";
 import FormInput from "@/src/components/common/FormInput";
+import { authApi } from "@/src/service/authApi";
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
@@ -40,6 +41,19 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(loginUser(form));
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await authApi.getGoogleAuthUrl();
+      if (response.url) {
+        window.location.href = response.url;
+      } else {
+        toast.error("Failed to get Google login URL");
+      }
+    } catch (err) {
+      toast.error("An error occurred while connecting to Google");
+    }
   };
 
   useEffect(() => {
@@ -132,12 +146,12 @@ export default function LoginPage() {
           <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
             <div className="w-full max-w-md">
 
-             {/* Header */}
-<div className="text-center mb-6">
-  <h1 className="text-3xl font-semibold text-black">
-    {isVendor ? "Vendor Login" : "Login"}
-  </h1>
-</div>
+              {/* Header */}
+              <div className="text-center mb-6">
+                <h1 className="text-3xl font-semibold text-black">
+                  {isVendor ? "Vendor Login" : "Login"}
+                </h1>
+              </div>
 
 
 
@@ -195,15 +209,15 @@ export default function LoginPage() {
                 </button>
 
                 {/* Bottom Register CTA */}
-<div className="mt-3 text-center text-sm text-gray-600">
-  {isVendor ? "New to Delmon?" : "Don’t have an account?"}{" "}
-  <Link
-    href={isVendor ? "/register?role=vendor" : "/register"}
-    className="font-medium text-[#114f30] hover:underline"
-  >
-    {isVendor ? "Become a Vendor" : "Create one"}
-  </Link>
-</div>
+                <div className="mt-3 text-center text-sm text-gray-600">
+                  {isVendor ? "New to Delmon?" : "Don’t have an account?"}{" "}
+                  <Link
+                    href={isVendor ? "/register?role=vendor" : "/register"}
+                    className="font-medium text-[#114f30] hover:underline"
+                  >
+                    {isVendor ? "Become a Vendor" : "Create one"}
+                  </Link>
+                </div>
 
                 {/* Divider and Social Login (Only for User) */}
                 {!isVendor && (
@@ -218,6 +232,7 @@ export default function LoginPage() {
 
                       <button
                         type="button"
+                        onClick={handleGoogleLogin}
                         className="w-12 h-12 flex items-center justify-center rounded-full border hover:shadow"
                       >
                         <svg className="w-6 h-6" viewBox="0 0 24 24">

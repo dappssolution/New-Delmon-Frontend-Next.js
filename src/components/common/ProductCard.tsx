@@ -52,7 +52,6 @@ const colorMap: Record<string, string> = {
 export default function ProductCard({
     product,
     showBadge = true,
-    backgroundColor = "bg-white"
 }: ProductCardProps) {
     const dispatch = useAppDispatch();
     const { token } = useAppSelector((state: RootState) => state.auth);
@@ -155,69 +154,72 @@ export default function ProductCard({
 
     return (
         <>
-            <div className={`${backgroundColor} rounded-lg overflow-hidden w-full h-full flex flex-col relative`}>
+            <div className="w-full flex flex-col group bg-white">
                 {/* Image Section */}
-                <div className="relative bg-gray-100 aspect-square flex items-center justify-center shrink-0">
-                    <Link href={`/product/${encodeURIComponent(product.slug)}`} className="block w-full h-full">
+                <div className="relative w-full pt-[100%] rounded-2xl overflow-hidden shrink-0 transition-all duration-300 bg-gray-50">
+                    <Link href={`/product/${encodeURIComponent(product.slug)}`} className="absolute inset-0 block">
                         <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                     </Link>
                 </div>
 
                 {/* Content Section  */}
-                <div className="p-4 flex flex-col grow">
+                <div className="py-4 flex flex-col grow">
                     {/* Category */}
-                    <p className="text-gray-500 text-xs mb-1">
+                    <p className="text-gray-500 text-sm mb-1">
                         {product.category}
                     </p>
 
                     {/* Title */}
                     <Link href={`/product/${encodeURIComponent(product.slug)}`}>
-                        <h3 className="text-gray-900 text-base font-semibold mb-3 hover:text-green-700 transition-colors line-clamp-2 min-h-12">
+                        <h3 className="text-black text-[17px] font-bold mb-1 hover:text-[#006637] transition-colors line-clamp-1">
                             {product.title}
                         </h3>
                     </Link>
 
                     {/* Price Section */}
-                    <div className="flex items-center gap-2 mb-4 flex-wrap">
-                        <span className="text-gray-900 text-lg font-bold">
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="text-black text-base font-bold">
                             {product.price}
                         </span>
                         {product.oldPrice && (
-                            <span className="text-gray-400 text-sm line-through">
+                            <span className="text-gray-400 text-sm line-through font-medium">
                                 {product.oldPrice}
                             </span>
                         )}
                         {showBadge && discountBadge && (
-                            <span className="bg-red-100 text-red-500 text-xs font-medium px-2 py-0.5 rounded-full">
-                                {discountBadge}
+                            <span className="bg-red-50 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-100">
+                                -{discountBadge.replace(/[^0-9%]/g, '')}
                             </span>
                         )}
                     </div>
 
-                    {/* Buttons - Push to bottom */}
+                    {/* Buttons Section */}
                     <div className="flex items-center gap-2 mt-auto">
                         <button
                             onClick={handleAddToCart}
                             disabled={isAdding}
-                            className="flex-1 w-full bg-green-700 hover:bg-green-800 text-white text-sm font-medium py-2.5 px-4 rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-sm font-bold py-3 px-6 rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group-hover:shadow-md"
                         >
                             {isAdding ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
                                     Add to Cart
-                                    <span className="text-lg">+</span>
+                                    <span className="text-lg leading-none">+</span>
                                 </>
                             )}
                         </button>
 
                         <button
                             onClick={handleWishlistToggle}
-                            className={`w-11 h-11 bg-white border-2 rounded-full flex items-center justify-center transition-colors shrink-0 ${isInWishlist ? 'border-red-500 text-red-500' : 'border-green-700 text-green-700 hover:bg-green-50'}`}
+                            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all border-2 shrink-0 ${isInWishlist
+                                ? 'bg-[#006637] border-[#006637] text-white'
+                                : 'bg-transparent border-[#006637] text-[#006637] hover:bg-green-50'
+                                }`}
                         >
                             {isWishlistLoading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -313,7 +315,7 @@ export default function ProductCard({
                             <button
                                 onClick={handleConfirmVariant}
                                 disabled={isAdding}
-                                className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                                className="w-full bg-[#006637] hover:bg-[#004d2a] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
                             >
                                 {isAdding ? (
                                     <>

@@ -8,23 +8,59 @@ import { resendVerificationEmail } from "@/src/redux/auth/authThunk";
 import { useSelector } from "react-redux";
 import { RootState } from "@/src/redux/store";
 import { toast } from "sonner";
-import { Mail, Loader2, ArrowLeft } from "lucide-react";
+import { Mail, Loader2, ArrowLeft, Timer } from "lucide-react";
+import { logout } from "@/src/redux/auth/authSlice";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { token } = useSelector((state: RootState) => state.auth);
+  const { token, user } = useSelector((state: RootState) => state.auth);
+  const [email, setEmail] = useState<string | null>(null);
 
   const [resendLoading, setResendLoading] = useState(false);
   const [loginUrl, setLoginUrl] = useState("/login");
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const redirect = searchParams.get("redirect") || sessionStorage.getItem("redirectAfterLogin");
+    const emailParam = searchParams.get("email");
+
     if (redirect) {
       setLoginUrl(`/login?redirect=${encodeURIComponent(redirect)}`);
     }
-  }, []);
+
+    if (emailParam) {
+      setEmail(emailParam);
+    } else if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      dispatch(logout());
+      toast.error("Verification session expired. Please register again if you didn't receive the email.");
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, dispatch]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleLoginNavigation = () => {
+    dispatch(logout());
+    router.push(loginUrl);
+  };
 
   const handleResendEmail = async () => {
     if (!token) {
@@ -77,7 +113,7 @@ export default function VerifyEmailPage() {
               </h1>
 
               <p className="text-base text-gray-600 mb-6">
-                We've sent a verification link to your email address.
+                We've sent a verification link to <span className="font-semibold text-black">{email || "your email address"}</span>.
                 <br />
                 Please click the link in the email to verify your account.
               </p>
@@ -92,7 +128,7 @@ export default function VerifyEmailPage() {
               <div className="space-y-3">
                 <button
                   onClick={handleResendEmail}
-                  disabled={resendLoading}
+                  disabled={resendLoading || timeLeft <= 0}
                   className="w-full h-12 rounded-full bg-[#114f30] text-white font-semibold hover:bg-[#0d3d25] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resendLoading ? (
@@ -102,14 +138,14 @@ export default function VerifyEmailPage() {
                     </>
                   ) : (
                     <>
-                      <Mail className="w-5 h-5" />
-                      Resend Verification Email
+                      <Timer className="w-5 h-5" />
+                      {timeLeft > 0 ? `Resend Verification Email (${formatTime(timeLeft)})` : "Session Expired"}
                     </>
                   )}
                 </button>
 
                 <button
-                  onClick={() => router.push(loginUrl)}
+                  onClick={handleLoginNavigation}
                   className="w-full h-12 rounded-full border-2 border-[#114f30] text-[#114f30] font-semibold hover:bg-[#114f30] hover:text-white transition flex items-center justify-center gap-2"
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -120,7 +156,7 @@ export default function VerifyEmailPage() {
               <p className="text-sm text-gray-500 mt-6">
                 Already verified?{" "}
                 <button
-                  onClick={() => router.push(loginUrl)}
+                  onClick={handleLoginNavigation}
                   className="font-medium text-[#114f30] hover:underline"
                 >
                   Login here

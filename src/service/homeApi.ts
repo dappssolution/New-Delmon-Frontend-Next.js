@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { BrandGetResponse, SliderResponse } from "../types/home.types";
+import { BrandGetResponse, SliderResponse, VendorDetailedResponse } from "../types/home.types";
 
 export const homeApi = {
   async getBanners() {
@@ -98,8 +98,8 @@ export const homeApi = {
     return res.data;
   },
 
-  async getVendorById(id: string | number) {
-    const res = await api.get(`/vendor/${id}`);
+  async getVendorById(id: string | number, params?: { page?: number; category_id?: number | null }) {
+    const res = await api.get<VendorDetailedResponse>(`/vendor/${id}`, { params });
     return res.data;
   },
 

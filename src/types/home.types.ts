@@ -1,3 +1,5 @@
+import { ProductData } from "./product.types"
+
 export interface SliderResponse {
   success: boolean
   message: string
@@ -64,6 +66,63 @@ export interface VendorGetData {
   facebook_id: any
   created_at: any
   updated_at: string
+}
+
+export interface Meta {
+  total: number
+  current_loaded: number
+  loaded: number
+  prev_page: any
+  next_page: any
+  current_page: number
+  last_page: number
+}
+
+
+export interface VendorDetailedResponse {
+  success: boolean
+  message: string
+  data: VendorDetailData
+  meta: Meta
+}
+
+export interface VendorDetailData {
+  products: ProductData[]
+  vendor: Vendor
+  category_data: CategoryDaum[]
+}
+
+export interface Vendor {
+  id: number
+  name: string
+  username: string
+  email: string
+  email_verified_at: string
+  photo: string
+  phone: string
+  address: string
+  vendor_join: string
+  vendor_short_info: string
+  role: string
+  status: string
+  last_seen: string
+  google_id: any
+  facebook_id: any
+  created_at: string
+  updated_at: string
+}
+
+export interface CategoryDaum {
+  id: number
+  main_category_id: number
+  category_name: string
+  category_slug: string
+  category_image?: string
+  created_at: string
+  updated_at: string
+  meta_title: string
+  meta_description: string
+  meta_keywords: string
 }
 
 export interface Meta {

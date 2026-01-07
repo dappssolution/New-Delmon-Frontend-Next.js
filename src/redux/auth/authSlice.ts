@@ -48,6 +48,11 @@ const authSlice = createSlice({
       state.message = null;
       removeAuthToken();
     },
+    setToken: (state, action) => {
+      state.token = action.payload;
+      setAuthToken(action.payload);
+      removeGuestId();
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -113,6 +118,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { hydrateAuth, logout } = authSlice.actions;
+export const { hydrateAuth, logout, setToken } = authSlice.actions;
 
 export default authSlice.reducer;

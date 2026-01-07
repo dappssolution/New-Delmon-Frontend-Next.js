@@ -9,6 +9,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
+import { authApi } from "@/src/service/authApi";
 
 export default function RegisterPage() {
     const dispatch = useAppDispatch();
@@ -29,6 +31,8 @@ export default function RegisterPage() {
 
     const [agreeTerms, setAgreeTerms] = useState(false);
     const [loginUrl, setLoginUrl] = useState("/login");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
@@ -77,9 +81,9 @@ export default function RegisterPage() {
 
             const searchParams = new URLSearchParams(window.location.search);
             const redirect = searchParams.get("redirect") || sessionStorage.getItem("redirectAfterLogin");
-            let verifyUrl = "/verify-email/0/0";
+            let verifyUrl = `/verify-email/0/0?email=${encodeURIComponent(form.email)}`;
             if (redirect) {
-                verifyUrl += `?redirect=${encodeURIComponent(redirect)}`;
+                verifyUrl += `&redirect=${encodeURIComponent(redirect)}`;
             }
 
             setTimeout(() => {
@@ -93,6 +97,19 @@ export default function RegisterPage() {
             toast.error(error);
         }
     }, [error]);
+
+    const handleGoogleLogin = async () => {
+        try {
+            const response = await authApi.getGoogleAuthUrl();
+            if (response.url) {
+                window.location.href = response.url;
+            } else {
+                toast.error("Failed to get Google login URL");
+            }
+        } catch (err) {
+            toast.error("An error occurred while connecting to Google");
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12 text-black">
@@ -169,25 +186,51 @@ export default function RegisterPage() {
                                     </select>
                                 )}
 
-                                <input
-                                    name="password"
-                                    type="password"
-                                    placeholder="Password *"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Password *"
+                                        value={form.password}
+                                        onChange={handleChange}
+                                        className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30] pr-12"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                </div>
 
-                                <input
-                                    name="password_confirmation"
-                                    type="password"
-                                    placeholder="Confirm Password *"
-                                    value={form.password_confirmation}
-                                    onChange={handleChange}
-                                    className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30]"
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        name="password_confirmation"
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirm Password *"
+                                        value={form.password_confirmation}
+                                        onChange={handleChange}
+                                        className="w-full h-12 px-4 border border-[#8fccab] rounded-md focus:outline-none focus:border-[#114f30] pr-12"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff className="w-5 h-5" />
+                                        ) : (
+                                            <Eye className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                </div>
 
                                 {/* Terms */}
                                 <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -238,6 +281,7 @@ export default function RegisterPage() {
                                         <div className="flex gap-4 justify-center">
                                             <button
                                                 type="button"
+                                                onClick={handleGoogleLogin}
                                                 className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 hover:shadow-md hover:bg-gray-50 transition-all"
                                             >
                                                 <svg className="w-6 h-6" viewBox="0 0 24 24">

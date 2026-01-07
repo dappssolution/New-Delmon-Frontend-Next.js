@@ -1,20 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Trash2, Loader2 } from "lucide-react";
-import { cartApi } from "@/src/service/cartApi";
 import { checkoutApi } from "@/src/service/checkoutApi";
-import { Cart, CartItem } from "@/src/types/cart.types";
 import { DivisionData, DistrictData, StateData } from "@/src/types/checkout.types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
+import { RootState } from "@/src/redux/store";
+import { fetchCart, updateCartItem, removeFromCart, applyCoupon } from "@/src/redux/cart/cartThunk";
+
+// Debounce hook
+function useDebounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+): T {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedFunction = useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  ) as T;
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return debouncedFunction;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [cart, setCart] = useState<Cart | null>(null);
+  const dispatch = useAppDispatch();
+  const { cart, loading: cartLoading } = useAppSelector((state: RootState) => state.cart);
   const [divisions, setDivisions] = useState<DivisionData[]>([]);
   const [districts, setDistricts] = useState<DistrictData[]>([]);
   const [states, setStates] = useState<StateData[]>([]);
+
+  const [localQuantities, setLocalQuantities] = useState<Record<number, number>>({});
+  const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
 
   const [formData, setFormData] = useState({
     name: "",
@@ -37,14 +72,21 @@ export default function CheckoutPage() {
     fetchInitialData();
   }, []);
 
+  useEffect(() => {
+    if (cart?.cart_items) {
+      const quantities: Record<number, number> = {};
+      cart.cart_items.forEach(item => {
+        quantities[item.id] = item.qty;
+      });
+      setLocalQuantities(quantities);
+    }
+  }, [cart?.cart_items]);
+
   const fetchInitialData = async () => {
     try {
       setInitialLoading(true);
-      const [cartData, divisionsData] = await Promise.all([
-        cartApi.getCart(),
-        checkoutApi.getDivisions()
-      ]);
-      setCart(cartData);
+      const divisionsData = await checkoutApi.getDivisions();
+      await dispatch(fetchCart());
       setDivisions(divisionsData);
     } catch (error) {
       console.error("Error fetching initial data:", error);
@@ -103,32 +145,34 @@ export default function CheckoutPage() {
     });
   };
 
-  const updateQuantity = async (id: number, delta: number) => {
-    if (!cart) return;
-    const item = cart.cart_items.find((i: CartItem) => i.id === id);
-    if (!item) return;
+  // Debounced API call
+  const debouncedUpdateCart = useDebounce(async (itemId: number, quantity: number) => {
+    setUpdatingItems(prev => new Set(prev).add(itemId));
+    await dispatch(updateCartItem({ itemId, quantity }));
+    setUpdatingItems(prev => {
+      const next = new Set(prev);
+      next.delete(itemId);
+      return next;
+    });
+  }, 500);
 
-    const newQty = item.qty + delta;
-    if (newQty < 1) return;
+  const updateQuantity = (id: number, delta: number) => {
+    const currentQty = localQuantities[id] || 1;
+    const newQuantity = Math.max(1, currentQty + delta);
 
-    try {
-      await cartApi.updateCartItem(id, newQty);
-      const updatedCart = await cartApi.getCart();
-      setCart(updatedCart);
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-      toast.error("Failed to update quantity");
-    }
+    setLocalQuantities(prev => ({
+      ...prev,
+      [id]: newQuantity
+    }));
+
+    debouncedUpdateCart(id, newQuantity);
   };
 
   const handleRemoveItem = async (id: number) => {
-    try {
-      await cartApi.removeFromCart(id);
-      const updatedCart = await cartApi.getCart();
-      setCart(updatedCart);
+    const res = await dispatch(removeFromCart(id));
+    if (removeFromCart.fulfilled.match(res)) {
       toast.success("Item removed from cart");
-    } catch (error) {
-      console.error("Error removing item:", error);
+    } else {
       toast.error("Failed to remove item");
     }
   };
@@ -140,20 +184,14 @@ export default function CheckoutPage() {
     }
 
     setCouponLoading(true);
-    try {
-      const response = await cartApi.applyCoupon(couponCode);
-      if (response.success) {
-        setCart(response.data);
-        toast.success(response.message || "Coupon applied successfully!");
-        setCouponCode("");
-      } else {
-        toast.error(response.message || "Failed to apply coupon");
-      }
-    } catch (error: any) {
-      console.error("Error applying coupon:", error);
-      toast.error(error.response?.data?.message || "Invalid coupon code");
-    } finally {
-      setCouponLoading(false);
+    const res = await dispatch(applyCoupon(couponCode));
+    setCouponLoading(false);
+
+    if (applyCoupon.fulfilled.match(res)) {
+      toast.success("Coupon applied successfully!");
+      setCouponCode("");
+    } else {
+      toast.error(res.payload as string || "Failed to apply coupon");
     }
   };
 
@@ -194,7 +232,7 @@ export default function CheckoutPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
       </div>
     );
@@ -248,7 +286,7 @@ export default function CheckoutPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded"></div>
+                        <div className="w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded"></div>
                       )}
                     </div>
 
@@ -274,28 +312,33 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center border border-gray-300 rounded-md h-8">
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                        disabled={item.qty <= 1}
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center text-sm font-medium">
-                        {item.qty}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
-                      >
-                        +
-                      </button>
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <div className="flex items-center border border-gray-300 rounded-md h-8">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                          disabled={(localQuantities[item.id] || item.qty) <= 1}
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center text-sm font-medium">
+                          {localQuantities[item.id] ?? item.qty}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
+                        >
+                          +
+                        </button>
+                      </div>
+                      {updatingItems.has(item.id) && (
+                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                      )}
                     </div>
 
                     {/* Price */}
                     <div className="w-20 text-right font-semibold text-gray-900 whitespace-nowrap">
-                      AED {item.total}
+                      AED {(item.price * (localQuantities[item.id] || item.qty)).toFixed(2)}
                     </div>
 
                     {/* Delete Button */}
@@ -524,13 +567,13 @@ export default function CheckoutPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-gray-700">
                   <span>Sub Total</span>
-                  <span className="font-semibold">AED {cart.cart_total}</span>
+                  <span className="font-semibold">AED {cart.cart_total.toFixed(2)}</span>
                 </div>
 
                 {cart.discount_amount && cart.discount_amount > 0 && (
                   <div className="flex justify-between text-gray-700">
                     <span>Discount</span>
-                    <span className="font-semibold text-green-600">-AED {cart.discount_amount}</span>
+                    <span className="font-semibold text-green-600">-AED {cart.discount_amount.toFixed(2)}</span>
                   </div>
                 )}
 
@@ -541,13 +584,13 @@ export default function CheckoutPage() {
 
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span className="font-semibold">AED {cart.shipping_config.cost}</span>
+                  <span className="font-semibold">AED {cart.shipping_config.cost.toFixed(2)}</span>
                 </div>
 
                 <div className="border-t border-gray-300 pt-4">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Grand Total</span>
-                    <span>AED {cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0)}</span>
+                    <span>AED {(cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0)).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

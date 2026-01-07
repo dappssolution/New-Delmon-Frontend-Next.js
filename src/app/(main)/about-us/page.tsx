@@ -41,15 +41,15 @@ export default function AboutUsPage() {
                         </p>
 
                         <div className="flex flex-wrap gap-4 mb-10">
-                            <Button className="bg-green-700! hover:bg-green-800! text-white rounded-full px-8">
+                            <Link href='/' className="bg-green-700!  hover:bg-green-800! text-white rounded-full px-8 py-2">
                                 Shop Now
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="rounded-full px-8 border-gray-300 hover:bg-gray-50"
+                            </Link>
+                            <Link
+                                href='/'
+                                className="rounded-full px-8 border-gray-300 border text-black hover:bg-gray-50 py-2"
                             >
                                 Explore Categories
-                            </Button>
+                            </Link>
                         </div>
 
                         <div className="grid grid-cols-3 gap-8">
@@ -203,9 +203,9 @@ export default function AboutUsPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        <div className="group text-center">
-                            <div className="relative w-full h-64 mb-4 rounded-2xl overflow-hidden">
+                    <div className="flex flex-wrap justify-center items-end gap-8 max-w-5xl mx-auto">
+                        <div className="group text-center w-full md:w-[280px]">
+                            <div className="relative w-full h-80 mb-4 rounded-xl overflow-hidden bg-gray-100">
                                 <Image
                                     src="/about-image-3.jpeg"
                                     alt="Founder & CEO"
@@ -215,8 +215,8 @@ export default function AboutUsPage() {
                             </div>
                             <h3 className="font-bold text-lg text-gray-900">Founder & CEO</h3>
                         </div>
-                        <div className="group text-center">
-                            <div className="relative w-full h-64 mb-4 rounded-2xl overflow-hidden">
+                        <div className="group text-center w-full md:w-[240px]">
+                            <div className="relative w-full h-64 mb-4 rounded-xl overflow-hidden bg-gray-100">
                                 <Image
                                     src="/about-image-4.jpeg"
                                     alt="Marketing"
@@ -226,8 +226,8 @@ export default function AboutUsPage() {
                             </div>
                             <h3 className="font-bold text-lg text-gray-900">Marketing</h3>
                         </div>
-                        <div className="group text-center">
-                            <div className="relative w-full h-64 mb-4 rounded-2xl overflow-hidden">
+                        <div className="group text-center w-full md:w-[240px]">
+                            <div className="relative w-full h-64 mb-4 rounded-xl overflow-hidden bg-gray-100">
                                 <Image
                                     src="/about-image-5.jpeg"
                                     alt="Sales"

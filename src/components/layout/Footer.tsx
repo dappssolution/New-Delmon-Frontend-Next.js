@@ -1,9 +1,31 @@
+"use client";
+
 import React from "react";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
+import { RootState } from "@/src/redux/store";
+import { logout } from "@/src/redux/auth/authSlice";
+import { resetCart } from "@/src/redux/cart/cartSlice";
+import { resetWishlist } from "@/src/redux/wishlist/wishlistSlice";
+import { useRouter } from "next/navigation";
 
 const Footer = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { token } = useAppSelector((state: RootState) => state.auth);
+
+  const handleVendorAuth = (e: React.MouseEvent, path: string) => {
+    if (token) {
+      e.preventDefault();
+      dispatch(logout());
+      dispatch(resetCart());
+      dispatch(resetWishlist());
+      router.push(path);
+    }
+  };
+
   return (
     <footer className="w-full">
       {/* Main Footer - Green Background */}
@@ -150,6 +172,7 @@ const Footer = () => {
                 <li>
                   <Link
                     href="/register?role=vendor"
+                    onClick={(e) => handleVendorAuth(e, "/register?role=vendor")}
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Become a Vendor
@@ -158,6 +181,7 @@ const Footer = () => {
                 <li>
                   <Link
                     href="/login?role=vendor"
+                    onClick={(e) => handleVendorAuth(e, "/login?role=vendor")}
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Login to Vendor Panel

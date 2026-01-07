@@ -339,14 +339,13 @@ export default function ProductDetailsPage() {
                                 {product.product_name}
                             </h1>
 
-                            <div className="flex items-center gap-4 mb-4">
+                            {/* <div className="flex items-center gap-4 mb-4">
                                 <div className="flex text-yellow-400">
                                     {[1, 2, 3, 4, 5].map((s) => (
                                         <Star key={s} className="w-5 h-5 fill-current" />
                                     ))}
                                 </div>
-                                <span className="text-gray-500 text-sm font-medium">+100 Bought</span>
-                            </div>
+                            </div> */}
 
                             <div className="flex items-baseline gap-3 mb-8">
                                 <span className="text-2xl font-bold text-[#E31E24]">AED {currentPrice}</span>
@@ -455,9 +454,6 @@ export default function ProductDetailsPage() {
                                         ) : (
                                             <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
                                         )}
-                                    </button>
-                                    <button className="w-12 h-12 rounded-xl bg-[#E8F3ED] flex items-center justify-center text-gray-600 hover:text-[#E31E24] transition-colors border border-[#d6eadd]">
-                                        <ArrowRightLeft className="w-5 h-5" />
                                     </button>
                                 </div>
                             </div>
