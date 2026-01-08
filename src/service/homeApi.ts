@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { BrandGetResponse, SliderResponse, VendorDetailedResponse } from "../types/home.types";
+import { BrandGetResponse, SearchProductResponse, SliderResponse, VendorDetailedResponse } from "../types/home.types";
 
 export const homeApi = {
   async getBanners() {
@@ -103,9 +103,9 @@ export const homeApi = {
     return res.data;
   },
 
-  async searchProducts(query: string) {
-    const res = await api.get(`/search-products`, {
-      params: { query }
+  async searchProducts(query: string, page: number = 1, perPage: number = 12) {
+    const res = await api.get<SearchProductResponse>(`/search-products`, {
+      params: { query, page, per_page: perPage }
     });
     return res.data;
   }

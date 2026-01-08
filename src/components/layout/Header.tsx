@@ -87,8 +87,8 @@ export default function Header() {
         setIsSearching(true);
         try {
           const res = await homeApi.searchProducts(searchQuery);
-          if (res.success && res.data?.products) {
-            setSuggestions(res.data.products);
+          if (res.success && res.data) {
+            setSuggestions(res.data);
             setShowSuggestions(true);
           } else {
             setSuggestions([]);
@@ -113,6 +113,17 @@ export default function Header() {
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) {
+      if ('preventDefault' in e) e.preventDefault();
+    }
+    if (searchQuery.trim().length >= 2) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSuggestions(false);
+      setSearchOpen(false);
+    }
+  };
 
   const handleSuggestionClick = (slug: string) => {
     router.push(`/product/${encodeURIComponent(slug)}`);
@@ -177,6 +188,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Search For Products"
                   className="w-full h-10 px-4 pr-10 bg-white border text-gray-900 border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-700"
                 />
@@ -222,6 +234,14 @@ export default function Header() {
                         </div>
                       </div>
                     ))}
+                    <div className="px-4 py-3 border-t border-gray-50 text-center">
+                      <button
+                        onClick={handleSearch}
+                        className="text-xs font-semibold text-green-700 hover:text-green-800"
+                      >
+                        View all results for "{searchQuery}"
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -277,10 +297,11 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Search For Products"
                   className="w-full h-11 px-5 text-gray-900 pr-12 bg-gray-50 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-700 focus:border-transparent"
                 />
-                <button className="absolute right-0 top-0 h-11 w-11 flex items-center justify-center">
+                <button onClick={handleSearch} className="absolute right-0 top-0 h-11 w-11 flex items-center justify-center">
                   {isSearching ? (
                     <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
                   ) : (
@@ -329,10 +350,10 @@ export default function Header() {
                       </div>
                     </div>
                   ))}
-                  {suggestions.length >= 5 && (
+                  {suggestions.length > 0 && (
                     <div className="px-4 py-3 border-t border-gray-50 text-center">
                       <button
-                        onClick={() => router.push(`/search?q=${encodeURIComponent(searchQuery)}`)}
+                        onClick={handleSearch}
                         className="text-xs font-semibold text-green-700 hover:text-green-800"
                       >
                         View all results for "{searchQuery}"

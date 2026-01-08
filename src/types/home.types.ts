@@ -134,3 +134,69 @@ export interface Meta {
   current_page: number
   last_page: number
 }
+
+export interface SearchProductResponse {
+  success: boolean
+  message: string
+  data: SearchProductData[]
+  meta: Meta
+}
+
+export interface SearchProductData {
+  id: number
+  brand_id: number
+  brand_name: any
+  main_category_id: any
+  main_category_name: any
+  category_id: number
+  category_name: any
+  subcategory_id?: number
+  subcategory_name: any
+  product_name: string
+  product_slug: string
+  product_code: string
+  product_qty: string
+  product_tags: string
+  product_size: string
+  product_color: string
+  packing: any
+  height: any
+  width: any
+  length: any
+  weight: any
+  origin: any
+  alt: any
+  selling_price: string
+  contract_price: any
+  discount_price: string
+  specification: any
+  short_description: string
+  long_description: string
+  product_thambnail: string
+  vendor_id: number
+  hot_deals: number
+  featured: number
+  special_offer?: number
+  special_deals?: number
+  new_product: any
+  category_skip_0: any
+  category_skip_4: any
+  category_skip_7: any
+  meta_title: any
+  meta_keyword: any
+  meta_description: any
+  wholesale: any
+  status: number
+  created_at: string
+  updated_at?: string
+}
+
+export interface Meta {
+  total: number
+  current_loaded: number
+  loaded: number
+  prev_page: any
+  next_page: any
+  current_page: number
+  last_page: number
+}
