@@ -57,8 +57,12 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (token && user && verified) {
-      toast.success("Login Successful!");
+    if (token && user) {
+      if (verified) {
+        toast.success("Login Successful!");
+      } else {
+        toast.success("Login Successful! Please verify your email.");
+      }
 
       const redirectPath = searchParams.get("redirect");
       const storedRedirect = sessionStorage.getItem("redirectAfterLogin");

@@ -349,22 +349,6 @@ function WishlistContent() {
                                 ))}
                             </div>
                         </div>
-
-                        {/* Update Now Button */}
-                        <div className="flex justify-start">
-                            <Button
-                                variant="primary"
-                                className="px-8 py-3 rounded-lg bg-black hover:bg-gray-800 text-white"
-                                onClick={() => dispatch(fetchWishlist())}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    "Update Now"
-                                )}
-                            </Button>
-                        </div>
                     </>
                 )}
             </div>

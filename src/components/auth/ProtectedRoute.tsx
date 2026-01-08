@@ -62,7 +62,7 @@ export default function ProtectedRoute({
 
                 if (user) {
                     const currentUser = user as unknown as UserData;
-                    if (currentUser.email_verified_at === null && pathname !== "/verify-email") {
+                    if (currentUser.email_verified_at === null && !pathname.startsWith("/verify-email")) {
                         router.replace("/verify-email/0/0");
                         return;
                     }
