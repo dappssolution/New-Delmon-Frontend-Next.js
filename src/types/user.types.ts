@@ -22,6 +22,7 @@ export interface UserData {
   facebook_id: any
   created_at: string
   updated_at: string
+  contract_status: "Not Requested" | "Requested" | "Approved"
 }
 
 

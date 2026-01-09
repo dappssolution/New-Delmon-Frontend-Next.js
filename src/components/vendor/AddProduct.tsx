@@ -196,12 +196,10 @@ export default function AddProductPage() {
                     multiImages: null
                 });
 
-            } else {
-                toast.error(response.message || 'Failed to add product');
             }
         } catch (error: any) {
             console.error('Error adding product:', error);
-            toast.error(error.response?.data?.message || 'Failed to add product');
+            toast.error(error.response?.data?.error || error.response?.data?.message || 'Failed to add product');
         } finally {
             setIsSubmitting(false);
         }

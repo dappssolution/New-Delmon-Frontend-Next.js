@@ -11,7 +11,7 @@ export const fetchCart = createAsyncThunk(
             return await cartApi.getCart();
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to fetch cart"
+                error.response?.data?.error || error.response?.data?.message || "Failed to fetch cart"
             );
         }
     }
@@ -32,7 +32,7 @@ export const addToCart = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to add to cart"
+                error.response?.data?.error || error.response?.data?.message || "Failed to add to cart"
             );
         }
     }
@@ -53,7 +53,7 @@ export const updateCartItem = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to update cart item"
+                error.response?.data?.error || error.response?.data?.message || "Failed to update cart item"
             );
         }
     }
@@ -71,7 +71,7 @@ export const removeFromCart = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to remove from cart"
+                error.response?.data?.error || error.response?.data?.message || "Failed to remove from cart"
             );
         }
     }
@@ -88,7 +88,7 @@ export const applyCoupon = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to apply coupon"
+                error.response?.data?.error || error.response?.data?.message || "Failed to apply coupon"
             );
         }
     }
@@ -105,7 +105,7 @@ export const removeCoupon = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to remove coupon"
+                error.response?.data?.error || error.response?.data?.message || "Failed to remove coupon"
             );
         }
     }

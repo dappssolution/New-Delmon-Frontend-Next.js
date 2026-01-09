@@ -9,7 +9,7 @@ export const fetchWishlist = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to fetch wishlist"
+                error.response?.data?.error || error.response?.data?.message || "Failed to fetch wishlist"
             );
         }
     }
@@ -23,7 +23,7 @@ export const addToWishlist = createAsyncThunk(
             return data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to add to wishlist"
+                error.response?.data?.error || error.response?.data?.message || "Failed to add to wishlist"
             );
         }
     }
@@ -37,7 +37,7 @@ export const removeFromWishlist = createAsyncThunk(
             return productId;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to remove from wishlist"
+                error.response?.data?.error || error.response?.data?.message || "Failed to remove from wishlist"
             );
         }
     }

@@ -92,12 +92,6 @@ export default function RegisterPage() {
         }
     };
 
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
-
     const handleGoogleLogin = async () => {
         try {
             const response = await authApi.getGoogleAuthUrl();

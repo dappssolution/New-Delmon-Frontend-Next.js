@@ -42,7 +42,7 @@ export default function Header() {
   const dispatch = useAppDispatch();
   const { wishlist } = useAppSelector((state: RootState) => state.wishlist);
   const { cart } = useAppSelector((state: RootState) => state.cart);
-  const { token } = useAppSelector((state: RootState) => state.auth);
+  const { token, user } = useAppSelector((state: RootState) => state.auth);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -74,6 +74,8 @@ export default function Header() {
   const handleVendorAuth = (e: React.MouseEvent, path: string) => {
     if (token) {
       e.preventDefault();
+      sessionStorage.clear();
+      sessionStorage.removeItem("redirectAfterLogin")
       dispatch(logout());
       dispatch(resetCart());
       dispatch(resetWishlist());
@@ -378,10 +380,20 @@ export default function Header() {
             {/* Right Icons */}
             <div className="flex items-center gap-3 xl:gap-5">
 
-              <Link href="/contract/request" className="hidden xl:flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[50px]">
-                <Scale className="w-5 h-5" />
-                <span className="text-[11px] font-medium">Contract</span>
-              </Link>
+              {user?.contract_status === "Approved" ? (
+                <Link
+                  href="/contract/products"
+                  className="hidden xl:flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[50px]"
+                >
+                  <Scale className="w-5 h-5" />
+                  <span className="text-[11px] font-medium">Contract</span>
+                </Link>
+              ) : (
+                <Link href="/contract/request" className="hidden xl:flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[50px]">
+                  <Scale className="w-5 h-5" />
+                  <span className="text-[11px] font-medium">Contract</span>
+                </Link>
+              )}
               <Link
                 href="/login?role=vendor"
                 onClick={(e) => handleVendorAuth(e, "/login?role=vendor")}

@@ -9,6 +9,7 @@ export interface ContractRequestPayload {
 export interface ContractRequestResponse {
   status: boolean
   message: string
+  error?: string
   data: ContractRequestData
 }
 

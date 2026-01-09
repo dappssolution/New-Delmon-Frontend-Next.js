@@ -224,7 +224,7 @@ export default function CheckoutPage() {
       }
     } catch (error: any) {
       console.error("Error placing order:", error);
-      toast.error(error.response?.data?.message || "Something went wrong while placing the order");
+      toast.error(error.response?.data?.error || error.response?.data?.message || "Something went wrong while placing the order");
     } finally {
       setLoading(false);
     }

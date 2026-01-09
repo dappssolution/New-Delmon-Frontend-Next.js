@@ -12,12 +12,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchVendorProducts = createAsyncThunk(
     "vendor/fetchVendorProducts",
-    async (_, { rejectWithValue }) => {
+    async (params: { page?: number; per_page?: number; search?: string } = {}, { rejectWithValue }) => {
         try {
-            const response = await vendorApis.getProducts();
+            const response = await vendorApis.getProducts(params);
             return response as AllProductGetResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch products");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to fetch products");
         }
     }
 );
@@ -29,19 +29,19 @@ export const deleteVendorProduct = createAsyncThunk(
             const response = await vendorApis.deleteProduct(productId);
             return { productId, response };
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to delete product");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to delete product");
         }
     }
 );
 
 export const updateVendorProduct = createAsyncThunk(
     "vendor/updateVendorProduct",
-    async ({ productId, productData, newStatus }: { productId: string; productData: FormData; newStatus?: number }, { rejectWithValue }) => {
+    async ({ productId, productData }: { productId: string; productData: FormData }, { rejectWithValue }) => {
         try {
             const response = await vendorApis.updateProduct(productId, productData);
-            return { ...response, newStatus } as UpdateProductResponse & { newStatus?: number };
+            return response as UpdateProductResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to update product");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to update product");
         }
     }
 );
@@ -53,7 +53,7 @@ export const fetchVendorOrders = createAsyncThunk(
             const response = await vendorApis.getAllOrders();
             return response as OrdersGetResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch orders");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to fetch orders");
         }
     }
 );
@@ -65,7 +65,7 @@ export const fetchOrderDetail = createAsyncThunk(
             const response = await vendorApis.OrderDetails(orderId);
             return response as OrderDetailResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch order details");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to fetch order details");
         }
     }
 );
@@ -77,7 +77,7 @@ export const updateVendorOrderStatus = createAsyncThunk(
             const response = await vendorApis.updateOrderStatus(orderId, status);
             return response as UpdateOrderStatusResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to update order status");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to update order status");
         }
     }
 );
@@ -89,7 +89,7 @@ export const updateVendorProfile = createAsyncThunk(
             const response = await vendorApis.updateProfile(profileData);
             return response as ProfileUpdateResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to update profile");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to update profile");
         }
     }
 );
@@ -101,7 +101,7 @@ export const fetchVendorReturnOrders = createAsyncThunk(
             const response = await vendorApis.getReturnOrders();
             return response as GetReturnOrderResponse;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch return orders");
+            return rejectWithValue(error.response?.data?.error || error.response?.data?.message || "Failed to fetch return orders");
         }
     }
 );

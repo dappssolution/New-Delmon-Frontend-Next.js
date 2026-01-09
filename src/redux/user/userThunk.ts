@@ -9,7 +9,7 @@ export const fetchUserProfile = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to fetch user profile"
+                error.response?.data?.error || error.response?.data?.message || "Failed to fetch user profile"
             );
         }
     }
@@ -23,7 +23,7 @@ export const updateUserPassword = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to update password"
+                error.response?.data?.error || error.response?.data?.message || "Failed to update password"
             );
         }
     }
@@ -37,7 +37,7 @@ export const updateUserProfile = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
-                error.response?.data?.message || "Failed to update profile"
+                error.response?.data?.error || error.response?.data?.message || "Failed to update profile"
             );
         }
     }

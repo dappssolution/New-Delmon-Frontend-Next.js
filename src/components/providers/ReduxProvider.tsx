@@ -33,14 +33,15 @@ function InitAuth({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (token) {
-      if (user?.role === 'user') {
-        dispatch(fetchWishlist());
-      }
-      if (!user) {
-        dispatch(fetchUserProfile());
-      }
+      dispatch(fetchUserProfile());
     }
-  }, [dispatch, token, user]);
+  }, [dispatch, token]);
+
+  useEffect(() => {
+    if (token && user?.role === 'user') {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, token, user?.role]);
 
   useEffect(() => {
     if (user) {

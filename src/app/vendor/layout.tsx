@@ -22,7 +22,7 @@ import Loading from "@/src/components/common/Loading";
 import Image from "next/image";
 import Link from "next/link";
 import { logout } from "@/src/redux/auth/authSlice";
-import { authApi } from "@/src/service/authApi";
+// import { authApi } from "@/src/service/authApi";
 import { useAppDispatch } from "@/src/hooks/useRedux";
 
 export default function VendorLayout({
@@ -46,12 +46,15 @@ export default function VendorLayout({
 
     const handleLogout = async () => {
         try {
-            await authApi.logout();
+            // await authApi.logout();
+            dispatch(logout());
+            router.push('/')
+
         } catch (error) {
             console.error("Logout failed", error);
         } finally {
             dispatch(logout());
-            router.push("/login");
+            router.push("/");
         }
     };
 
@@ -66,9 +69,6 @@ export default function VendorLayout({
             </ProtectedRoute>
         );
     }
-
-    console.log("phtoso ssssheree:", `${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${profile?.photo}`);
-
 
     return (
         <ProtectedRoute>
@@ -88,7 +88,7 @@ export default function VendorLayout({
                 `}>
                     {/* Logo Section */}
                     <div className="h-[73px] flex items-center justify-between px-14 border-b border-gray-100 bg-white sticky top-0 z-10">
-                        <div onClick={() => router.push('/')} className="cursor-pointer">
+                        <div onClick={() => router.push('/vendor')} className="cursor-pointer">
                             <Image
                                 src="/delmon-logo-only.png"
                                 alt="Delmon"

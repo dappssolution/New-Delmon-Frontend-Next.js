@@ -80,12 +80,6 @@ export default function LoginPage() {
     }
   }, [token, user, verified, profile, router, searchParams]);
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
-
   const [registerUrl, setRegisterUrl] = useState("/register");
 
   useEffect(() => {
@@ -168,7 +162,6 @@ export default function LoginPage() {
                   placeholder="Email *"
                   value={form.email}
                   onChange={handleChange}
-                  error={error!}
                   className="h-12 border-[#8fccab] focus:ring-black"
                   required
                 />

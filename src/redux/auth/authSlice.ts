@@ -10,6 +10,7 @@ interface User {
   phone: string;
   role: string;
   status: string;
+  contract_status?: "Not Requested" | "Requested" | "Approved";
 }
 
 interface AuthState {

@@ -12,8 +12,8 @@ export const vendorApis = {
         return response.data
     },
 
-    async getProducts() {
-        const response = await api.get('/vendor/products')
+    async getProducts(params?: { page?: number; per_page?: number; search?: string }) {
+        const response = await api.get('/vendor/products', { params })
         return response.data
     },
 

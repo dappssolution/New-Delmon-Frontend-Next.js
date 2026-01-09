@@ -62,7 +62,7 @@ export default function VendorOrdersPage() {
                         <select
                             value={entriesPerPage}
                             onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
+                            className="px-3 py-1.5 text-gray-900 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
                         >
                             <option value={10}>10</option>
                             <option value={25}>25</option>
@@ -77,7 +77,7 @@ export default function VendorOrdersPage() {
                             placeholder="Search"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full sm:w-64 px-4 py-1.5 pr-10 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
+                            className="w-full text-gray-900 sm:w-64 px-4 py-1.5 pr-10 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
                         />
                         <Search className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
                     </div>

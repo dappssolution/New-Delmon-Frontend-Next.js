@@ -11,15 +11,28 @@ import { toast } from 'sonner';
 
 export default function ManageProductPage() {
     const dispatch = useAppDispatch();
-    const { products, loading, error, deleting, updating } = useAppSelector((state: RootState) => state.vendor);
+    const { products, loading, error, deleting, updating, pagination } = useAppSelector((state: RootState) => state.vendor);
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [entriesPerPage, setEntriesPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        dispatch(fetchVendorProducts());
-    }, [dispatch]);
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+            setCurrentPage(1);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        dispatch(fetchVendorProducts({
+            page: currentPage,
+            per_page: entriesPerPage,
+            search: debouncedSearchTerm
+        }));
+    }, [dispatch, currentPage, entriesPerPage, debouncedSearchTerm]);
 
     const handleDelete = async (productId: string) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
@@ -45,7 +58,6 @@ export default function ManageProductPage() {
             const resultAction = await dispatch(updateVendorProduct({
                 productId: product.id.toString(),
                 productData: formData,
-                newStatus: newStatus
             }));
 
             if (updateVendorProduct.fulfilled.match(resultAction)) {
@@ -56,18 +68,12 @@ export default function ManageProductPage() {
         }
     };
 
-    // Filter products based on search term
-    const filteredProducts = products.filter((product) =>
-        product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.product_code.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     // Pagination logic
-    const totalProducts = filteredProducts.length;
-    const totalPages = Math.ceil(totalProducts / entriesPerPage);
+    const totalProducts = pagination?.total || 0;
+    const totalPages = pagination?.lastPage || 1;
     const startIndex = (currentPage - 1) * entriesPerPage;
-    const endIndex = startIndex + entriesPerPage;
-    const currentProducts = filteredProducts.slice(startIndex, endIndex);
+    const endIndex = Math.min(startIndex + entriesPerPage, totalProducts);
+    const currentProducts = products;
 
     // Calculate discount percentage
     const calculateDiscount = (product: AllProductData) => {
@@ -78,10 +84,7 @@ export default function ManageProductPage() {
         return "0%";
     };
 
-    // Reset to page 1 when search term or entries per page changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, entriesPerPage]);
+
 
     return (
         <div className="w-full">
@@ -114,7 +117,7 @@ export default function ManageProductPage() {
                         <select
                             value={entriesPerPage}
                             onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-                            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
+                            className="px-3 py-1.5 border text-gray-900 border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
                         >
                             <option value={10}>10</option>
                             <option value={25}>25</option>
@@ -129,7 +132,7 @@ export default function ManageProductPage() {
                             placeholder="Search"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full sm:w-64 px-4 py-1.5 pr-10 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
+                            className="w-full sm:w-64 text-gray-900 px-4 py-1.5 pr-10 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838]"
                         />
                         <Search className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
                     </div>
@@ -242,7 +245,7 @@ export default function ManageProductPage() {
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm border text-gray-900 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         >
@@ -264,7 +267,7 @@ export default function ManageProductPage() {
                         ))}
 
                         <button
-                            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 text-sm border text-gray-900 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={currentPage === totalPages || totalPages === 0}
                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         >

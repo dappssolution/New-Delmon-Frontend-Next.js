@@ -81,6 +81,7 @@ export interface AllProductGetResponse {
   success: boolean
   message: string
   data: AllProductData[]
+  meta?: Meta
 }
 
 export interface AllProductData {
@@ -136,6 +137,7 @@ export interface AllProductData {
 export interface AddProductResponse {
   status: boolean
   message: string
+  error?: string
   data: AddProductData
 }
 
@@ -168,7 +170,7 @@ export interface AddProductData {
 
 
 export interface UpdateProductResponse {
-  success: boolean
+  status: boolean
   message: string
   data: UpdateProductData
 }

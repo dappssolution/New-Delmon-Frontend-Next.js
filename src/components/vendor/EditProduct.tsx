@@ -57,7 +57,7 @@ export default function EditProduct({ productId }: { productId: string }) {
         dispatch(fetchAllBrands());
         dispatch(fetchAllCategory());
         dispatch(fetchAllSubCategories());
-        dispatch(fetchVendorProducts());
+        dispatch(fetchVendorProducts({}));
     }, [dispatch]);
 
     useEffect(() => {

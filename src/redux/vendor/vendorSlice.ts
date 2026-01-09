@@ -14,6 +14,12 @@ interface VendorState {
     updatingStatus: boolean;
     profileLoading: boolean;
     returnOrders: GetReturnOrderData[];
+    pagination: {
+        total: number;
+        currentPage: number;
+        lastPage: number;
+        perPage: number;
+    } | null;
 }
 
 const initialState: VendorState = {
@@ -28,6 +34,7 @@ const initialState: VendorState = {
     updatingStatus: false,
     profileLoading: false,
     returnOrders: [],
+    pagination: null,
 };
 
 export const vendorSlice = createSlice({
@@ -46,6 +53,14 @@ export const vendorSlice = createSlice({
                 ...product,
                 status: Number(product.status)
             }));
+            if (action.payload.meta) {
+                state.pagination = {
+                    total: action.payload.meta.total,
+                    currentPage: action.payload.meta.current_page,
+                    lastPage: action.payload.meta.last_page,
+                    perPage: (action.payload.meta as any).per_page || 10 // Fallback if per_page is not in Meta type yet
+                };
+            }
         });
         builder.addCase(fetchVendorProducts.rejected, (state, action) => {
             state.loading = false;
@@ -74,12 +89,14 @@ export const vendorSlice = createSlice({
         });
         builder.addCase(updateVendorProduct.fulfilled, (state, action) => {
             state.updating = null;
-            if (action.payload.success && action.payload.data) {
-                const updatedProduct = action.payload.data;
-                const index = state.products.findIndex(
-                    (p) => p.id.toString() === updatedProduct.id.toString()
-                );
-                if (index !== -1) {
+            const productId = action.meta.arg.productId;
+            const index = state.products.findIndex(
+                (p) => p.id.toString() === productId
+            );
+
+            if (index !== -1) {
+                if (action.payload.status && action.payload.data) {
+                    const updatedProduct = action.payload.data;
                     state.products[index] = {
                         ...state.products[index],
                         ...updatedProduct,
@@ -90,8 +107,11 @@ export const vendorSlice = createSlice({
                         featured: updatedProduct.featured ? Number(updatedProduct.featured) : 0,
                         special_offer: updatedProduct.special_offer ? Number(updatedProduct.special_offer) : 0,
                         special_deals: Number(updatedProduct.special_deals),
-                        status: action.payload.newStatus !== undefined ? action.payload.newStatus : Number(updatedProduct.status)
                     };
+                }
+
+                if (action.payload.status && action.payload.data) {
+                    state.products[index].status = Number(action.payload.data.status);
                 }
             }
         });
