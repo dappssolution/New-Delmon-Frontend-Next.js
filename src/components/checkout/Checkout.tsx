@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2, Loader2, CreditCard, Lock } from "lucide-react";
 import { checkoutApi } from "@/src/service/checkoutApi";
 import { DivisionData, DistrictData, StateData } from "@/src/types/checkout.types";
 import { toast } from "sonner";
@@ -9,6 +9,31 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import { fetchCart, updateCartItem, removeFromCart, applyCoupon } from "@/src/redux/cart/cartThunk";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { resetCart } from "@/src/redux/cart/cartSlice";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY || "");
+
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      color: "#1f2937",
+      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSmoothing: "antialiased",
+      fontSize: "16px",
+      "::placeholder": {
+        color: "#9ca3af",
+      },
+      iconColor: "#6b7280",
+    },
+    invalid: {
+      color: "#ef4444",
+      iconColor: "#ef4444",
+    },
+  },
+  hidePostalCode: true,
+};
 
 // Debounce hook
 function useDebounce<T extends (...args: any[]) => void>(
@@ -40,9 +65,12 @@ function useDebounce<T extends (...args: any[]) => void>(
   return debouncedFunction;
 }
 
-export default function CheckoutPage() {
+function CheckoutForm() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const stripe = useStripe();
+  const elements = useElements();
+
   const { cart, loading: cartLoading } = useAppSelector((state: RootState) => state.cart);
   const [divisions, setDivisions] = useState<DivisionData[]>([]);
   const [districts, setDistricts] = useState<DistrictData[]>([]);
@@ -62,11 +90,13 @@ export default function CheckoutPage() {
     zipCode: "",
     additionalAddress: ""
   });
-  const [paymentMethod, setPaymentMethod] = useState("tap");
+  const [paymentMethod, setPaymentMethod] = useState("stripe");
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
+  const [cardError, setCardError] = useState<string | null>(null);
+  const [cardComplete, setCardComplete] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -195,10 +225,31 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleCardChange = (event: any) => {
+    setCardComplete(event.complete);
+    if (event.error) {
+      setCardError(event.error.message);
+    } else {
+      setCardError(null);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!formData.name || !formData.phone || !formData.email || !formData.address) {
       toast.error("Please fill in all required fields");
       return;
+    }
+
+    if (paymentMethod === "stripe") {
+      if (!stripe || !elements) {
+        toast.error("Stripe is not loaded. Please refresh and try again.");
+        return;
+      }
+
+      if (!cardComplete) {
+        toast.error("Please complete your card details");
+        return;
+      }
     }
 
     setLoading(true);
@@ -216,12 +267,57 @@ export default function CheckoutPage() {
       };
 
       const response = await checkoutApi.placeOrder(payload);
-      if (response.success) {
-        toast.success("Order placed successfully!");
-        // router.push(`/order-success?order_id=${response.data.order_id}`);
-      } else {
+
+      if (!response.status) {
         toast.error(response.message || "Failed to place order");
+        return;
       }
+
+      if (paymentMethod === "stripe" && response.data.client_secret) {
+        const cardElement = elements?.getElement(CardElement);
+
+        if (!cardElement) {
+          toast.error("Card element not found");
+          return;
+        }
+
+        const { error, paymentIntent } = await stripe!.confirmCardPayment(
+          response.data.client_secret,
+          {
+            payment_method: {
+              card: cardElement,
+              billing_details: {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+              },
+            },
+          }
+        );
+
+        if (error) {
+          toast.error(error.message || "Payment failed");
+          return;
+        }
+
+        if (paymentIntent?.status === "succeeded") {
+          const confirmResponse = await checkoutApi.confirmStripePayment(paymentIntent.id);
+
+          if (confirmResponse.status) {
+            toast.success("Payment successful! Order placed.");
+            router.push(`/order-success?order_id=${confirmResponse.data?.order_id}`);
+          } else {
+            toast.success("Payment successful! Your order is being processed.");
+            router.push("/account/orders");
+          }
+        } else {
+          toast.error("Payment was not completed. Please try again.");
+        }
+      } else {
+        toast.success("Order placed successfully!");
+        router.push("/account/orders");
+      }
+      dispatch(resetCart());
     } catch (error: any) {
       console.error("Error placing order:", error);
       toast.error(error.response?.data?.error || error.response?.data?.message || "Something went wrong while placing the order");
@@ -486,19 +582,40 @@ export default function CheckoutPage() {
               <h2 className="text-lg font-semibold mb-4 text-gray-900">Payment</h2>
 
               <div className="space-y-3 mb-6">
-                <label className="flex items-center gap-3 cursor-pointer">
+                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
                   <input
                     type="radio"
                     name="payment"
-                    value="tap"
-                    checked={paymentMethod === "tap"}
+                    value="stripe"
+                    checked={paymentMethod === "stripe"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                     className="w-4 h-4 text-blue-600"
                   />
-                  <span className="text-gray-900 font-medium">TAP</span>
+                  <CreditCard className="w-5 h-5 text-gray-600" />
+                  <span className="text-gray-900 font-medium">Credit/Debit Card</span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-5" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-5" />
+                  </div>
                 </label>
 
-                <label className="flex items-center gap-3 cursor-pointer">
+                {/* Stripe Card Element - Show only when stripe is selected */}
+                {paymentMethod === "stripe" && (
+                  <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
+                      <Lock className="w-4 h-4" />
+                      <span>Secure payment powered by Stripe</span>
+                    </div>
+                    <div className={`p-4 border ${cardError ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white`}>
+                      <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
+                    </div>
+                    {cardError && (
+                      <p className="mt-2 text-sm text-red-600">{cardError}</p>
+                    )}
+                  </div>
+                )}
+
+                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
                   <input
                     type="radio"
                     name="payment"
@@ -511,21 +628,10 @@ export default function CheckoutPage() {
                 </label>
               </div>
 
-              {/* Payment Icons */}
-              <div className="flex items-center gap-4">
-                <div className="text-blue-600 font-bold text-xl">PayPal</div>
-                <div className="text-teal-500 font-bold text-xl">zapper</div>
-                <div className="text-blue-900 font-bold text-xl">VISA</div>
-                <div className="flex gap-1">
-                  <div className="w-6 h-6 rounded-full bg-red-500"></div>
-                  <div className="w-6 h-6 rounded-full bg-orange-500 -ml-2"></div>
-                </div>
-              </div>
-
               {/* Place Order Button - Mobile */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
                 className="lg:hidden w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
@@ -534,7 +640,10 @@ export default function CheckoutPage() {
                     Processing...
                   </>
                 ) : (
-                  "Place Order"
+                  <>
+                    {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
+                    {paymentMethod === "stripe" ? "Pay Now" : "Place Order"}
+                  </>
                 )}
               </button>
             </div>
@@ -598,7 +707,7 @@ export default function CheckoutPage() {
               {/* Place Order Button - Desktop */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
                 className="hidden lg:flex w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center justify-center gap-2"
               >
                 {loading ? (
@@ -607,13 +716,32 @@ export default function CheckoutPage() {
                     Processing...
                   </>
                 ) : (
-                  "Place Order"
+                  <>
+                    {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
+                    {paymentMethod === "stripe" ? "Pay Now" : "Place Order"}
+                  </>
                 )}
               </button>
+
+              {paymentMethod === "stripe" && (
+                <p className="mt-3 text-xs text-center text-gray-500 flex items-center justify-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  Your payment is secure and encrypted
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Wrapper component with Elements provider
+export default function Checkout() {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
+    </Elements>
   );
 }

@@ -4,6 +4,7 @@ import {
     DistrictGetResponse,
     StateGetResponse,
     OrderCreateResponse,
+    StripeConfirmResponse,
 } from "../types/checkout.types";
 
 export interface PlaceOrderPayload {
@@ -41,4 +42,13 @@ export const checkoutApi = {
         );
         return res.data;
     },
+
+    async confirmStripePayment(paymentIntentId: string) {
+        const res = await api.post<StripeConfirmResponse>(
+            "/checkout/stripe/confirm",
+            { payment_intent_id: paymentIntentId }
+        );
+        return res.data;
+    },
 };
+

@@ -220,26 +220,26 @@ const Footer = () => {
             {/* Social Media Icons */}
             <div className="flex items-center gap-4">
               <a
-                href="#"
-                className="text-gray-600 hover:text-green-700 transition-colors"
+                href="https://www.facebook.com/NewDelmongoodswholesalellc?_rdc=1&_rdr#"
+                className="text-[#1877F2] hover:opacity-80 transition-opacity"
               >
                 <Facebook className="w-5 h-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-600 hover:text-green-700 transition-colors"
+                className="text-[#1DA1F2] hover:opacity-80 transition-opacity"
               >
                 <Twitter className="w-5 h-5" />
               </a>
               <a
-                href="#"
-                className="text-gray-600 hover:text-green-700 transition-colors"
+                href="https://www.instagram.com/newdelmonwholesalegoodsllc"
+                className="text-[#E4405F] hover:opacity-80 transition-opacity"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
-                className="text-gray-600 hover:text-green-700 transition-colors"
+                href="https://youtube.com/@newdelmonllc?si=fLuezjjQSvw0lc9d"
+                className="text-[#FF0000] hover:opacity-80 transition-opacity"
               >
                 <Youtube className="w-5 h-5" />
               </a>

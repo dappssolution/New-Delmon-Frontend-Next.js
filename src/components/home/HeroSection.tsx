@@ -107,7 +107,7 @@ const HeroSection = () => {
                 <img
                   src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[activeIndex].banner_image}`}
                   alt={banners[activeIndex].banner_title || "Banner"}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
               </a>
             </motion.div>
@@ -141,7 +141,7 @@ const HeroSection = () => {
                 <img
                   src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
                   alt={banner.banner_title || "Banner"}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover/banner:scale-105"
+                  className="w-full h-full transition-transform duration-500 group-hover/banner:scale-105"
                 />
               </a>
             ))}
@@ -158,7 +158,7 @@ const HeroSection = () => {
               <img
                 src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[2].banner_image}`}
                 alt={banners[2].banner_title || "Special Offer"}
-                className="w-full h-auto md:h-full md:object-cover transition-transform duration-500 group-hover/banner:scale-105"
+                className="w-full h-full transition-transform duration-500 group-hover/banner:scale-105"
               />
             </a>
           )}

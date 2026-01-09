@@ -41,11 +41,25 @@ export interface StateData {
 }
 
 export interface OrderCreateResponse {
-  success: boolean
+  status: boolean
   message: string
   data: OrderData
 }
 
 export interface OrderData {
-  payment_url: string
+  client_secret: string
+  payment_intent_id: string
+  amount: number
+  currency: string
+}
+
+
+export interface StripeConfirmResponse {
+  status: boolean
+  message: string
+  data: StripeConfirmData
+}
+
+export interface StripeConfirmData {
+  order_id: number
 }

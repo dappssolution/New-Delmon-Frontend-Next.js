@@ -145,13 +145,6 @@ export default function ShoppingCart() {
                 {/* Page Title */}
                 <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
 
-                {/* Error Message */}
-                {error && (
-                    <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        {error}
-                    </div>
-                )}
-
                 {loading && !cart ? (
                     <Loading className="py-20" />
                 ) : cartItems.length === 0 ? (
