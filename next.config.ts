@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "palegoldenrod-wombat-569197.hostingersite.com",
+        hostname: "sandbox.newdelmon.com",
       },
     ],
   },

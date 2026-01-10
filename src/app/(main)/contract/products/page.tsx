@@ -63,7 +63,7 @@ export default function ContractProductsPage() {
                             title: item.product_name,
                             price: `AED ${finalPrice}`,
                             oldPrice: oldPrice ? `AED ${oldPrice}` : undefined,
-                            image: `https://palegoldenrod-wombat-569197.hostingersite.com/${item.product_thambnail}`,
+                            image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
                             badge,
                             colors,
                             sizes
@@ -231,7 +231,7 @@ export default function ContractProductsPage() {
                                         className="border border-gray-100 rounded-2xl p-8 flex items-center justify-center min-h-[140px] hover:border-green-200 hover:shadow-xl hover:shadow-green-900/5 transition-all duration-300 bg-white group"
                                     >
                                         <Image
-                                            src={`https://palegoldenrod-wombat-569197.hostingersite.com/${brand.brand_image}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                                             alt={brand.brand_name}
                                             width={140}
                                             height={70}

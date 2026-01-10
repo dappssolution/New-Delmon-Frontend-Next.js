@@ -330,7 +330,7 @@ export default function EditProduct({ productId }: { productId: string }) {
                             {currentThumbnail && !formData.mainThumbnail && (
                                 <div className="mb-3 relative group w-32 h-32">
                                     <img
-                                        src={`https://palegoldenrod-wombat-569197.hostingersite.com/${currentThumbnail}`}
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${currentThumbnail}`}
                                         alt="Current"
                                         className="w-full h-full object-cover rounded-lg border border-gray-200"
                                     />

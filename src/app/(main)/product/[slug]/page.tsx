@@ -156,7 +156,7 @@ export default function ProductDetailsPage() {
                                 title: item.product_name,
                                 price: `AED${finalPrice}`,
                                 oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
-                                image: `https://palegoldenrod-wombat-569197.hostingersite.com/${item.product_thambnail}`,
+                                image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
                                 badge: badge,
                                 colors: colors.length > 0 ? colors : undefined,
                                 sizes: sizes.length > 0 ? sizes : undefined
@@ -297,7 +297,7 @@ export default function ProductDetailsPage() {
                     <div className="lg:col-span-6 xl:col-span-5">
                         <div className="bg-[#F8F8F8] rounded-3xl overflow-hidden mb-4 p-8 flex items-center justify-center aspect-square relative">
                             <img
-                                src={`https://palegoldenrod-wombat-569197.hostingersite.com/${activeImage}`}
+                                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${activeImage}`}
                                 alt={product.product_name}
                                 className="w-full h-full object-contain mix-blend-multiply"
                             />
@@ -318,10 +318,10 @@ export default function ProductDetailsPage() {
                                         onClick={() => setActiveImage(img.photo_name)}
                                     >
                                         <img
-                                            src={`https://palegoldenrod-wombat-569197.hostingersite.com/${img.photo_name}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${img.photo_name}`}
                                             alt={`Thumbnail ${index + 1}`}
                                             className="w-full h-full object-contain mix-blend-multiply"
-                                        />
+                                        />  
                                     </button>
                                 ))}
                             </div>

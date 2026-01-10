@@ -55,7 +55,7 @@ export default function MoreProducts() {
                 title: item.product_name,
                 price: `AED${finalPrice}`,
                 oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
-                image: `https://palegoldenrod-wombat-569197.hostingersite.com/${item.product_thambnail}`,
+                image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
                 badge: badge,
                 colors: colors.length > 0 ? colors : undefined,
                 sizes: sizes.length > 0 ? sizes : undefined

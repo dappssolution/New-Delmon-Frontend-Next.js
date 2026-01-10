@@ -84,7 +84,7 @@ const Categories = () => {
             const imageUrl = cat.category_image
               ? cat.category_image.startsWith("http")
                 ? cat.category_image
-                : `https://palegoldenrod-wombat-569197.hostingersite.com/${cat.category_image}`
+                : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${cat.category_image}`
               : "https://placehold.co/150x150?text=No+Image";
 
             return (
