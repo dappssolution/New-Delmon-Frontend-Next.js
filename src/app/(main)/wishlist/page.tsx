@@ -33,13 +33,13 @@ function WishlistContent() {
                 quantities[item.product_id] = 1;
 
                 // Set default size if available
-                if (item.product.product_size) {
-                    const availableSizes = item.product.product_size.split(',').map(s => s.trim());
+                if (item.product?.product_size) {
+                    const availableSizes = item.product?.product_size.split(',').map(s => s.trim());
                     if (availableSizes.length > 0) sizes[item.product_id] = availableSizes[0];
                 }
 
                 // Set default color if available
-                if (item.product.product_color) {
+                if (item.product?.product_color) {
                     const availableColors = item.product.product_color.split(',').map(c => c.trim());
                     if (availableColors.length > 0) colors[item.product_id] = availableColors[0];
                 }
@@ -162,43 +162,44 @@ function WishlistContent() {
                                             <div className="flex gap-4">
                                                 <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden relative shrink-0">
                                                     <Image
-                                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product.product_thambnail}`}
-                                                        alt={item.product.product_name}
+                                                        src={item.product?.product_thambnail?.startsWith('http') ? item.product.product_thambnail : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product?.product_thambnail || ""}`}
+                                                        alt={item.product?.product_name || ""}
                                                         width={80}
                                                         height={80}
                                                         className="object-contain"
+                                                        unoptimized={true}
                                                     />
                                                 </div>
                                                 <div className="flex-1">
                                                     <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
-                                                        {item.product.product_name}
+                                                        {item.product?.product_name}
                                                     </h3>
                                                     <div className="flex flex-wrap gap-2 mt-2">
-                                                        {item.product.product_size && (
+                                                        {item.product?.product_size && (
                                                             <select
                                                                 value={selectedSizes[item.product_id] || ""}
                                                                 onChange={(e) => setSelectedSizes(prev => ({ ...prev, [item.product_id]: e.target.value }))}
                                                                 className="text-[10px] bg-gray-50 border border-gray-200 rounded px-1 py-0.5"
                                                             >
-                                                                {item.product.product_size.split(',').map(size => (
+                                                                {item.product?.product_size.split(',').map(size => (
                                                                     <option key={size.trim()} value={size.trim()}>{size.trim()}</option>
                                                                 ))}
                                                             </select>
                                                         )}
-                                                        {item.product.product_color && (
+                                                        {item.product?.product_color && (
                                                             <select
                                                                 value={selectedColors[item.product_id] || ""}
                                                                 onChange={(e) => setSelectedColors(prev => ({ ...prev, [item.product_id]: e.target.value }))}
                                                                 className="text-[10px] bg-gray-50 border border-gray-200 rounded px-1 py-0.5"
                                                             >
-                                                                {item.product.product_color.split(',').map(color => (
+                                                                {item.product?.product_color.split(',').map(color => (
                                                                     <option key={color.trim()} value={color.trim()}>{color.trim()}</option>
                                                                 ))}
                                                             </select>
                                                         )}
                                                     </div>
                                                     <p className="text-green-700 font-bold mt-2">
-                                                        AED {(parseFloat(item.product.selling_price) * (localQuantities[item.product_id] || 1)).toFixed(2)}
+                                                        AED {(parseFloat(item.product?.selling_price) * (localQuantities[item.product_id] || 1)).toFixed(2)}
                                                     </p>
                                                 </div>
                                                 <button
@@ -253,19 +254,20 @@ function WishlistContent() {
                                             <div className="col-span-5 flex items-center gap-4">
                                                 <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden relative shrink-0">
                                                     <Image
-                                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product.product_thambnail}`}
-                                                        alt={item.product.product_name}
+                                                        src={item.product?.product_thambnail?.startsWith('http') ? item.product.product_thambnail : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product?.product_thambnail || ""}`}
+                                                        alt={item.product?.product_name || ""}
                                                         width={60}
                                                         height={60}
                                                         className="object-contain"
+                                                        unoptimized={true}
                                                     />
                                                 </div>
                                                 <div>
                                                     <h3 className="font-medium text-gray-900 text-sm line-clamp-1">
-                                                        {item.product.product_name}
+                                                        {item.product?.product_name || ""}
                                                     </h3>
                                                     <div className="flex flex-wrap gap-2 mt-2">
-                                                        {item.product.product_size && (
+                                                        {item.product?.product_size && (
                                                             <select
                                                                 value={selectedSizes[item.product_id] || ""}
                                                                 onChange={(e) => setSelectedSizes(prev => ({ ...prev, [item.product_id]: e.target.value }))}
@@ -276,7 +278,7 @@ function WishlistContent() {
                                                                 ))}
                                                             </select>
                                                         )}
-                                                        {item.product.product_color && (
+                                                        {item.product?.product_color && (
                                                             <select
                                                                 value={selectedColors[item.product_id] || ""}
                                                                 onChange={(e) => setSelectedColors(prev => ({ ...prev, [item.product_id]: e.target.value }))}
@@ -315,7 +317,7 @@ function WishlistContent() {
 
                                             {/* Total Price */}
                                             <div className="col-span-2 text-center font-semibold text-gray-900">
-                                                AED {(parseFloat(item.product.selling_price) * (localQuantities[item.product_id] || 1)).toFixed(2)}
+                                                AED {(parseFloat(item.product?.selling_price || "0") * (localQuantities[item.product_id] || 1)).toFixed(2)}
                                             </div>
 
                                             {/* Action Buttons */}

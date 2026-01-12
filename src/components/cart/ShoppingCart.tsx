@@ -183,6 +183,7 @@ export default function ShoppingCart() {
                                                         width={60}
                                                         height={60}
                                                         className="object-contain"
+                                                        unoptimized={true}
                                                     />
                                                 </div>
 

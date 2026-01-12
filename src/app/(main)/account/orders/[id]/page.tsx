@@ -67,161 +67,197 @@ export default function OrderDetailsPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 md:mb-6">
                 <button
                     onClick={() => router.push('/account/orders')}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors bg-white shadow-sm border border-gray-100"
                 >
                     <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
-                <h1 className="text-xl font-bold text-gray-900">Order Details</h1>
+                <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">Order Details</h1>
+                    <p className="text-sm text-gray-500 md:hidden">Invoice: {order.invoice_no}</p>
+                </div>
             </div>
 
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Shipping Details */}
-                <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Details</h2>
-                    <div className="space-y-3">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Name</span>
-                            <span className="font-medium text-gray-900">{order.name}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Phone</span>
-                            <span className="font-medium text-gray-900">{order.phone}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Email</span>
-                            <span className="font-medium text-gray-900">{order.email}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Division</span>
-                            <span className="font-medium text-gray-900">{order.division?.division_name || 'N/A'}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">District</span>
-                            <span className="font-medium text-gray-900">{order.district?.district_name || 'N/A'}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">State</span>
-                            <span className="font-medium text-gray-900">{order.state?.state_name || 'N/A'}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Post code</span>
-                            <span className="font-medium text-gray-900">{order.post_code}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Order date</span>
-                            <span className="font-medium text-gray-900">{formatDate(order.order_date)}</span>
-                        </div>
-                        <div className="flex justify-between py-2">
-                            <span className="text-gray-600">Address</span>
-                            <span className="font-medium text-gray-900 text-right">{order.address}</span>
+                <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 shadow-sm">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-green-600 rounded-full"></div>
+                        Shipping Details
+                    </h2>
+                    <div className="space-y-1">
+                        {[
+                            { label: "Name", value: order.name },
+                            { label: "Phone", value: order.phone },
+                            { label: "Email", value: order.email },
+                            { label: "Division", value: order.division?.division_name },
+                            { label: "District", value: order.district?.district_name },
+                            { label: "State", value: order.state?.state_name },
+                            { label: "Post code", value: order.post_code },
+                            { label: "Order date", value: formatDate(order.order_date) },
+                        ].map((detail, idx) => (
+                            <div key={idx} className="flex justify-between py-2.5 border-b border-gray-50 last:border-0">
+                                <span className="text-sm text-gray-500">{detail.label}</span>
+                                <span className="text-sm font-medium text-gray-900 text-right">{detail.value || 'N/A'}</span>
+                            </div>
+                        ))}
+                        <div className="flex flex-col py-2.5">
+                            <span className="text-sm text-gray-500 mb-1">Address</span>
+                            <span className="text-sm font-medium text-gray-900">{order.address}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Order Details */}
-                <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Details</h2>
-                    <div className="space-y-3">
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Name</span>
-                            <span className="font-medium text-gray-900">{order.name}</span>
+                <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 shadow-sm">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-green-600 rounded-full"></div>
+                        Order Summary
+                    </h2>
+                    <div className="space-y-1">
+                        {[
+                            { label: "Invoice", value: order.invoice_no, highlight: true },
+                            { label: "Payment type", value: order.payment_method },
+                            { label: "Transaction id", value: order.transaction_id },
+                            { label: "Order amount", value: `${order.currency} ${(order.amount - order.tax - order.shipping + order.coupon_amount).toFixed(2)}` },
+                            { label: "Tax", value: `${order.currency} ${order.tax.toFixed(2)}` },
+                            { label: "Shipping", value: `${order.currency} ${order.shipping.toFixed(2)}` },
+                        ].map((detail, idx) => (
+                            <div key={idx} className="flex justify-between py-2.5 border-b border-gray-50 last:border-0 text-sm">
+                                <span className="text-gray-500">{detail.label}</span>
+                                <span className={`font-medium ${detail.highlight ? 'text-green-700 font-bold' : 'text-gray-900'}`}>{detail.value || 'N/A'}</span>
+                            </div>
+                        ))}
+                        <div className="flex justify-between py-3 border-t border-gray-100 mt-2">
+                            <span className="font-bold text-gray-900">Total Amount</span>
+                            <span className="text-lg font-bold text-green-700">{order.currency} {order.amount.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Phone</span>
-                            <span className="font-medium text-gray-900">{order.phone}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Payment type</span>
-                            <span className="font-medium text-gray-900">{order.payment_method}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Transaction id</span>
-                            <span className="font-medium text-gray-900">{order.transaction_id || 'N/A'}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Invoice</span>
-                            <span className="font-medium text-gray-900">{order.invoice_no}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Order amount</span>
-                            <span className="font-medium text-gray-900">{order.currency} {(order.amount - order.tax - order.shipping + order.coupon_amount).toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Tax</span>
-                            <span className="font-medium text-gray-900">{order.currency} {order.tax.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between py-2 border-b border-gray-100">
-                            <span className="text-gray-600">Shipping</span>
-                            <span className="font-medium text-gray-900">{order.currency} {order.shipping.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between py-2">
-                            <span className="text-gray-600">Order status</span>
-                            <span className="font-medium text-gray-900">{order.status}</span>
+                        <div className="pt-2">
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                    order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                        'bg-blue-100 text-blue-700'
+                                }`}>
+                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Order Items */}
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
-                
-                {/* Table Header */}
-                <div className="overflow-x-auto">
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 shadow-sm overflow-hidden">
+                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-6 bg-green-600 rounded-full"></div>
+                    Ordered Items ({items.length})
+                </h2>
+
+                {/* Mobile Items View */}
+                <div className="md:hidden space-y-4">
+                    {items.map((item) => (
+                        <div key={item.id} className="flex gap-4 p-3 rounded-xl border border-gray-100">
+                            <div className="relative w-20 h-20 bg-gray-50 rounded-lg overflow-hidden shrink-0">
+                                {item.product?.product_thambnail ? (
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product.product_thambnail}`}
+                                        alt={item.product?.product_name || "Product"}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <Package className="w-8 h-8 text-gray-300" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-bold text-gray-900 line-clamp-2">{item.product?.product_name || 'N/A'}</h3>
+                                <p className="text-xs text-gray-500 mt-1">Code: {item.product?.product_code || 'N/A'}</p>
+                                <div className="flex gap-3 mt-2">
+                                    {item.size && <span className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">Size: {item.size}</span>}
+                                    {item.color && <span className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">Color: {item.color}</span>}
+                                </div>
+                                <div className="flex justify-between items-center mt-2">
+                                    <span className="text-xs text-gray-600">Qty: {item.qty}</span>
+                                    <span className="text-sm font-bold text-green-700">{order.currency} {item.subtotal.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Desktop Items Table */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b-2 border-gray-200">
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Image</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Product name</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Vendor name</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Product code</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Size</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Color</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Quantity</th>
-                                <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">Total</th>
+                            <tr className="border-b border-gray-100">
+                                <th className="text-left py-4 px-2 text-sm font-bold text-gray-700">Product</th>
+                                <th className="text-left py-4 px-2 text-sm font-bold text-gray-700">Code</th>
+                                <th className="text-left py-4 px-2 text-sm font-bold text-gray-700">Size/Color</th>
+                                <th className="text-center py-4 px-2 text-sm font-bold text-gray-700">Quantity</th>
+                                <th className="text-right py-4 px-2 text-sm font-bold text-gray-700">Total</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-gray-50">
                             {items.map((item) => (
-                                <tr key={item.id} className="border-b border-gray-100 last:border-0">
+                                <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
                                     <td className="py-4 px-2">
-                                        <div className="relative w-12 h-12 bg-gray-100 rounded overflow-hidden">
-                                            {item.product?.product_thambnail ? (
-                                                <Image
-                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product.product_thambnail}`}
-                                                    alt={item.product?.product_name || "Product"}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <Package className="w-6 h-6 text-gray-400" />
-                                                </div>
-                                            )}
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 border border-gray-100">
+                                                {item.product?.product_thambnail ? (
+                                                    <Image
+                                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product.product_thambnail}`}
+                                                        alt={item.product?.product_name || "Product"}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <Package className="w-6 h-6 text-gray-300" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-900 max-w-[200px] line-clamp-2">{item.product?.product_name || 'N/A'}</span>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-2 text-sm text-gray-900">{item.product?.product_name || 'N/A'}</td>
-                                    {/* <td className="py-4 px-2 text-sm text-gray-900">{item.product?.vendor?.name || 'N/A'}</td> */}
-                                    <td className="py-4 px-2 text-sm text-gray-900">{item.product?.product_code || 'N/A'}</td>
-                                    <td className="py-4 px-2 text-sm text-gray-900">{item.size || '-'}</td>
-                                    <td className="py-4 px-2 text-sm text-gray-900">{item.color || '-'}</td>
-                                    <td className="py-4 px-2 text-sm text-gray-900">{item.qty}</td>
-                                    <td className="py-4 px-2 text-sm font-semibold text-gray-900">{order.currency} {item.subtotal.toFixed(2)}</td>
+                                    <td className="py-4 px-2 text-sm text-gray-600">{item.product?.product_code || 'N/A'}</td>
+                                    <td className="py-4 px-2 text-sm text-gray-600">
+                                        <div className="flex flex-col gap-1">
+                                            {item.size && <span>Size: {item.size}</span>}
+                                            {item.color && <span>Color: {item.color}</span>}
+                                            {!item.size && !item.color && <span>-</span>}
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-2 text-sm text-center font-medium text-gray-900">{item.qty}</td>
+                                    <td className="py-4 px-2 text-sm font-bold text-green-700 text-right">{order.currency} {item.subtotal.toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
 
-                {/* Subtotal */}
-                <div className="flex justify-end mt-6 pt-4 border-t-2 border-gray-200">
-                    <div className="text-right">
-                        <span className="text-gray-600 mr-4">Subtotal :</span>
-                        <span className="text-lg font-bold text-gray-900">{order.currency} {order.amount.toFixed(2)}</span>
+                {/* Subtotal Desktop */}
+                <div className="hidden md:flex justify-end mt-8 pt-6 border-t border-gray-100">
+                    <div className="w-64 space-y-3">
+                        <div className="flex justify-between text-sm text-gray-600">
+                            <span>Subtotal</span>
+                            <span className="font-medium text-gray-900">{order.currency} {order.amount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-600">
+                            <span>Tax</span>
+                            <span className="font-medium text-gray-900">{order.currency} {order.tax.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-600">
+                            <span>Shipping</span>
+                            <span className="font-medium text-gray-900">{order.currency} {order.shipping.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between pt-3 border-t border-gray-100">
+                            <span className="text-base font-bold text-gray-900">Total</span>
+                            <span className="text-xl font-bold text-green-700">{order.currency} {order.amount.toFixed(2)}</span>
+                        </div>
                     </div>
                 </div>
             </div>

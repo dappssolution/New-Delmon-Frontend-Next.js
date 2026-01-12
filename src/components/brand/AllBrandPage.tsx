@@ -55,7 +55,7 @@ export default function AllBrandsPage() {
         : brandsByLetter;
 
     if (loading) {
-        return <Loading className="min-h-screen"/>;
+        return <Loading className="min-h-screen" />;
     }
 
     if (error) {
@@ -96,10 +96,10 @@ export default function AllBrandsPage() {
                                     onClick={() => setSelectedLetter(isSelected ? null : letter)}
                                     disabled={!isAvailable}
                                     className={`w-10 h-10 rounded-md font-semibold transition-colors ${isSelected
-                                            ? "bg-orange-600 text-white"
-                                            : isAvailable
-                                                ? "bg-orange-500 text-white hover:bg-orange-600"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        ? "bg-orange-600 text-white"
+                                        : isAvailable
+                                            ? "bg-orange-500 text-white hover:bg-orange-600"
+                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                         }`}
                                 >
                                     {letter}
@@ -120,10 +120,10 @@ export default function AllBrandsPage() {
                                     onClick={() => setSelectedLetter(isSelected ? null : letter)}
                                     disabled={!isAvailable}
                                     className={`w-10 h-10 rounded-md font-semibold transition-colors ${isSelected
-                                            ? "bg-orange-600 text-white"
-                                            : isAvailable
-                                                ? "bg-orange-500 text-white hover:bg-orange-600"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        ? "bg-orange-600 text-white"
+                                        : isAvailable
+                                            ? "bg-orange-500 text-white hover:bg-orange-600"
+                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                         }`}
                                 >
                                     {letter}
@@ -147,32 +147,33 @@ export default function AllBrandsPage() {
                                 </div>
 
                                 {/* Brand Grid */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                                     {letterBrands.map((brand) => (
                                         <Link
                                             key={brand.id}
                                             href={`/brand/${brand.brand_slug}`}
-                                            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer flex flex-col items-center justify-center group"
+                                            className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center justify-center group h-full"
                                         >
                                             {/* Brand Logo */}
-                                            <div className="w-full h-20 flex items-center justify-center mb-3">
+                                            <div className="w-full h-32 flex items-center justify-center mb-4 relative">
                                                 {brand.brand_image ? (
                                                     <Image
                                                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                                                         alt={brand.brand_name}
-                                                        width={80}
-                                                        height={80}
-                                                        className="object-contain max-h-full"
+                                                        fill
+                                                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                                        unoptimized={true}
+                                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                                                     />
                                                 ) : (
-                                                    <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
+                                                    <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-md">
                                                         {brand.brand_name.charAt(0)}
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* Brand Name */}
-                                            <p className="text-center text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors line-clamp-2">
+                                            <p className="text-center text-base font-semibold text-gray-800 group-hover:text-orange-600 transition-colors line-clamp-2">
                                                 {brand.brand_name}
                                             </p>
                                         </Link>

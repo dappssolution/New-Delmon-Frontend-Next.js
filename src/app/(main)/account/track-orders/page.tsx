@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Eye, Loader2, Package } from "lucide-react";
+import { Eye, Loader2, Package, Check } from "lucide-react";
 import { trackOrder } from "@/src/service/userApi";
 import { OrderData } from "@/src/types/user.types";
 import { useRouter } from "next/navigation";
@@ -60,16 +60,31 @@ export default function TrackOrdersPage() {
         return steps;
     };
 
+    const getStatusStyles = (status: string) => {
+        switch (status) {
+            case 'delivered':
+                return 'bg-green-100 text-green-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'processing':
+                return 'bg-blue-100 text-blue-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
             {/* Search Form */}
-            <div className="max-w-2xl mx-auto py-12 px-4">
-                <div className="text-center space-y-8">
+            <div className="max-w-2xl mx-auto py-6 md:py-12 px-2 sm:px-4">
+                <div className="text-center space-y-6 md:space-y-8">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900">Track your Orders</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Track your Orders</h2>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                         <div className="text-left">
                             <label htmlFor="invoiceCode" className="block text-sm font-medium text-gray-700 mb-2">
                                 Invoice code*
@@ -89,7 +104,7 @@ export default function TrackOrdersPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="bg-green-700 text-white font-medium px-8 py-3 rounded-full hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+                            className="w-full sm:w-auto bg-green-700 text-white font-medium px-8 py-3 rounded-full hover:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
                         >
                             {loading ? (
                                 <>
@@ -123,12 +138,57 @@ export default function TrackOrdersPage() {
                         </div>
                     ) : (
                         <>
-                            <h3 className="text-xl font-semibold text-gray-900">
+                            <h3 className="text-lg md:text-xl font-semibold text-gray-900">
                                 Found {orders.length} order{orders.length > 1 ? 's' : ''}
                             </h3>
 
-                            {/* Orders Table */}
-                            <div className="overflow-x-auto">
+                            {/* Mobile Card View */}
+                            <div className="block lg:hidden space-y-4">
+                                {orders.map((order, index) => (
+                                    <div
+                                        key={order.id}
+                                        className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+                                    >
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-medium text-gray-500">#{index + 1}</span>
+                                                <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusStyles(order.status)}`}>
+                                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleViewOrder(order.id)}
+                                                className="p-2 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                                                title="View Order Details"
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                            </button>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-500">Invoice</span>
+                                                <span className="text-sm font-medium text-gray-900">{order.invoice_no}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-500">Date</span>
+                                                <span className="text-sm text-gray-700">{formatDate(order.order_date)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-500">Total</span>
+                                                <span className="text-sm font-semibold text-gray-900">{order.currency} {order.amount.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-500">Payment</span>
+                                                <span className="text-sm text-gray-700">{order.payment_method}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Desktop Table View */}
+                            <div className="hidden lg:block overflow-x-auto">
                                 <table className="w-full">
                                     <thead>
                                         <tr className="border-2 border-gray-300 rounded-full">
@@ -150,12 +210,7 @@ export default function TrackOrdersPage() {
                                                 <td className="px-6 py-4 text-sm text-gray-700">{order.payment_method}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">{order.invoice_no}</td>
                                                 <td className="px-6 py-4 text-sm">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                            order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                                                                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                                    'bg-gray-100 text-gray-800'
-                                                        }`}>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyles(order.status)}`}>
                                                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                                     </span>
                                                 </td>
@@ -175,15 +230,58 @@ export default function TrackOrdersPage() {
                             </div>
 
                             {/* Order Status Timeline for each order */}
-                            <div className="space-y-6 mt-8">
+                            <div className="space-y-6 mt-6 md:mt-8">
                                 {orders.map((order) => {
                                     const statusSteps = getOrderStatusSteps(order);
                                     return (
-                                        <div key={order.id} className="bg-white rounded-lg border text-gray-900 border-gray-200 p-6">
-                                            <h3 className="text-lg font-semibold mb-6">
+                                        <div key={order.id} className="bg-white rounded-lg border text-gray-900 border-gray-200 p-4 md:p-6">
+                                            <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6">
                                                 Order ID: {order.invoice_no}
                                             </h3>
-                                            <div className="relative">
+
+                                            {/* Mobile Vertical Timeline */}
+                                            <div className="block md:hidden">
+                                                <div className="relative pl-8">
+                                                    {/* Vertical line */}
+                                                    <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200">
+                                                        <div
+                                                            className="w-full bg-green-600 transition-all duration-500"
+                                                            style={{
+                                                                height: `${(statusSteps.filter(s => s.completed).length / statusSteps.length) * 100}%`
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    {statusSteps.map((step, index) => (
+                                                        <div key={index} className="relative pb-6 last:pb-0">
+                                                            {/* Status dot */}
+                                                            <div className={`absolute -left-5 w-6 h-6 rounded-full flex items-center justify-center ${step.completed ? 'bg-green-600' : 'bg-gray-200'
+                                                                }`}>
+                                                                {step.completed ? (
+                                                                    <Check className="w-3.5 h-3.5 text-white" />
+                                                                ) : (
+                                                                    <div className="w-2 h-2 bg-gray-400 rounded-full" />
+                                                                )}
+                                                            </div>
+
+                                                            {/* Content */}
+                                                            <div className="ml-4">
+                                                                <p className={`text-sm font-medium ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>
+                                                                    {step.label}
+                                                                </p>
+                                                                {step.date && (
+                                                                    <p className="text-xs text-gray-500 mt-0.5">
+                                                                        {formatDate(step.date)}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Desktop Horizontal Timeline */}
+                                            <div className="hidden md:block relative">
                                                 {/* Progress Line */}
                                                 <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200">
                                                     <div

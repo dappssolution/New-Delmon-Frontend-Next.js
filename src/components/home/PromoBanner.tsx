@@ -135,21 +135,6 @@ export default function PromoBanner() {
                     rel="noopener noreferrer"
                     className={`relative rounded-lg h-48 md:h-64 flex items-center px-6 md:px-12 overflow-hidden bg-white cursor-pointer group/promo`}
                   >
-                    {/* Text */}
-                    <div className="z-10 relative">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
-                      >
-                        <h3 className="text-black text-xl md:text-3xl font-bold mb-1 md:mb-2">
-                          {slider.slider_title}
-                        </h3>
-                        <h3 className="text-black text-xl md:text-3xl font-bold">
-                          {slider.short_title}
-                        </h3>
-                      </motion.div>
-                    </div>
 
                     {/* Image */}
                     <motion.img

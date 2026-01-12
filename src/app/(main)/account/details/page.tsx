@@ -41,8 +41,8 @@ export default function AccountDetailsPage() {
     apiFormData.append("phone", formData.get("phone") as string);
     apiFormData.append("address", formData.get("address") as string);
     if (profile?.email) {
-  apiFormData.append("email", profile.email);
-}
+      apiFormData.append("email", profile.email);
+    }
 
 
     const photoFile = formData.get("photo");
@@ -56,10 +56,10 @@ export default function AccountDetailsPage() {
   const key = profile ? profile.id : "loading";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       {/* ✅ Corrected heading */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">
           Account Details
         </h2>
         <p className="text-sm text-gray-600 mt-1">
@@ -67,8 +67,8 @@ export default function AccountDetailsPage() {
         </p>
       </div>
 
-      <form className="space-y-5 max-w-3xl text-gray-900" key={key} onSubmit={handleSubmit}>
-        <div className="grid md:grid-cols-2 gap-5">
+      <form className="space-y-4 md:space-y-5 max-w-3xl text-gray-900" key={key} onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           <div>
             <label
               htmlFor="username"

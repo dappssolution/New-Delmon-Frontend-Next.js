@@ -26,6 +26,13 @@ const Footer = () => {
     }
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(resetCart());
+    dispatch(resetWishlist());
+    router.push("/login");
+  };
+
   return (
     <footer className="w-full">
       {/* Main Footer - Green Background */}
@@ -121,12 +128,16 @@ const Footer = () => {
               </h3>
               <ul className="space-y-2 md:space-y-3">
                 <li>
-                  <Link
+                  {
+                    token ? <button onClick={handleLogout}
+                    className="text-white text-sm hover:text-gray-200 transition-colors"
+                    >Logout</button> : <Link
                     href="/login"
                     className="text-white text-sm hover:text-gray-200 transition-colors"
                   >
                     Login
                   </Link>
+                  }
                 </li>
                 <li>
                   <Link

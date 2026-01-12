@@ -145,8 +145,8 @@ export default function VendorDetailView() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${vendor.status === 'active'
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-gray-100 text-gray-600'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-gray-100 text-gray-600'
                                         }`}>
                                         {vendor.status === 'active' ? 'Active' : 'Inactive'}
                                     </span>
@@ -236,8 +236,8 @@ export default function VendorDetailView() {
                             <button
                                 onClick={() => handleCategoryChange("all")}
                                 className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${selectedCategory === "all"
-                                        ? "bg-green-50 text-green-700 font-medium"
-                                        : "hover:bg-gray-50 text-gray-700"
+                                    ? "bg-green-50 text-green-700 font-medium"
+                                    : "hover:bg-gray-50 text-gray-700"
                                     }`}
                             >
                                 <div className="flex items-center justify-between">
@@ -254,8 +254,8 @@ export default function VendorDetailView() {
                                         key={category.id}
                                         onClick={() => handleCategoryChange(category.id.toString())}
                                         className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === category.id.toString()
-                                                ? "bg-green-50 text-green-700 font-medium"
-                                                : "hover:bg-gray-50 text-gray-700"
+                                            ? "bg-green-50 text-green-700 font-medium"
+                                            : "hover:bg-gray-50 text-gray-700"
                                             }`}
                                     >
                                         <div className="flex items-center justify-between">
@@ -316,8 +316,8 @@ export default function VendorDetailView() {
                                                     key={page}
                                                     onClick={() => handlePageChange(page)}
                                                     className={`w-10 h-10 rounded-lg font-medium transition-colors ${currentPage === page
-                                                            ? 'bg-green-600 text-white'
-                                                            : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                                                        ? 'bg-green-600 text-white'
+                                                        : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
                                                         }`}
                                                 >
                                                     {page}

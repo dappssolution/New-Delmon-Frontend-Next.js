@@ -300,24 +300,23 @@ function CheckoutForm() {
           return;
         }
 
+
         if (paymentIntent?.status === "succeeded") {
           const confirmResponse = await checkoutApi.confirmStripePayment(paymentIntent.id);
 
           if (confirmResponse.status) {
             toast.success("Payment successful! Order placed.");
+            dispatch(resetCart());
             router.push(`/order-success?order_id=${confirmResponse.data?.order_id}`);
           } else {
             toast.success("Payment successful! Your order is being processed.");
+            dispatch(resetCart());
             router.push("/account/orders");
           }
         } else {
           toast.error("Payment was not completed. Please try again.");
         }
-      } else {
-        toast.success("Order placed successfully!");
-        router.push("/account/orders");
-      }
-      dispatch(resetCart());
+      } 
     } catch (error: any) {
       console.error("Error placing order:", error);
       toast.error(error.response?.data?.error || error.response?.data?.message || "Something went wrong while placing the order");
@@ -372,79 +371,92 @@ function CheckoutForm() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <div className="space-y-4">
                 {cart.cart_items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-gray-200 last:border-0">
-                    {/* Product Image */}
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                      {item.img ? (
-                        <img
-                          src={item.img.startsWith('http') ? item.img : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.img}`}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded"></div>
-                      )}
-                    </div>
+                  <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-4 pb-4 border-b border-gray-200 last:border-0 relative">
+                    {/* Product Image & Info Group */}
+                    <div className="flex items-start gap-4 flex-1 w-full sm:w-auto">
+                      <div className="w-20 h-20 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                        {item.img ? (
+                          <img
+                            src={item.img.startsWith('http') ? item.img : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.img}`}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-linear-to-br from-yellow-400 to-orange-500 rounded"></div>
+                        )}
+                      </div>
 
-                    {/* Product Info */}
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 text-sm mb-2">
-                        {item.name}
-                      </h3>
-                      <div className="flex items-center gap-4 text-xs text-gray-600">
-                        {item.size && (
-                          <div>
-                            <span className="font-medium">Size</span>
-                            <p className="text-gray-900">{item.size}</p>
-                          </div>
-                        )}
-                        {item.color && (
-                          <div>
-                            <span className="font-medium">Color</span>
-                            <p className="text-gray-900">{item.color}</p>
-                          </div>
-                        )}
+                      <div className="flex-1 min-w-0 pt-1">
+                        <div className="flex justify-between items-start gap-2">
+                          <h3 className="font-medium text-gray-900 text-sm mb-2 truncate">
+                            {item.name}
+                          </h3>
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="sm:hidden p-1 -mt-1 -mr-1 text-gray-400 hover:text-red-500"
+                            aria-label="Remove item"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
+                          {item.size && (
+                            <div className="flex gap-1">
+                              <span className="font-medium">Size:</span>
+                              <p className="text-gray-900">{item.size}</p>
+                            </div>
+                          )}
+                          {item.color && (
+                            <div className="flex gap-1">
+                              <span className="font-medium">Color:</span>
+                              <p className="text-gray-900">{item.color}</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Quantity Controls */}
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <div className="flex items-center border border-gray-300 rounded-md h-8">
+                    {/* Quantity Controls & Price */}
+                    <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-24 sm:pl-0">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center border border-gray-300 rounded-md h-8 text-gray-900">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                            disabled={(localQuantities[item.id] || item.qty) <= 1}
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center text-sm font-medium">
+                            {localQuantities[item.id] ?? item.qty}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
+                          >
+                            +
+                          </button>
+                        </div>
+                        {updatingItems.has(item.id) && (
+                          <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="w-20 text-right font-semibold text-gray-900 whitespace-nowrap">
+                          AED {(item.price * (localQuantities[item.id] || item.qty)).toFixed(2)}
+                        </div>
+
+                        {/* Desktop Delete Button */}
                         <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
-                          disabled={(localQuantities[item.id] || item.qty) <= 1}
+                          onClick={() => handleRemoveItem(item.id)}
+                          className="hidden sm:block p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-gray-400"
+                          aria-label="Remove item"
                         >
-                          -
-                        </button>
-                        <span className="w-8 text-center text-sm font-medium">
-                          {localQuantities[item.id] ?? item.qty}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
-                        >
-                          +
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      {updatingItems.has(item.id) && (
-                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                      )}
                     </div>
-
-                    {/* Price */}
-                    <div className="w-20 text-right font-semibold text-gray-900 whitespace-nowrap">
-                      AED {(item.price * (localQuantities[item.id] || item.qty)).toFixed(2)}
-                    </div>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-gray-400"
-                      aria-label="Remove item"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 ))}
               </div>
@@ -581,51 +593,36 @@ function CheckoutForm() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-900">Payment</h2>
 
-              <div className="space-y-3 mb-6">
-                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="stripe"
-                    checked={paymentMethod === "stripe"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <CreditCard className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Credit/Debit Card</span>
+              <div className="mb-6">
+                <div className="flex items-center gap-3 p-4 rounded-t-lg border border-gray-200 bg-blue-50/50 border-b-0">
+                  <div className="p-2 bg-white rounded-md border border-gray-100 shadow-sm">
+                    <CreditCard className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-gray-900 font-semibold text-sm">Credit/Debit Card</h3>
+                    <p className="text-xs text-gray-500">Secure payment via Stripe</p>
+                  </div>
                   <div className="ml-auto flex items-center gap-2">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-5" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-5" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6 object-contain" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-6 object-contain" />
                   </div>
-                </label>
+                </div>
 
-                {/* Stripe Card Element - Show only when stripe is selected */}
-                {paymentMethod === "stripe" && (
-                  <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
-                      <Lock className="w-4 h-4" />
-                      <span>Secure payment powered by Stripe</span>
-                    </div>
-                    <div className={`p-4 border ${cardError ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white`}>
-                      <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
-                    </div>
-                    {cardError && (
-                      <p className="mt-2 text-sm text-red-600">{cardError}</p>
-                    )}
+                <div className="p-4 border border-gray-200 rounded-b-lg bg-white">
+                  <div className={`p-4 border ${cardError ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white transition-colors focus-within:border-blue-500 ring-1 focus-within:ring-blue-500/20 ring-transparent`}>
+                    <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
                   </div>
-                )}
-
-                <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="Cash On Delivery"
-                    checked={paymentMethod === "Cash On Delivery"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span className="text-gray-900 font-medium">Cash On Delivery</span>
-                </label>
+                  {cardError && (
+                    <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-red-600"></span>
+                      {cardError}
+                    </p>
+                  )}
+                  <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                    <Lock className="w-3 h-3" />
+                    <span>Your transaction is secured with 256-bit SSL encryption</span>
+                  </div>
+                </div>
               </div>
 
               {/* Place Order Button - Mobile */}

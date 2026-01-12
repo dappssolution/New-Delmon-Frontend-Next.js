@@ -15,12 +15,12 @@ export default function AccountDashboard() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-green-700">
+        <h2 className="text-2xl md:text-3xl font-bold text-green-700">
           Welcome Back, {user?.name || "User"}
         </h2>
-        <p className="text-gray-600 mt-2">Manage your orders and account settings</p>
+        <p className="text-gray-600 mt-1 md:mt-2 text-sm md:text-base">Manage your orders and account settings</p>
       </div>
     </div>
   );

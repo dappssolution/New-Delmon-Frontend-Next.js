@@ -321,7 +321,7 @@ export default function ProductDetailsPage() {
                                             src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${img.photo_name}`}
                                             alt={`Thumbnail ${index + 1}`}
                                             className="w-full h-full object-contain mix-blend-multiply"
-                                        />  
+                                        />
                                     </button>
                                 ))}
                             </div>

@@ -41,9 +41,9 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Change Password</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">Change Password</h2>
       </div>
 
       {successMessage && (
@@ -58,7 +58,7 @@ export default function ChangePasswordPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5 max-w-3xl text-gray-900">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5 max-w-3xl text-gray-900">
         <div className="relative">
           <label htmlFor="oldpassword" className="block text-sm font-medium text-gray-700 mb-2">
             Old Password*
