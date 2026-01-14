@@ -120,7 +120,7 @@ function CheckoutForm() {
       setDivisions(divisionsData);
     } catch (error) {
       console.error("Error fetching initial data:", error);
-      toast.error("Failed to load checkout data");
+      // toast.error("Failed to load checkout data");
     } finally {
       setInitialLoading(false);
     }
@@ -202,8 +202,6 @@ function CheckoutForm() {
     const res = await dispatch(removeFromCart(id));
     if (removeFromCart.fulfilled.match(res)) {
       toast.success("Item removed from cart");
-    } else {
-      toast.error("Failed to remove item");
     }
   };
 
@@ -220,8 +218,6 @@ function CheckoutForm() {
     if (applyCoupon.fulfilled.match(res)) {
       toast.success("Coupon applied successfully!");
       setCouponCode("");
-    } else {
-      toast.error(res.payload as string || "Failed to apply coupon");
     }
   };
 

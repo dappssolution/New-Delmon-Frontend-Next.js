@@ -167,65 +167,66 @@ export default function ProductCard({
                 </div>
 
                 {/* Content Section  */}
-                <div className="py-4 flex flex-col grow">
+                <div className="py-2 md:py-4 flex flex-col grow">
                     {/* Category */}
-                    <p className="text-gray-500 text-sm mb-1">
+                    <p className="text-gray-500 text-[10px] md:text-sm mb-0.5 md:mb-1">
                         {product.category}
                     </p>
 
                     {/* Title */}
                     <Link href={`/product/${encodeURIComponent(product.slug)}`}>
-                        <h3 className="text-black text-[17px] font-bold mb-1 hover:text-[#006637] transition-colors line-clamp-1">
+                        <h3 className="text-black text-[14px] md:text-[17px] font-bold mb-1 hover:text-[#006637] transition-colors line-clamp-1">
                             {product.title}
                         </h3>
                     </Link>
 
                     {/* Price Section */}
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="text-black text-base font-bold">
+                    <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                        <span className="text-black text-sm md:text-base font-bold">
                             {product.price}
                         </span>
                         {product.oldPrice && (
-                            <span className="text-gray-400 text-sm line-through font-medium">
+                            <span className="text-gray-400 text-[10px] md:text-sm line-through font-medium">
                                 {product.oldPrice}
                             </span>
                         )}
                         {showBadge && discountBadge && (
-                            <span className="bg-red-50 text-red-500 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-100">
+                            <span className="bg-red-50 text-red-500 text-[9px] md:text-[11px] font-bold px-1.5 md:px-2 py-0.5 rounded-full border border-red-100">
                                 -{discountBadge.replace(/[^0-9%]/g, '')}
                             </span>
                         )}
                     </div>
 
                     {/* Buttons Section */}
-                    <div className="flex items-center gap-2 mt-auto">
+                    <div className="flex items-center gap-1.5 md:gap-2 mt-auto">
                         <button
                             onClick={handleAddToCart}
                             disabled={isAdding}
-                            className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-sm font-bold py-3 px-6 rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed group-hover:shadow-md"
+                            className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-[10px] md:text-sm font-bold py-2 md:py-3 px-2 md:px-6 rounded-full transition-all flex items-center justify-center gap-1 md:gap-2 disabled:opacity-70 disabled:cursor-not-allowed group-hover:shadow-md"
                         >
                             {isAdding ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                             ) : (
                                 <>
-                                    Add to Cart
-                                    <span className="text-lg leading-none">+</span>
+                                    <span className="hidden xs:inline">Add to Cart</span>
+                                    <span className="xs:hidden">Add</span>
+                                    <span className="text-sm md:text-lg leading-none">+</span>
                                 </>
                             )}
                         </button>
 
                         <button
                             onClick={handleWishlistToggle}
-                            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all border-2 shrink-0 ${isInWishlist
+                            className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center transition-all border-2 shrink-0 ${isInWishlist
                                 ? 'bg-[#006637] border-[#006637] text-white'
                                 : 'bg-transparent border-[#006637] text-[#006637] hover:bg-green-50'
                                 }`}
                         >
                             {isWishlistLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                             ) : (
                                 <Heart
-                                    className="w-5 h-5"
+                                    className="w-4 h-4 md:w-5 md:h-5"
                                     fill={isInWishlist ? "currentColor" : "none"}
                                 />
                             )}

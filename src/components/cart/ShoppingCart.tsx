@@ -323,30 +323,6 @@ export default function ShoppingCart() {
                             <div className="bg-gray-100 rounded-lg p-6 sticky top-8">
                                 <h2 className="text-xl font-bold mb-6">Order Summary</h2>
 
-                                {/* Discount Voucher */}
-                                <div className="flex gap-2 mb-6">
-                                    <input
-                                        type="text"
-                                        placeholder="Discount Voucher"
-                                        value={discountCode}
-                                        onChange={(e) => setDiscountCode(e.target.value)}
-                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        disabled={applyingCoupon}
-                                    />
-                                    <Button
-                                        variant="outline"
-                                        className="px-6 rounded-full border-gray-400"
-                                        onClick={handleApplyCoupon}
-                                        disabled={applyingCoupon || !discountCode.trim()}
-                                    >
-                                        {applyingCoupon ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                            "Apply"
-                                        )}
-                                    </Button>
-                                </div>
-
                                 {/* Price Breakdown */}
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-gray-700">

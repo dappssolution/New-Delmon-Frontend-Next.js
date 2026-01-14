@@ -155,7 +155,7 @@ export default function CategoriesPage() {
                     {/* Main Content */}
                     <main className="flex-1">
                         {!isAnyCategoryExpanded ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {categoriesData.data.map((mainCategory) => (
                                     <Link href={`/main-category/${mainCategory.main_category_slug}`}
                                         key={mainCategory.id}
@@ -200,7 +200,7 @@ export default function CategoriesPage() {
                                                     <h2 className="text-2xl font-bold text-gray-900 mb-6">
                                                         {mainCategory.main_category_name}
                                                     </h2>
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {mainCategory.categories.map((category) => (
                                                             <Link
                                                                 key={category.id}
@@ -245,7 +245,7 @@ export default function CategoriesPage() {
                                                             <p className="text-gray-600 mb-6">
                                                                 {mainCategory.main_category_name}
                                                             </p>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                                                 {category.sub_categories.map((subCategory) => (
                                                                     <Link
                                                                         key={subCategory.id}
