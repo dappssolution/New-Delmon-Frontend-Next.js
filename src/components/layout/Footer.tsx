@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 const Footer = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { token } = useAppSelector((state: RootState) => state.auth);
+  const { token, user } = useAppSelector((state: RootState) => state.auth);
 
   const handleVendorAuth = (e: React.MouseEvent, path: string) => {
     if (token) {
@@ -22,15 +22,20 @@ const Footer = () => {
       dispatch(logout());
       dispatch(resetCart());
       dispatch(resetWishlist());
-      router.push(path);
+      window.location.href = path;
     }
   };
 
   const handleLogout = () => {
+    const isVendor = user?.role === "vendor";
     dispatch(logout());
     dispatch(resetCart());
     dispatch(resetWishlist());
-    router.push("/login");
+    if (isVendor) {
+      router.push("/login?role=vendor");
+    } else {
+      router.push("/login");
+    }
   };
 
   return (
@@ -130,13 +135,13 @@ const Footer = () => {
                 <li>
                   {
                     token ? <button onClick={handleLogout}
-                    className="text-white text-sm hover:text-gray-200 transition-colors"
+                      className="text-white text-sm hover:text-gray-200 transition-colors"
                     >Logout</button> : <Link
-                    href="/login"
-                    className="text-white text-sm hover:text-gray-200 transition-colors"
-                  >
-                    Login
-                  </Link>
+                      href="/login"
+                      className="text-white text-sm hover:text-gray-200 transition-colors"
+                    >
+                      Login
+                    </Link>
                   }
                 </li>
                 <li>

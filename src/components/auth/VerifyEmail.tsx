@@ -25,10 +25,17 @@ export default function VerifyEmailPage() {
     const searchParams = new URLSearchParams(window.location.search);
     const redirect = searchParams.get("redirect") || sessionStorage.getItem("redirectAfterLogin");
     const emailParam = searchParams.get("email");
+    const roleParam = searchParams.get("role") || (user?.role === 'vendor' ? 'vendor' : null);
+
+    let baseLoginUrl = "/login";
+    if (roleParam === 'vendor' || roleParam?.startsWith('vendor')) {
+      baseLoginUrl += "?role=vendor";
+    }
 
     if (redirect) {
-      setLoginUrl(`/login?redirect=${encodeURIComponent(redirect)}`);
+      baseLoginUrl += (baseLoginUrl.includes('?') ? '&' : '?') + `redirect=${encodeURIComponent(redirect)}`;
     }
+    setLoginUrl(baseLoginUrl);
 
     if (emailParam) {
       setEmail(emailParam);

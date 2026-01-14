@@ -237,7 +237,7 @@ export default function AddProductPage() {
                             <input
                                 type="text"
                                 name="productName"
-                                placeholder="Enter Product Title"
+                                placeholder="Dell Inspiron 15 Laptop"
                                 value={formData.productName}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -252,7 +252,7 @@ export default function AddProductPage() {
                             <input
                                 type="text"
                                 name="productTag"
-                                placeholder="Enter Product Title"
+                                placeholder="Intel i5, 16GB RAM, 512GB SSD"
                                 value={formData.productTag}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -267,7 +267,7 @@ export default function AddProductPage() {
                             <input
                                 type="text"
                                 name="productSize"
-                                placeholder="Enter Product Title"
+                                placeholder="15.6-inch Display"
                                 value={formData.productSize}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -282,7 +282,7 @@ export default function AddProductPage() {
                             <input
                                 type="text"
                                 name="productColor"
-                                placeholder="Enter Product Title"
+                                placeholder="Silver, Space Gray"
                                 value={formData.productColor}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -296,7 +296,7 @@ export default function AddProductPage() {
                             </label>
                             <textarea
                                 name="shortDescription"
-                                placeholder="Enter Product Title"
+                                placeholder="Powerful 15.6-inch laptop with Intel i5 processor, ideal for work and study."
                                 value={formData.shortDescription}
                                 onChange={handleInputChange}
                                 rows={4}
@@ -311,7 +311,8 @@ export default function AddProductPage() {
                             </label>
                             <textarea
                                 name="longDescription"
-                                placeholder="Enter Product Title"
+                                placeholder="Dell Inspiron 15 features an Intel Core i5 processor, 16GB RAM, 512GB SSD,
+Full HD display, Windows 11, and long battery life for everyday productivity."
                                 value={formData.longDescription}
                                 onChange={handleInputChange}
                                 rows={4}
@@ -340,7 +341,7 @@ export default function AddProductPage() {
                                         Choose File
                                     </span>
                                     <span className="text-gray-500">
-                                        {formData.mainThumbnail ? formData.mainThumbnail[0]?.name : 'No file chosen'}
+                                        {formData.mainThumbnail ? formData.mainThumbnail[0]?.name :  "Upload main laptop image (front view)"}
                                     </span>
                                 </label>
                             </div>
@@ -368,7 +369,7 @@ export default function AddProductPage() {
                                         Choose File
                                     </span>
                                     <span className="text-gray-500">
-                                        {formData.multiImages ? `${formData.multiImages.length} file(s) chosen` : 'No file chosen'}
+                                        {formData.multiImages ? `${formData.multiImages.length} file(s) chosen` : "Upload additional images (side, keyboard, ports)"}
                                     </span>
                                 </label>
                             </div>
@@ -386,7 +387,7 @@ export default function AddProductPage() {
                                 <input
                                     type="text"
                                     name="productPrice"
-                                    placeholder="00 : 00"
+                                    placeholder="65000"
                                     value={formData.productPrice}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -399,7 +400,7 @@ export default function AddProductPage() {
                                 <input
                                     type="text"
                                     name="discountPrice"
-                                    placeholder="00 : 00"
+                                    placeholder="59999"
                                     value={formData.discountPrice}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -416,7 +417,7 @@ export default function AddProductPage() {
                                 <input
                                     type="text"
                                     name="productCode"
-                                    placeholder="00 : 00"
+                                    placeholder="LAP-DELL-INS-15"
                                     value={formData.productCode}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"
@@ -429,7 +430,7 @@ export default function AddProductPage() {
                                 <input
                                     type="text"
                                     name="productQuantity"
-                                    placeholder="00 : 00"
+                                    placeholder="25"
                                     value={formData.productQuantity}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] focus:border-transparent"

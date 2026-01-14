@@ -17,7 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get("role");
-  const isVendor = role === "vendor";
+  const isVendor = role === "vendor" || role?.startsWith("vendor");
 
   const { loading, error, token, user, verified } = useSelector(
     (state: RootState) => state.auth

@@ -65,10 +65,15 @@ export default function Header() {
   console.log("main categoryies:", categories);
 
   const handleLogout = () => {
+    const isVendor = user?.role === "vendor";
     dispatch(logout());
     dispatch(resetCart());
     dispatch(resetWishlist());
-    router.push("/login");
+    if (isVendor) {
+      router.push("/login?role=vendor");
+    } else {
+      router.push("/login");
+    }
   };
 
   const handleVendorAuth = (e: React.MouseEvent, path: string) => {
@@ -79,7 +84,7 @@ export default function Header() {
       dispatch(logout());
       dispatch(resetCart());
       dispatch(resetWishlist());
-      router.push(path);
+      window.location.href = path;
     }
   };
 

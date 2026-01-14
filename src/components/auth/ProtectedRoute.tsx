@@ -48,7 +48,8 @@ export default function ProtectedRoute({
                 const currentPath = window.location.pathname;
                 sessionStorage.setItem("redirectAfterLogin", currentPath);
 
-                router.replace(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
+                const separator = redirectTo.includes('?') ? '&' : '?';
+                router.replace(`${redirectTo}${separator}redirect=${encodeURIComponent(currentPath)}`);
                 setIsAuthenticated(false);
                 setIsChecking(false);
             } else {

@@ -14,8 +14,9 @@ import {
   X
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAppDispatch } from "@/src/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { logout } from "@/src/redux/auth/authSlice";
+import { RootState } from "@/src/redux/store";
 import ProtectedRoute from "@/src/components/auth/ProtectedRoute";
 
 const menu = [
@@ -33,13 +34,19 @@ export default function AccountLayout({
   children: React.ReactNode;
 }) {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state: RootState) => state.auth);
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
+    const isVendor = user?.role === "vendor";
     dispatch(logout());
-    router.push("/login");
+    if (isVendor) {
+      router.push("/login?role=vendor");
+    } else {
+      router.push("/login");
+    }
   };
 
   const handleLinkClick = () => {

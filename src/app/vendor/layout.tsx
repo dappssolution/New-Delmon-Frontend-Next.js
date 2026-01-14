@@ -48,13 +48,13 @@ export default function VendorLayout({
         try {
             // await authApi.logout();
             dispatch(logout());
-            router.push('/')
+            router.push('/login?role=vendor')
 
         } catch (error) {
             console.error("Logout failed", error);
         } finally {
             dispatch(logout());
-            router.push("/");
+            router.push("/login?role=vendor");
         }
     };
 
@@ -64,14 +64,14 @@ export default function VendorLayout({
 
     if (!user) {
         return (
-            <ProtectedRoute>
+            <ProtectedRoute redirectTo="/login?role=vendor">
                 <Loading fullScreen />
             </ProtectedRoute>
         );
     }
 
     return (
-        <ProtectedRoute>
+        <ProtectedRoute redirectTo="/login?role=vendor">
             <div className="flex min-h-screen bg-gray-50">
                 {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (
@@ -204,37 +204,32 @@ export default function VendorLayout({
                                 {/* Search */}
                                 <div className="flex-1 max-w-xl">
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Search here..."
-                                            className="w-full h-10 px-4 pr-10 bg-gray-50 border border-gray-300 rounded-full text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d6838] transition-all"
-                                        />
-                                        <button className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <Search className="w-5 h-5 text-gray-400" />
-                                        </button>
                                     </div>
                                 </div>
 
                                 {/* Right Actions */}
                                 <div className="flex items-center gap-6 ml-4">
-                                    <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+                                    {/* <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
                                         <Bell className="w-5 h-5 text-gray-700" />
                                         <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-                                    </button>
+                                    </button> */}
                                     <div className="relative">
                                         <button
                                             onClick={() => setIsProfileOpen(!isProfileOpen)}
                                             className="flex items-center gap-3 pl-6 border-l border-gray-200 hover:opacity-80 transition-opacity"
                                         >
-                                            <div className="w-10 h-10 bg-[#e6f0eb] rounded-full flex items-center justify-center text-[#0d6838]">
-                                                <Image
-                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${profile?.photo}`}
-                                                    alt="Vendor"
-                                                    width={40}
-                                                    height={40}
-                                                    className="object-cover rounded-full"
-                                                />
+                                            <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e6f0eb]">
+                                                {profile?.photo && (
+                                                    <Image
+                                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${profile.photo}`}
+                                                        alt="Vendor"
+                                                        width={40}
+                                                        height={40}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                )}
                                             </div>
+
                                             <div className="hidden sm:flex flex-col items-start">
                                                 <span className="text-sm font-semibold text-gray-900 leading-none">{user?.name}</span>
                                                 <span className="text-[11px] text-gray-500 mt-1 capitalize">{user?.role}</span>
