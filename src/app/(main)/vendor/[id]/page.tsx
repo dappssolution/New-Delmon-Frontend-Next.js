@@ -116,11 +116,11 @@ export default function VendorDetailView() {
             </div>
 
             {/* Vendor Header Section */}
-            <div className="bg-gradient-to-br from-[#E8F3ED] to-white border-b border-gray-100">
+            <div className="bg-linear-to-br from-[#E8F3ED] to-white border-b border-gray-100">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
                     <div className="flex flex-col md:flex-row gap-8 items-start">
                         {/* Vendor Avatar */}
-                        <div className="w-32 h-32 bg-white rounded-2xl border-2 border-green-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div className="w-32 h-32 bg-white rounded-2xl border-2 border-green-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
                             {vendor.photo ? (
                                 <Image
                                     src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/upload/vendor_images/${vendor.photo}`}
@@ -156,7 +156,7 @@ export default function VendorDetailView() {
                             {/* Contact Information Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                                 <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
-                                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shrink-0">
                                         <Phone className="w-5 h-5 text-green-600" />
                                     </div>
                                     <div className="min-w-0">
@@ -166,7 +166,7 @@ export default function VendorDetailView() {
                                 </div>
 
                                 <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
-                                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
                                         <Mail className="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div className="min-w-0">
@@ -176,7 +176,7 @@ export default function VendorDetailView() {
                                 </div>
 
                                 <div className="flex items-center gap-3 bg-white rounded-xl p-4 border border-gray-100">
-                                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center shrink-0">
                                         <Calendar className="w-5 h-5 text-purple-600" />
                                     </div>
                                     <div className="min-w-0">
@@ -226,7 +226,7 @@ export default function VendorDetailView() {
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-12">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar - Categories */}
-                    <aside className="lg:w-72 flex-shrink-0">
+                    <aside className="lg:w-72 shrink-0">
                         <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-6">
                             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Grid3x3 className="w-5 h-5 text-green-600" />

@@ -35,8 +35,8 @@ const SupportCenterPage = () => {
                                 </div>
                                 <h3 className="font-semibold text-lg text-gray-900 mb-2">Email Us</h3>
                                 <p className="text-gray-600 mb-2 text-sm">We usually reply within 24 hours</p>
-                                <a href="mailto:support@newdelmonstationery.com" className="text-green-700 font-bold hover:underline">
-                                    support@newdelmon.com
+                                <a href="mailto:info@newdelmonstationery.com" className="text-green-700 font-bold hover:underline">
+                                    info@newdelmonstationery.com
                                 </a>
                             </div>
 
@@ -46,10 +46,21 @@ const SupportCenterPage = () => {
                                 </div>
                                 <h3 className="font-semibold text-lg text-gray-900 mb-2">Visit Us</h3>
                                 <p className="text-gray-600 mb-2 text-sm">Come say hello at our office</p>
-                                <span className="text-gray-900 font-medium">
-                                    Dubai, UAE
+                                <span className="text-gray-900 text-sm font-medium">
+                                    Near RTA Customer Happiness Center, Umm Ramool, Rashidiya, Dubai, UAE
                                 </span>
                             </div>
+                        </section>
+
+                        {/* Map Section */}
+                        <section className="w-full h-[400px] rounded-2xl overflow-hidden border border-gray-200">
+                            <iframe
+                                title="Delmon Location"
+                                src="https://www.google.com/maps?q=RTA%20Customer%20Happiness%20Center%20Umm%20Ramool%20Rashidiya&output=embed"
+                                className="w-full h-full border-0"
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
                         </section>
 
                         {/* FAQs */}

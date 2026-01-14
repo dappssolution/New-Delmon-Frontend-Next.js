@@ -260,19 +260,19 @@ export default function AboutUsPage() {
                         Get in Touch
                     </h2>
                     <p className="text-gray-500 text-sm mb-12 max-w-2xl mx-auto">
-                        Lorem ipsum dolor sit amet consectetur. Est in magna gravida mi vulputate id justo convallis. Dui amet congue euismod facilisis. Pharetra.
+                        Have questions about our products or services? Our team is here to assist you with anything you need. Reach out to us through any of the channels below.
                     </p>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 h-[300px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-  <iframe
-    title="Delmon Location"
-    src="https://www.google.com/maps?q=RTA%20Customer%20Happiness%20Center%20Umm%20Ramool%20Rashidiya&output=embed"
-    className="w-full h-full border-0"
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-  />
-</div>
+                            <iframe
+                                title="Delmon Location"
+                                src="https://www.google.com/maps?q=RTA%20Customer%20Happiness%20Center%20Umm%20Ramool%20Rashidiya&output=embed"
+                                className="w-full h-full border-0"
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                        </div>
 
 
                         <div className="flex flex-col justify-center space-y-6 text-left">

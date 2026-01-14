@@ -133,7 +133,7 @@ export default function CategoriesPage() {
                                                                         <Link
                                                                             key={subCategory.id}
                                                                             href={`/category/${subCategory.subcategory_slug}`}
-                                                                            className="w-full px-8 py-2 flex items-center hover:bg-gray-50 transition-colors text-left block"
+                                                                            className="w-full px-8 py-2 flex items-center hover:bg-gray-50 transition-colors text-left"
                                                                         >
                                                                             <span className="text-gray-600 text-xs">
                                                                                 {subCategory.subcategory_name}
