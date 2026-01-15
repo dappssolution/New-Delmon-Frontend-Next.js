@@ -693,13 +693,33 @@ function CheckoutForm() {
 
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span className="font-semibold">AED {cart.shipping_config.cost.toFixed(2)}</span>
+                  <span className="font-semibold">
+                    {(() => {
+                      const selectedDistrict = districts.find(d => String(d.id) === formData.district);
+                      const isDubai = selectedDistrict?.district_name.toLowerCase() === "dubai";
+                      const subtotal = cart.cart_total;
+
+                      if (isDubai || subtotal >= 300) return "FREE";
+                      return `AED 35.00`;
+                    })()}
+                  </span>
                 </div>
 
                 <div className="border-t border-gray-300 pt-4">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Grand Total</span>
-                    <span>AED {(cart.grand_total || (cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0) - (cart.coupon_discount || 0))).toFixed(2)}</span>
+                    <span>
+                      AED {(() => {
+                        const selectedDistrict = districts.find(d => String(d.id) === formData.district);
+                        const isDubai = selectedDistrict?.district_name.toLowerCase() === "dubai";
+                        const subtotal = cart.cart_total;
+                        const shipping = (isDubai || subtotal >= 300) ? 0 : 35;
+                        const tax = (subtotal * cart.tax_percentage / 100);
+                        const discounts = (cart.discount_amount || 0) + (cart.coupon_discount || 0);
+
+                        return (subtotal + tax + shipping - discounts).toFixed(2);
+                      })()}
+                    </span>
                   </div>
                 </div>
               </div>

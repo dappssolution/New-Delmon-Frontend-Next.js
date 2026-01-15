@@ -120,9 +120,9 @@ export default function ShoppingCart() {
     const shippingCost = cart?.shipping_config?.cost || cart?.shipping_config?.custom_cost || 0;
     const discount = cart?.discount_amount || 0;
     const couponDiscount = cart?.coupon_discount || 0;
-    const deliveryFee = shippingCost;
+    const deliveryFee = subtotal >= 300 ? 0 : 35;
     const taxAmount = (subtotal * (cart?.tax_percentage || 0)) / 100;
-    const total = cart?.grand_total || (subtotal + shippingCost + taxAmount - discount - couponDiscount);
+    const total = subtotal + deliveryFee + taxAmount - discount - couponDiscount;
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 text-black">
