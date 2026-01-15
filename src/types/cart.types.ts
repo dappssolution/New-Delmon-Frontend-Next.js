@@ -21,14 +21,17 @@ export interface RemoveCartResponse {
 }
 
 export interface Cart {
-  cart_items: CartItem[];
-  cart_count: number;
-  cart_total: number;
-  currency: string;
-  tax_percentage: number;
-  shipping_config: ShippingConfig;
-  coupon_code?: string;
-  discount_amount?: number;
+  cart_items: CartItem[]
+  cart_count: number
+  cart_total: number
+  coupon_name: string
+  coupon_discount: number
+  discount_amount: number
+  delivery_charge: number
+  grand_total: number
+  currency: string
+  tax_percentage: number
+  shipping_config: ShippingConfig
 }
 
 export interface CartItem {
@@ -52,4 +55,16 @@ export interface ShippingConfig {
   type: string;
   cost: number;
   custom_cost: number;
+}
+
+
+export interface CouponResponse {
+  status: boolean
+  message: string
+  data: CouponData
+}
+
+export interface CouponData {
+  coupon_name: string
+  coupon_discount: number
 }

@@ -63,7 +63,7 @@ export default function ReturnOrdersPage() {
 
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case 'delivered':
+            case 'deliverd':
                 return 'bg-green-100 text-green-800';
             case 'pending':
                 return 'bg-yellow-100 text-yellow-800';

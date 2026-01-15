@@ -115,20 +115,14 @@ export default function ShoppingCart() {
         await dispatch(removeFromCart(id));
     };
 
-    const handleApplyCoupon = async () => {
-        if (!discountCode.trim()) return;
-
-        setApplyingCoupon(true);
-        await dispatch(applyCoupon(discountCode));
-        setApplyingCoupon(false);
-    };
-
     const cartItems = cart?.cart_items || [];
     const subtotal = cart?.cart_total || 0;
     const shippingCost = cart?.shipping_config?.cost || cart?.shipping_config?.custom_cost || 0;
     const discount = cart?.discount_amount || 0;
+    const couponDiscount = cart?.coupon_discount || 0;
     const deliveryFee = shippingCost;
-    const total = subtotal + shippingCost;
+    const taxAmount = (subtotal * (cart?.tax_percentage || 0)) / 100;
+    const total = cart?.grand_total || (subtotal + shippingCost + taxAmount - discount - couponDiscount);
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 text-black">
@@ -335,6 +329,16 @@ export default function ShoppingCart() {
                                             <span className="font-semibold text-green-600">-AED {discount.toFixed(2)}</span>
                                         </div>
                                     )}
+                                    {couponDiscount > 0 && (
+                                        <div className="flex justify-between text-gray-700">
+                                            <span>Coupon ({cart?.coupon_name})</span>
+                                            <span className="font-semibold text-green-600">-AED {couponDiscount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-gray-700">
+                                        <span>Tax</span>
+                                        <span className="font-semibold">{cart?.tax_percentage || 0}%</span>
+                                    </div>
                                     <div className="flex justify-between text-gray-700">
                                         <span>Delivery fee</span>
                                         <span className="font-semibold">

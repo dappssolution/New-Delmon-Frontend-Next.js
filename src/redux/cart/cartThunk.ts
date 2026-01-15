@@ -11,7 +11,7 @@ export const fetchCart = createAsyncThunk(
         try {
             return await cartApi.getCart();
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to fetch cart");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to fetch cart");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to fetch cart"
             );
@@ -33,7 +33,7 @@ export const addToCart = createAsyncThunk(
             dispatch(fetchCart());
             return data;
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to add to cart");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to add to cart");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to add to cart"
             );
@@ -55,7 +55,7 @@ export const updateCartItem = createAsyncThunk(
             dispatch(fetchCart());
             return data;
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to update cart item");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to update cart item");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to update cart item"
             );
@@ -74,7 +74,7 @@ export const removeFromCart = createAsyncThunk(
             dispatch(fetchCart());
             return data;
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to remove from cart");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to remove from cart");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to remove from cart"
             );
@@ -87,12 +87,13 @@ export const removeFromCart = createAsyncThunk(
  */
 export const applyCoupon = createAsyncThunk(
     "cart/applyCoupon",
-    async (code: string, { rejectWithValue }) => {
+    async (code: string, { rejectWithValue, dispatch }) => {
         try {
             const response = await cartApi.applyCoupon(code);
+            dispatch(fetchCart());
             return response.data;
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to apply coupon");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to apply coupon");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to apply coupon"
             );
@@ -110,7 +111,7 @@ export const removeCoupon = createAsyncThunk(
             const data = await cartApi.removeCoupon();
             return data;
         } catch (error: any) {
-          toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to remove coupon");
+            toast.error(error.response?.data?.error || error.response?.data?.message || "Failed to remove coupon");
             return rejectWithValue(
                 error.response?.data?.error || error.response?.data?.message || "Failed to remove coupon"
             );

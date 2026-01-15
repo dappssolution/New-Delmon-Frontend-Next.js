@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { CartResponse, UpdateCartResponse, RemoveCartResponse } from "../types/cart.types";
+import { CartResponse, UpdateCartResponse, RemoveCartResponse, CouponResponse } from "../types/cart.types";
 
 export interface AddToCartPayload {
   qty?: number;
@@ -37,7 +37,7 @@ export const cartApi = {
   },
 
   async applyCoupon(couponName: string) {
-    const res = await api.post<CartResponse>(
+    const res = await api.post<CouponResponse>(
       "/coupon/apply",
       { coupon_name: couponName }
     );

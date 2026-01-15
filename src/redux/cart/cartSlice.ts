@@ -144,9 +144,6 @@ const cartSlice = createSlice({
             })
             .addCase(applyCoupon.fulfilled, (state, action) => {
                 state.loading = false;
-                if (action.payload && action.payload.cart_items) {
-                    state.cart = action.payload;
-                }
                 state.message = "Coupon applied successfully";
             })
             .addCase(applyCoupon.rejected, (state, action) => {

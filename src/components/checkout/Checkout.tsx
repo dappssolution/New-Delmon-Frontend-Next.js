@@ -312,7 +312,7 @@ function CheckoutForm() {
         } else {
           toast.error("Payment was not completed. Please try again.");
         }
-      } 
+      }
     } catch (error: any) {
       console.error("Error placing order:", error);
       toast.error(error.response?.data?.error || error.response?.data?.message || "Something went wrong while placing the order");
@@ -679,6 +679,13 @@ function CheckoutForm() {
                   </div>
                 )}
 
+                {cart.coupon_discount && cart.coupon_discount > 0 && (
+                  <div className="flex justify-between text-gray-700">
+                    <span>Coupon ({cart.coupon_name})</span>
+                    <span className="font-semibold text-green-600">-AED {cart.coupon_discount.toFixed(2)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-gray-700">
                   <span>Tax</span>
                   <span className="font-semibold">{cart.tax_percentage}%</span>
@@ -692,7 +699,7 @@ function CheckoutForm() {
                 <div className="border-t border-gray-300 pt-4">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Grand Total</span>
-                    <span>AED {(cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0)).toFixed(2)}</span>
+                    <span>AED {(cart.grand_total || (cart.cart_total + (cart.cart_total * cart.tax_percentage / 100) + cart.shipping_config.cost - (cart.discount_amount || 0) - (cart.coupon_discount || 0))).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

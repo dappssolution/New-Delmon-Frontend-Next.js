@@ -40,3 +40,8 @@ export const trackOrder = async (code: string) => {
     const res = await api.post<GetUserOrdersResponse>("/order/track", { code });
     return res.data;
 }
+
+export const returnOrder = async (id: number, reason: string) => {
+    const res = await api.post(`/user/order/return/${id}`, { return_reason: reason });
+    return res.data;
+}
