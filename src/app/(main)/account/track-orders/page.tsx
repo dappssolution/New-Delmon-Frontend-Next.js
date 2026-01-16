@@ -55,7 +55,7 @@ export default function TrackOrdersPage() {
             { label: "Order pending", date: order.order_date, completed: true },
             { label: "Order confirm", date: order.confirmed_date, completed: !!order.confirmed_date },
             { label: "Order processing", date: order.processing_date, completed: !!order.processing_date },
-            { label: "Ready for pickup", date: order.picked_date, completed: !!order.picked_date },
+            { label: "Order delivered", date: order.delivered_date, completed: !!order.delivered_date },
         ];
         return steps;
     };
