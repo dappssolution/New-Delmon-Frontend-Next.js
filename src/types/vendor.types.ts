@@ -552,3 +552,24 @@ export interface VendorItem {
   updated_at: any
   product: ProductData
 }
+
+export interface DashboardStatsResponse {
+  status: boolean
+  message: string
+  data: DashboardStatsData
+  meta: any[]
+}
+
+export interface DashboardStatsData {
+  total_earnings: string
+  today_earnings: string
+  month_earnings: string
+  year_earnings: string
+  today_earnings_percent: string
+  month_earnings_percent: string
+  year_earnings_percent: string
+  total_orders: number
+  pending_orders: number
+  pending_orders_percent: string
+  total_products: number
+}

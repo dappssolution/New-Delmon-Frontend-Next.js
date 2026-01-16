@@ -1,5 +1,5 @@
 import api from "../lib/axios"
-import { AddProductResponse, UpdateProductResponse, OrdersGetResponse, OrderDetailResponse, UpdateOrderStatusResponse, ProfileUpdateResponse, GetReturnOrderResponse } from "../types/vendor.types"
+import { AddProductResponse, UpdateProductResponse, OrdersGetResponse, OrderDetailResponse, UpdateOrderStatusResponse, ProfileUpdateResponse, GetReturnOrderResponse, DashboardStatsResponse } from "../types/vendor.types"
 
 
 export const vendorApis = {
@@ -57,6 +57,11 @@ export const vendorApis = {
 
     async getReturnOrders() {
         const response = await api.get<GetReturnOrderResponse>('/vendor/orders/returns')
+        return response.data
+    },
+
+    async dashboardStats() {
+        const response = await api.get<DashboardStatsResponse>('/vendor/dashboard/stats')
         return response.data
     }
 }
