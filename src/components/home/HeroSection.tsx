@@ -126,8 +126,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Desktop Layout (hidden on screens smaller than lg) */}
-        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Left Banners - 30% */}
           <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
             {banners.slice(0, 2).map((banner) => (
@@ -157,7 +156,7 @@ const HeroSection = () => {
             >
               <img
                 src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[2].banner_image}`}
-                alt={banners[2].banner_title || "Special Offer"}
+                alt={banners[2].banner_title || "Offer"}
                 className="w-full h-full transition-transform duration-500 group-hover/banner:scale-105"
               />
             </a>
