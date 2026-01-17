@@ -82,92 +82,45 @@ const HeroSection = () => {
   return (
     <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        {/* Banner Container */}
-        <div className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl">
-
-          {/* Mobile Layout */}
-          <div className="md:hidden relative min-h-[480px]">
-            {/* Background Images with Crossfade */}
-            <div className="absolute inset-0">
-              {banners.map((banner, index) => (
-                <motion.div
-                  key={banner.id}
-                  initial={false}
-                  animate={{
-                    opacity: index === activeIndex ? 1 : 0,
-                    scale: index === activeIndex ? 1 : 1.05,
-                  }}
-                  transition={{
-                    opacity: { duration: 0.4, ease: "easeOut" },
-                    scale: { duration: 0.6, ease: "easeOut" },
-                  }}
-                  className="absolute inset-0"
-                  style={{ zIndex: index === activeIndex ? 1 : 0 }}
+        {/* Mobile Layout - Single Banner with reduced height */}
+        <div className="md:hidden relative h-[280px] overflow-hidden rounded-2xl">
+          <div className="absolute inset-0">
+            {banners.map((banner, index) => (
+              <motion.div
+                key={banner.id}
+                initial={false}
+                animate={{
+                  opacity: index === activeIndex ? 1 : 0,
+                  scale: index === activeIndex ? 1 : 1.05,
+                }}
+                transition={{
+                  opacity: { duration: 0.4, ease: "easeOut" },
+                  scale: { duration: 0.6, ease: "easeOut" },
+                }}
+                className="absolute inset-0"
+                style={{ zIndex: index === activeIndex ? 1 : 0 }}
+              >
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full h-full"
                 >
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full h-full"
-                  >
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
-                      alt={banner.banner_title || "Banner"}
-                      className="w-full h-full object-cover"
-                    />
-                  </a>
-                </motion.div>
-              ))}
-
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-10" />
-            </div>
-
-            {/* Animated Info Card - Left Bottom */}
-            <div className="absolute bottom-6 left-4 right-4 z-20">
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl py-5 px-5 shadow-xl max-w-xs">
-                <div className="flex items-center gap-3">
                   <img
-                    src="/delmon-logo-only.png"
-                    alt="Delmon Logo"
-                    className="w-16 h-11 md:w-11 md:h-11 object-contain flex-shrink-0"
+                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
+                    alt={banner.banner_title || "Banner"}
+                    className="w-full h-full object-cover"
                   />
-                  <div className="h-10 w-px bg-gray-200 flex-shrink-0" />
-                  <div className="relative flex-1 min-h-[44px]">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={infoIndex}
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -20, opacity: 0 }}
-                        transition={{ duration: 0.35, ease: "easeInOut" }}
-                        className="flex items-center gap-2"
-                      >
-                        {currentInfo.icon === "phone" && (
-                          <div className="w-8 h-8 bg-gradient-to-br from-[#1a9c7a] to-[#15b589] rounded-full flex items-center justify-center flex-shrink-0">
-                            <Phone className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        <div className="flex flex-col">
-                          <span className={`font-bold text-sm leading-tight ${currentInfo.icon === "phone" ? "text-[#1a9c7a]" : "text-gray-800"}`}>
-                            {currentInfo.line1}
-                          </span>
-                          <span className={`font-semibold text-xs leading-tight ${currentInfo.icon === "phone" ? "text-gray-600" : "text-[#1a9c7a]"}`}>
-                            {currentInfo.line2}
-                          </span>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+                </a>
+              </motion.div>
+            ))}
           </div>
+        </div>
 
-          {/* Desktop Layout */}
-          <div className="hidden md:block relative h-[320px] lg:h-[380px]">
-            {/* Background Images with Crossfade */}
+        {/* Desktop Layout - Two Banner Cards Side by Side */}
+        <div className="hidden md:flex gap-4 lg:gap-6 h-[320px] lg:h-[380px]">
+          {/* Left Banner Card */}
+          <div className="relative flex-1 overflow-hidden rounded-2xl lg:rounded-3xl">
             <div className="absolute inset-0">
               {banners.map((banner, index) => (
                 <motion.div
@@ -198,49 +151,48 @@ const HeroSection = () => {
                   </a>
                 </motion.div>
               ))}
-
-              {/* Gradient Overlay - Left side for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none z-10" />
             </div>
 
-            {/* Animated Info Card - Left Bottom */}
-            <div className="absolute left-8 lg:left-12 bottom-8 lg:bottom-10 z-20">
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl py-5 px-6 shadow-xl flex items-center gap-4">
-                <img
-                  src="/delmon-logo-only.png"
-                  alt="Delmon Logo"
-                  className="w-12 h-12 lg:w-14 lg:h-14 object-contain flex-shrink-0"
-                />
-                <div className="h-12 w-px bg-gray-200 flex-shrink-0" />
-                <div className="relative min-w-[220px] min-h-[52px]">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={infoIndex}
-                      initial={{ y: 25, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -25, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: "easeInOut" }}
-                      className="flex items-center gap-3"
+          
+          </div>
+
+          {/* Right Banner Card */}
+          <div className="relative flex-1 overflow-hidden rounded-2xl lg:rounded-3xl">
+            <div className="absolute inset-0">
+              {banners.map((banner, index) => {
+                // Show next banner on the right card
+                const nextIndex = (activeIndex + 1) % banners.length;
+                return (
+                  <motion.div
+                    key={banner.id}
+                    initial={false}
+                    animate={{
+                      opacity: index === nextIndex ? 1 : 0,
+                      scale: index === nextIndex ? 1 : 1.02,
+                    }}
+                    transition={{
+                      opacity: { duration: 0.4, ease: "easeOut" },
+                      scale: { duration: 0.6, ease: "easeOut" },
+                    }}
+                    className="absolute inset-0"
+                    style={{ zIndex: index === nextIndex ? 1 : 0 }}
+                  >
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full h-full"
                     >
-                      {currentInfo.icon === "phone" && (
-                        <div className="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-br from-[#1a9c7a] to-[#15b589] rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
-                          <Headphones className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
-                        </div>
-                      )}
-                      <div className="flex flex-col">
-                        <span className={`font-bold text-base lg:text-lg leading-tight ${currentInfo.icon === "phone" ? "text-[#1a9c7a]" : "text-gray-800"}`}>
-                          {currentInfo.line1}
-                        </span>
-                        <span className={`font-semibold text-sm lg:text-base leading-tight ${currentInfo.icon === "phone" ? "text-gray-600" : "text-[#1a9c7a]"}`}>
-                          {currentInfo.line2}
-                        </span>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
+                        alt={banner.banner_title || "Banner"}
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+                  </motion.div>
+                );
+              })}
             </div>
-
           </div>
         </div>
       </div>

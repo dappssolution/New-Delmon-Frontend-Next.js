@@ -48,17 +48,11 @@ const BrandsSection = () => {
   return (
     <section className="py-10 md:py-14 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className=" w-full mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <div className="text-center mb-8 md:mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-            Our Trusted Brands
-          </h2>
-        
-        </div>
+
 
         {/* Swiper Container */}
         <div className="relative">
-          
+
 
           <Swiper
             modules={[Autoplay]}
@@ -100,8 +94,8 @@ const BrandsSection = () => {
                   href={`/brand/${brand.brand_slug}`}
                   className="group block"
                 >
-                  <div className="relative bg-white rounded-2xl p-3 md:p-4  shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 hover:border-gray-200">
-                    <div className="flex items-center justify-center h-16">
+                  <div className="relative rounded-2xl p-3 md:p-4">
+                    <div className="flex items-center justify-center h-28">
                       <img
                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                         alt={brand.brand_name}
@@ -109,16 +103,9 @@ const BrandsSection = () => {
                           max-h-full
                           max-w-full
                           object-contain
-                          opacity-75
-                          group-hover:opacity-100
-                          group-hover:scale-110
-                          transition-all
-                          duration-300
                         "
                       />
                     </div>
-                    {/* Subtle glow effect on hover */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#D7263D]/0 to-[#D7263D]/0 group-hover:from-[#D7263D]/5 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
                   </div>
                 </Link>
               </SwiperSlide>
