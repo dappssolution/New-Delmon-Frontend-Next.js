@@ -1,13 +1,48 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { CheckCircle, Package, ArrowRight, Home } from "lucide-react";
 import Link from "next/link";
+import { getOrderDetails } from "@/src/service/userApi";
+import { OrderDetailsData } from "@/src/types/user.types";
 
 function OrderSuccessContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get("order_id");
+    const [orderDetails, setOrderDetails] = useState<OrderDetailsData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (orderId) {
+            fetchOrderDetails();
+        } else {
+            setLoading(false);
+        }
+    }, [orderId]);
+
+    const fetchOrderDetails = async () => {
+        try {
+            const data = await getOrderDetails(Number(orderId));
+            if (data.status) {
+                setOrderDetails(data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching order details:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
+            </div>
+        );
+    }
+
+    const invoiceNo = orderDetails?.order?.invoice_no;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center py-12 px-4">
@@ -25,11 +60,11 @@ function OrderSuccessContent() {
                     Thank you for your purchase. Your order has been confirmed.
                 </p>
 
-                {/* Order ID */}
-                {orderId && (
-                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                        <p className="text-sm text-gray-500 mb-1">Order ID</p>
-                        <p className="text-lg font-semibold text-gray-900">#{orderId}</p>
+                {/* Invoice ID */}
+                {invoiceNo && (
+                    <div className="bg-gray-50 rounded-lg p-4 mb-6 text-center">
+                        <p className="text-sm text-gray-500 mb-1 font-medium">Invoice ID</p>
+                        <p className="text-lg font-bold text-green-700">{invoiceNo}</p>
                     </div>
                 )}
 
@@ -73,7 +108,7 @@ function OrderSuccessContent() {
 export default function OrderSuccessPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
             </div>
         }>

@@ -76,7 +76,7 @@ export default function VendorCard({
                 {/* Visit Store Button */}
                 <Link
                     href={`/vendor/${id}`}
-                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-md sm:rounded-lg text-xs sm:text-sm font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-md hover:shadow-lg group/btn mt-2 sm:mt-3 md:mt-4"
+                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-[#006637] hover:bg-[#004d2a] text-white rounded-md sm:rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg group/btn mt-2 sm:mt-3 md:mt-4"
                 >
                     <span>Visit Store</span>
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover/btn:translate-x-1 transition-transform" />
