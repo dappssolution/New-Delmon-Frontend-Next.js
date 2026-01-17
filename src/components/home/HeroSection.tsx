@@ -130,7 +130,7 @@ const HeroSection = () => {
                   <img
                     src="/delmon-logo-only.png"
                     alt="Delmon Logo"
-                    className="w-11 h-11 object-contain flex-shrink-0"
+                    className="w-16 h-11 md:w-11 md:h-11 object-contain flex-shrink-0"
                   />
                   <div className="h-10 w-px bg-gray-200 flex-shrink-0" />
                   <div className="relative flex-1 min-h-[44px]">
