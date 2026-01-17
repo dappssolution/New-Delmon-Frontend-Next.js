@@ -3,7 +3,7 @@
 import { homeApi } from "@/src/service/homeApi";
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Headphones } from "lucide-react";
 
 type Banner = {
   id: number
@@ -14,30 +14,28 @@ type Banner = {
   updated_at: string
 };
 
-const variants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? 1000 : -1000,
-    opacity: 0,
-  }),
-  center: {
-    zIndex: 1,
-    x: 0,
-    opacity: 1,
+// Info card content items
+const infoItems = [
+  {
+    line1: "Quality products.",
+    line2: "Locally owned.",
+    icon: null,
   },
-  exit: (direction: number) => ({
-    zIndex: 0,
-    x: direction < 0 ? 1000 : -1000,
-    opacity: 0,
-  }),
-};
+  {
+    line1: "+971 42 88 1400",
+    line2: "24/7 Support",
+    icon: "phone",
+  },
+];
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [[page, direction], setPage] = useState([0, 0]);
+  const [page, setPage] = useState(0);
+  const [infoIndex, setInfoIndex] = useState(0);
 
-  const paginate = useCallback((newDirection: number) => {
-    setPage([page + newDirection, newDirection]);
-  }, [page]);
+  const paginate = useCallback(() => {
+    setPage((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     async function getBanners() {
@@ -54,16 +52,24 @@ const HeroSection = () => {
   useEffect(() => {
     if (banners.length === 0) return;
     const interval = setInterval(() => {
-      paginate(1);
+      paginate();
     }, 5000);
     return () => clearInterval(interval);
   }, [banners.length, paginate]);
 
+  // Info card text rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setInfoIndex((prev) => (prev + 1) % infoItems.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (!banners.length) {
     return (
-      <section className="bg-white py-8">
-        <div className="max-w-[1400px] mx-auto px-6">
-          <div className="animate-pulse h-72 bg-gray-200 rounded-lg" />
+      <section className="bg-white py-4 md:py-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <div className="animate-pulse h-[400px] md:h-[320px] bg-gray-200 rounded-2xl" />
         </div>
       </section>
     );
@@ -71,97 +77,171 @@ const HeroSection = () => {
 
   const activeIndex = ((page % banners.length) + banners.length) % banners.length;
   const whatsappUrl = "https://wa.me/971559817240";
+  const currentInfo = infoItems[infoIndex];
 
   return (
-    <section className="bg-white py-4 md:py-10">
+    <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+        {/* Banner Container */}
+        <div className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl">
 
-        {/* Mobile & Tablet Slider (hidden on lg) */}
-        <div className="lg:hidden relative group h-[200px] sm:h-[300px] md:h-[400px] w-full overflow-hidden rounded-xl">
-          <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-              key={page}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={1}
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipe = offset.x * velocity.x;
-                if (swipe < -10000) {
-                  paginate(1);
-                } else if (swipe > 10000) {
-                  paginate(-1);
-                }
-              }}
-              className="absolute w-full h-full cursor-pointer"
-            >
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <img
-                  src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[activeIndex].banner_image}`}
-                  alt={banners[activeIndex].banner_title || "Banner"}
-                  className="w-full h-full"
-                />
-              </a>
-            </motion.div>
-          </AnimatePresence>
+          {/* Mobile Layout */}
+          <div className="md:hidden relative min-h-[480px]">
+            {/* Background Images with Crossfade */}
+            <div className="absolute inset-0">
+              {banners.map((banner, index) => (
+                <motion.div
+                  key={banner.id}
+                  initial={false}
+                  animate={{
+                    opacity: index === activeIndex ? 1 : 0,
+                    scale: index === activeIndex ? 1 : 1.05,
+                  }}
+                  transition={{
+                    opacity: { duration: 0.4, ease: "easeOut" },
+                    scale: { duration: 0.6, ease: "easeOut" },
+                  }}
+                  className="absolute inset-0"
+                  style={{ zIndex: index === activeIndex ? 1 : 0 }}
+                >
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full h-full"
+                  >
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
+                      alt={banner.banner_title || "Banner"}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                </motion.div>
+              ))}
 
-          {/* Dots for mobile slider */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setPage([index, index > activeIndex ? 1 : -1])}
-                className={`h-1.5 rounded-full transition-all duration-300 ${activeIndex === index ? "bg-green-700 w-6" : "bg-white/50 w-2"
-                  }`}
-              />
-            ))}
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-10" />
+            </div>
+
+            {/* Animated Info Card - Left Bottom */}
+            <div className="absolute bottom-6 left-4 right-4 z-20">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl py-5 px-5 shadow-xl max-w-xs">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/delmon-logo-only.png"
+                    alt="Delmon Logo"
+                    className="w-11 h-11 object-contain flex-shrink-0"
+                  />
+                  <div className="h-10 w-px bg-gray-200 flex-shrink-0" />
+                  <div className="relative flex-1 min-h-[44px]">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={infoIndex}
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -20, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: "easeInOut" }}
+                        className="flex items-center gap-2"
+                      >
+                        {currentInfo.icon === "phone" && (
+                          <div className="w-8 h-8 bg-gradient-to-br from-[#1a9c7a] to-[#15b589] rounded-full flex items-center justify-center flex-shrink-0">
+                            <Phone className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className={`font-bold text-sm leading-tight ${currentInfo.icon === "phone" ? "text-[#1a9c7a]" : "text-gray-800"}`}>
+                            {currentInfo.line1}
+                          </span>
+                          <span className={`font-semibold text-xs leading-tight ${currentInfo.icon === "phone" ? "text-gray-600" : "text-[#1a9c7a]"}`}>
+                            {currentInfo.line2}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        {/* Desktop Layout (hidden on screens smaller than lg) */}
-        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Left Banners - 30% */}
-          <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
-            {banners.slice(0, 2).map((banner) => (
-              <a
-                key={banner.id}
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative rounded-lg overflow-hidden h-48 md:h-[280px] block group/banner"
-              >
+          {/* Desktop Layout */}
+          <div className="hidden md:block relative h-[320px] lg:h-[380px]">
+            {/* Background Images with Crossfade */}
+            <div className="absolute inset-0">
+              {banners.map((banner, index) => (
+                <motion.div
+                  key={banner.id}
+                  initial={false}
+                  animate={{
+                    opacity: index === activeIndex ? 1 : 0,
+                    scale: index === activeIndex ? 1 : 1.02,
+                  }}
+                  transition={{
+                    opacity: { duration: 0.4, ease: "easeOut" },
+                    scale: { duration: 0.6, ease: "easeOut" },
+                  }}
+                  className="absolute inset-0"
+                  style={{ zIndex: index === activeIndex ? 1 : 0 }}
+                >
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full h-full"
+                  >
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
+                      alt={banner.banner_title || "Banner"}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                </motion.div>
+              ))}
+
+              {/* Gradient Overlay - Left side for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none z-10" />
+            </div>
+
+            {/* Animated Info Card - Left Bottom */}
+            <div className="absolute left-8 lg:left-12 bottom-8 lg:bottom-10 z-20">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl py-5 px-6 shadow-xl flex items-center gap-4">
                 <img
-                  src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banner.banner_image}`}
-                  alt={banner.banner_title || "Banner"}
-                  className="w-full h-full transition-transform duration-500 group-hover/banner:scale-105"
+                  src="/delmon-logo-only.png"
+                  alt="Delmon Logo"
+                  className="w-12 h-12 lg:w-14 lg:h-14 object-contain flex-shrink-0"
                 />
-              </a>
-            ))}
-          </div>
+                <div className="h-12 w-px bg-gray-200 flex-shrink-0" />
+                <div className="relative min-w-[220px] min-h-[52px]">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={infoIndex}
+                      initial={{ y: 25, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -25, opacity: 0 }}
+                      transition={{ duration: 0.35, ease: "easeInOut" }}
+                      className="flex items-center gap-3"
+                    >
+                      {currentInfo.icon === "phone" && (
+                        <div className="w-10 h-10 lg:w-11 lg:h-11 bg-gradient-to-br from-[#1a9c7a] to-[#15b589] rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                          <Headphones className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <span className={`font-bold text-base lg:text-lg leading-tight ${currentInfo.icon === "phone" ? "text-[#1a9c7a]" : "text-gray-800"}`}>
+                          {currentInfo.line1}
+                        </span>
+                        <span className={`font-semibold text-sm lg:text-base leading-tight ${currentInfo.icon === "phone" ? "text-gray-600" : "text-[#1a9c7a]"}`}>
+                          {currentInfo.line2}
+                        </span>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
 
-          {/* Right Main Banner - 70% */}
-          {banners[2] && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="lg:col-span-8 relative rounded-lg overflow-hidden h-auto md:h-full lg:min-h-[600px] block group/banner"
-            >
-              <img
-                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[2].banner_image}`}
-                alt={banners[2].banner_title || "Special Offer"}
-                className="w-full h-full transition-transform duration-500 group-hover/banner:scale-105"
-              />
-            </a>
-          )}
+          </div>
         </div>
       </div>
     </section>
