@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Heart, Loader2, X, ShoppingBag } from "lucide-react";
+import { Heart, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/src/redux/cart/cartThunk";
@@ -154,126 +154,122 @@ export default function ProductCard({
 
     return (
         <>
-            <div className="w-full h-full flex flex-col group bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-black/8 border border-gray-100 hover:border-gray-200">
+            <div className="w-full flex flex-col group bg-white">
                 {/* Image Section */}
-                <div className="relative w-full pt-[100%] overflow-hidden shrink-0 bg-gray-50">
+                <div className="relative w-full pt-[100%] rounded-2xl overflow-hidden shrink-0 transition-all duration-300 bg-gray-50">
                     <Link href={`/product/${encodeURIComponent(product.slug)}`} className="absolute inset-0 block">
                         <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                        {/* Subtle overlay on hover */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
                     </Link>
-
-                    {/* Badge */}
-                    {showBadge && discountBadge && (
-                        <div className="absolute top-2 left-2 md:top-3 md:left-3">
-                            <span className="inline-flex items-center bg-gradient-to-r from-red-500 to-rose-500 text-white text-[9px] md:text-[11px] font-bold px-2 md:px-2.5 py-0.5 md:py-1 rounded-full shadow-sm">
-                                {discountBadge.replace(/[^0-9%]/g, '')} OFF
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Quick Wishlist Button */}
-                    <button
-                        onClick={handleWishlistToggle}
-                        className={`absolute top-2 right-2 md:top-3 md:right-3 w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${isInWishlist
-                            ? 'bg-[#006637] text-white shadow-lg'
-                            : 'bg-white/90 text-gray-600 hover:bg-white hover:text-[#006637] shadow-sm'
-                            }`}
-                    >
-                        {isWishlistLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Heart
-                                className="w-4 h-4"
-                                fill={isInWishlist ? "currentColor" : "none"}
-                            />
-                        )}
-                    </button>
                 </div>
 
-                {/* Content Section */}
-                <div className="p-3 md:p-4 flex flex-col grow">
+                {/* Content Section  */}
+                <div className="py-2 md:py-4 flex flex-col grow">
                     {/* Category */}
-                    <p className="text-[#006637] text-[10px] md:text-xs font-medium uppercase tracking-wide mb-1">
+                    <p className="text-gray-500 text-[10px] md:text-sm mb-0.5 md:mb-1">
                         {product.category}
                     </p>
 
-                    {/* Title - Fixed height for consistency */}
+                    {/* Title */}
                     <Link href={`/product/${encodeURIComponent(product.slug)}`}>
-                        <h3 className="text-gray-900 text-[13px] md:text-[15px] font-semibold mb-2 hover:text-[#006637] transition-colors duration-200 line-clamp-2 leading-snug h-[36px] md:h-[42px]">
+                        <h3 className="text-black text-[14px] md:text-[17px] font-bold mb-1 hover:text-[#006637] transition-colors line-clamp-1">
                             {product.title}
                         </h3>
                     </Link>
 
                     {/* Price Section */}
-                    <div className="flex items-baseline gap-2 mb-3 md:mb-4 mt-auto">
-                        <span className="text-gray-900 text-base md:text-lg font-bold">
+                    <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                        <span className="text-black text-sm md:text-base font-bold">
                             {product.price}
                         </span>
                         {product.oldPrice && (
-                            <span className="text-gray-400 text-xs md:text-sm line-through">
+                            <span className="text-gray-400 text-[10px] md:text-sm line-through font-medium">
                                 {product.oldPrice}
+                            </span>
+                        )}
+                        {showBadge && discountBadge && (
+                            <span className="bg-red-50 text-red-500 text-[9px] md:text-[11px] font-bold px-1.5 md:px-2 py-0.5 rounded-full border border-red-100">
+                                -{discountBadge.replace(/[^0-9%]/g, '')}
                             </span>
                         )}
                     </div>
 
-                    {/* Add to Cart Button */}
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={isAdding}
-                        className="w-full bg-[#006637] hover:bg-[#005229] text-white text-xs md:text-sm font-semibold py-2.5 md:py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-md active:scale-[0.98]"
-                    >
-                        {isAdding ? (
-                            <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
-                        ) : (
-                            <>
-                                <ShoppingBag className="w-4 h-4" />
-                                <span>Add to Cart</span>
-                            </>
-                        )}
-                    </button>
+                    {/* Buttons Section */}
+                    <div className="flex items-center gap-1.5 md:gap-2 mt-auto">
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={isAdding}
+                            className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-[10px] md:text-sm font-bold py-2 md:py-3 px-2 md:px-6 rounded-full transition-all flex items-center justify-center gap-1 md:gap-2 disabled:opacity-70 disabled:cursor-not-allowed group-hover:shadow-md"
+                        >
+                            {isAdding ? (
+                                <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    <span className="hidden xs:inline">Add to Cart</span>
+                                    <span className="xs:hidden">Add</span>
+                                    <span className="text-sm md:text-lg leading-none">+</span>
+                                </>
+                            )}
+                        </button>
+
+                        <button
+                            onClick={handleWishlistToggle}
+                            className={`w-9 h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center transition-all border-2 shrink-0 ${isInWishlist
+                                ? 'bg-[#006637] border-[#006637] text-white'
+                                : 'bg-transparent border-[#006637] text-[#006637] hover:bg-green-50'
+                                }`}
+                        >
+                            {isWishlistLoading ? (
+                                <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                            ) : (
+                                <Heart
+                                    className="w-4 h-4 md:w-5 md:h-5"
+                                    fill={isInWishlist ? "currentColor" : "none"}
+                                />
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {/* Quick View / Variant Selection Modal */}
             {showModal && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
                     onClick={() => setShowModal(false)}
                 >
                     <div
-                        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform transition-all animate-modalIn"
+                        className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl"
                         onClick={stopPropagation}
                     >
-                        <div className="relative p-5 md:p-6">
+                        <div className="relative p-6">
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
                             >
-                                <X size={18} />
+                                <X size={24} />
                             </button>
 
-                            <h3 className="text-lg font-bold text-gray-900 mb-1 pr-10">Select Options</h3>
-                            <p className="text-sm text-gray-500 mb-5 line-clamp-1">{product.title}</p>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1 pr-8">Select Options</h3>
+                            <p className="text-sm text-gray-500 mb-4">{product.title}</p>
 
-                            <div className="flex gap-4 mb-6 p-3 bg-gray-50 rounded-xl">
-                                <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center p-2 shadow-sm">
-                                    <img src={product.image} alt={product.title} className="w-full h-full object-cover rounded-md" />
+                            <div className="flex gap-4 mb-6">
+                                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center p-2">
+                                    <img src={product.image} alt={product.title} className="w-full h-full object-contain" />
                                 </div>
-                                <div className="flex flex-col justify-center">
-                                    <span className="block text-xl font-bold text-[#006637]">{product.price}</span>
+                                <div>
+                                    <span className="block text-lg font-bold text-green-700">{product.price}</span>
                                     {product.oldPrice && <span className="text-sm text-gray-400 line-through">{product.oldPrice}</span>}
                                 </div>
                             </div>
 
                             {/* Colors */}
                             {product.colors && product.colors.length > 0 && (
-                                <div className="mb-5">
-                                    <p className="text-sm font-semibold text-gray-900 mb-3">Color</p>
+                                <div className="mb-4">
+                                    <p className="text-sm font-medium text-gray-900 mb-2">Color</p>
                                     <div className="flex flex-wrap gap-2">
                                         {product.colors.map(color => {
                                             const clrLower = color.toLowerCase();
@@ -282,11 +278,11 @@ export default function ProductCard({
                                                 <button
                                                     key={color}
                                                     onClick={() => setSelectedColor(color)}
-                                                    className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 focus:outline-none ${selectedColor === color ? 'border-[#006637] ring-2 ring-[#006637]/20' : 'border-gray-200'}`}
+                                                    className={`w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-transform hover:scale-110 focus:outline-none ${selectedColor === color ? 'ring-2 ring-offset-2 ring-blue-500 bg-white' : ''}`}
                                                     title={color}
                                                 >
                                                     <span
-                                                        className="w-7 h-7 rounded-full border border-gray-100"
+                                                        className="w-full h-full rounded-full border border-gray-100"
                                                         style={{ backgroundColor: bg }}
                                                     />
                                                 </button>
@@ -299,15 +295,15 @@ export default function ProductCard({
                             {/* Sizes */}
                             {product.sizes && product.sizes.length > 0 && (
                                 <div className="mb-6">
-                                    <p className="text-sm font-semibold text-gray-900 mb-3">Size</p>
+                                    <p className="text-sm font-medium text-gray-900 mb-2">Size</p>
                                     <div className="flex flex-wrap gap-2">
                                         {product.sizes.map(size => (
                                             <button
                                                 key={size}
                                                 onClick={() => setSelectedSize(size)}
-                                                className={`px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 ${selectedSize === size
-                                                    ? 'border-[#006637] bg-[#006637] text-white'
-                                                    : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                                                className={`px-3 py-1.5 text-sm rounded-md border transition-all ${selectedSize === size
+                                                    ? 'border-black bg-black text-white'
+                                                    : 'border-gray-200 text-gray-700 hover:border-gray-300'
                                                     }`}
                                             >
                                                 {size}
@@ -320,7 +316,7 @@ export default function ProductCard({
                             <button
                                 onClick={handleConfirmVariant}
                                 disabled={isAdding}
-                                className="w-full bg-[#006637] hover:bg-[#005229] text-white font-bold py-3.5 rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2 shadow-lg shadow-[#006637]/20 active:scale-[0.98]"
+                                className="w-full bg-[#006637] hover:bg-[#004d2a] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
                             >
                                 {isAdding ? (
                                     <>
@@ -328,29 +324,11 @@ export default function ProductCard({
                                         Adding...
                                     </>
                                 ) : (
-                                    <>
-                                        <ShoppingBag className="w-5 h-5" />
-                                        Confirm & Add to Cart
-                                    </>
+                                    "Confirm & Add to Cart"
                                 )}
                             </button>
                         </div>
                     </div>
-                    <style jsx>{`
-                        @keyframes modalIn {
-                            from {
-                                opacity: 0;
-                                transform: scale(0.95) translateY(10px);
-                            }
-                            to {
-                                opacity: 1;
-                                transform: scale(1) translateY(0);
-                            }
-                        }
-                        .animate-modalIn {
-                            animation: modalIn 0.2s ease-out;
-                        }
-                    `}</style>
                 </div>
             )}
         </>
