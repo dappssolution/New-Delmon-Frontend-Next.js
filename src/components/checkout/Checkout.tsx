@@ -672,6 +672,15 @@ function CheckoutForm() {
                   <span className="font-semibold">AED {cart.cart_total.toFixed(2)}</span>
                 </div>
 
+                
+
+                {cart.coupon_discount && cart.coupon_discount > 0 && (
+                  <div className="flex justify-between text-gray-700">
+                    <span>Coupon ({cart.coupon_name})</span>
+                    <span className="font-semibold text-green-600">{cart.coupon_discount}%</span>
+                  </div>
+                )}
+
                 {cart.discount_amount && cart.discount_amount > 0 && (
                   <div className="flex justify-between text-gray-700">
                     <span>Discount</span>
@@ -679,16 +688,8 @@ function CheckoutForm() {
                   </div>
                 )}
 
-                {cart.coupon_discount && cart.coupon_discount > 0 && (
-                  <div className="flex justify-between text-gray-700">
-                    <span>Coupon ({cart.coupon_name})</span>
-                    <span className="font-semibold text-green-600">-AED {cart.coupon_discount.toFixed(2)}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between text-gray-700">
-                  <span>Tax</span>
-                  <span className="font-semibold">{cart.tax_percentage}%</span>
+                <div className="flex justify-end text-gray-700">
+                  <span className="text-xs italic text-gray-500">(All VAT amounts are included)</span>
                 </div>
 
                 <div className="flex justify-between text-gray-700">
@@ -714,8 +715,8 @@ function CheckoutForm() {
                         const isDubai = selectedDistrict?.district_name.toLowerCase() === "dubai";
                         const subtotal = cart.cart_total;
                         const shipping = (isDubai || subtotal >= 300) ? 0 : 35;
-                        const tax = (subtotal * cart.tax_percentage / 100);
-                        const discounts = (cart.discount_amount || 0) + (cart.coupon_discount || 0);
+                        const tax = 0; // Tax removed from calculation
+                        const discounts = (cart.discount_amount || 0); // coupon_discount removed from calculation
 
                         return (subtotal + tax + shipping - discounts).toFixed(2);
                       })()}

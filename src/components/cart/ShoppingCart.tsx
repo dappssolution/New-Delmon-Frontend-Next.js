@@ -121,8 +121,8 @@ export default function ShoppingCart() {
     const discount = cart?.discount_amount || 0;
     const couponDiscount = cart?.coupon_discount || 0;
     const deliveryFee = subtotal >= 300 ? 0 : 35;
-    const taxAmount = (subtotal * (cart?.tax_percentage || 0)) / 100;
-    const total = subtotal + deliveryFee + taxAmount - discount - couponDiscount;
+    const taxAmount = 0; // Tax calculation removed as per user request
+    const total = subtotal + deliveryFee - discount; // Coupon discount removed from calculation as per user request
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 text-black">
@@ -332,12 +332,11 @@ export default function ShoppingCart() {
                                     {couponDiscount > 0 && (
                                         <div className="flex justify-between text-gray-700">
                                             <span>Coupon ({cart?.coupon_name})</span>
-                                            <span className="font-semibold text-green-600">-AED {couponDiscount.toFixed(2)}</span>
+                                            <span className="font-semibold text-green-600">{couponDiscount}%</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between text-gray-700">
-                                        <span>Tax</span>
-                                        <span className="font-semibold">{cart?.tax_percentage || 0}%</span>
+                                    <div className="flex justify-end text-gray-700">
+                                        <span className="text-xs italic text-gray-500">(All VAT amounts are included)</span>
                                     </div>
                                     <div className="flex justify-between text-gray-700">
                                         <span>Delivery fee</span>
