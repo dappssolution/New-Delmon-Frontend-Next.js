@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, ArrowRightLeft, Star, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
@@ -64,6 +64,9 @@ export default function ProductDetailsPage() {
     const [openAccordion, setOpenAccordion] = useState<string | null>("description");
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+    const imageRef = useRef<HTMLDivElement>(null);
 
     const isInWishlist = wishlist?.some(item => item.product_id === product?.id);
     const isWishlistLoading = loadingProductId === product?.id;
@@ -270,6 +273,24 @@ export default function ProductDetailsPage() {
         setOpenAccordion(openAccordion === section ? null : section);
     };
 
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!imageRef.current) return;
+        
+        const rect = imageRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        setZoomPosition({ x, y });
+    };
+
+    const handleMouseEnter = () => {
+        setIsZoomed(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsZoomed(false);
+    };
+
     return (
         <div className="bg-white min-h-screen pb-12">
             {/* Breadcrumbs */}
@@ -295,37 +316,49 @@ export default function ProductDetailsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     {/* Left Column - Image Gallery */}
                     <div className="lg:col-span-6 xl:col-span-5">
-                        <div className="bg-[#F8F8F8] rounded-3xl overflow-hidden mb-4 p-8 flex items-center justify-center aspect-square relative">
-                            <img
-                                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${activeImage}`}
-                                alt={product.product_name}
-                                className="w-full h-full object-contain mix-blend-multiply"
-                            />
-                            {hasDiscount && (
-                                <span className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                                    {discountPercent}% OFF
-                                </span>
+                        <div className="max-w-md mx-auto">
+                            <div 
+                                ref={imageRef}
+                                className="bg-[#F8F8F8] rounded-[32px] overflow-hidden mb-4 p-6 flex items-center justify-center aspect-square relative cursor-zoom-in"
+                                onMouseMove={handleMouseMove}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${activeImage}`}
+                                    alt={product.product_name}
+                                    className="w-full h-full object-contain mix-blend-multiply transition-transform duration-200"
+                                    style={{
+                                        transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                                        transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+                                    }}
+                                />
+                                {hasDiscount && (
+                                    <span className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                                        {discountPercent}% OFF
+                                    </span>
+                                )}
+                            </div>
+                            {/* Thumbnails */}
+                            {allImages.length > 0 && (
+                                <div className="flex gap-4 overflow-x-auto pb-2">
+                                    {allImages.map((img, index) => (
+                                        <button
+                                            key={img.id || index}
+                                            className={`w-20 h-24 shrink-0 bg-[#F8F8F8] rounded-2xl flex items-center justify-center p-2 border-2 transition-all ${activeImage === img.photo_name ? 'border-gray-400' : 'border-transparent hover:border-gray-200'
+                                                }`}
+                                            onClick={() => setActiveImage(img.photo_name)}
+                                        >
+                                            <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${img.photo_name}`}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-full h-full object-contain mix-blend-multiply"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
                             )}
                         </div>
-                        {/* Thumbnails */}
-                        {allImages.length > 0 && (
-                            <div className="flex gap-4 overflow-x-auto pb-2">
-                                {allImages.map((img, index) => (
-                                    <button
-                                        key={img.id || index}
-                                        className={`w-20 h-24 shrink-0 bg-[#F8F8F8] rounded-xl flex items-center justify-center p-2 border-2 transition-all ${activeImage === img.photo_name ? 'border-gray-400' : 'border-transparent hover:border-gray-200'
-                                            }`}
-                                        onClick={() => setActiveImage(img.photo_name)}
-                                    >
-                                        <img
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${img.photo_name}`}
-                                            alt={`Thumbnail ${index + 1}`}
-                                            className="w-full h-full object-contain mix-blend-multiply"
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* Right Column - Product Details */}
@@ -335,7 +368,7 @@ export default function ProductDetailsPage() {
                                 Shop All {product.category?.category_name || "School Items"}
                             </span>
 
-                            <h1 className="text-3xl md:text-3xl font-bold text-gray-900 mb-4 font-serif tracking-wide">
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 font-serif tracking-wide">
                                 {product.product_name}
                             </h1>
 

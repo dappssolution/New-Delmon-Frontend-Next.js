@@ -50,7 +50,7 @@ const HeroSection = () => {
     return (
       <section className="bg-white py-4 md:py-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="animate-pulse h-[400px] md:h-[320px] bg-gray-200 rounded-2xl" />
+          <div className="animate-pulse h-[160px] md:h-[220px] bg-gray-200 rounded-2xl" />
         </div>
       </section>
     );
@@ -64,7 +64,7 @@ const HeroSection = () => {
     <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         {/* Mobile Layout - Single Banner with reduced height */}
-        <div className="md:hidden relative h-[280px] overflow-hidden rounded-2xl">
+        <div className="md:hidden relative h-[160px] overflow-hidden rounded-2xl">
           <div className="absolute inset-0">
             {banners.map((banner, index) => (
               <motion.div
@@ -98,7 +98,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-         <div className="hidden md:flex gap-4 lg:gap-6 h-[380px]   banner-slide-section">
+         <div className="hidden md:flex gap-4 lg:gap-6 h-[220px]   banner-slide-section">
            <div className="w-[40%] flex flex-col gap-4 lg:gap-6">
             {/* Top Left Card */}
             <div className="relative flex-1 overflow-hidden rounded-2xl lg:rounded-3xl">

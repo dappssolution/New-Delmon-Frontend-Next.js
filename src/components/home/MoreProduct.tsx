@@ -27,7 +27,7 @@ export default function MoreProducts() {
         const response = await homeApi.getProducts();
         if (response.success && response.data) {
           const mappedProducts: Product[] = response.data
-            .slice(0, 4) // Show only 4 products
+            .slice(0, 5) // Show only 5 products
             .map((item: ApiProduct) => {
               const hasDiscount = item.discount_price !== null;
               let finalPrice = item.selling_price;
@@ -77,7 +77,7 @@ export default function MoreProducts() {
         <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
           Suggested Products
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6">
           {products.map((product) => (
             <ProductCard
               key={product.id}

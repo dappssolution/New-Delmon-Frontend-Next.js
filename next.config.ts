@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "sandbox.newdelmon.com",
+     {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/**',
       },
     ],
   },

@@ -16,8 +16,9 @@ const ProductsGrid = () => {
         const fetchProducts = async () => {
             try {
                 // Fetch only 12 products for the home page
-                const response: ProductResponse = await homeApi.getPaginatedProducts(1, 8);
-
+                const response: ProductResponse = await homeApi.getPaginatedProducts(1, 10);
+                console.log(response.data,"ddddddddddddddddddata");
+                
                 if (response.success && response.data) {
                     const mappedProducts: Product[] = response.data.map((item: ProductData) => {
                         let finalPrice = item.selling_price;
@@ -83,7 +84,7 @@ const ProductsGrid = () => {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 mb-8">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
