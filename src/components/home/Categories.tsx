@@ -33,6 +33,7 @@ export interface Link {
   label: string
   active: boolean
 }
+
 const Categories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,6 @@ const Categories = () => {
   }, []);
 
   console.log("cateogeissss:", categories);
-
 
   if (loading) {
     return (
@@ -85,7 +85,7 @@ const Categories = () => {
               ? cat.category_image.startsWith("http")
                 ? cat.category_image
                 : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${cat.category_image}`
-              : "https://placehold.co/150x150?text=No+Image";
+              : null;
 
             return (
               <Link
@@ -94,17 +94,18 @@ const Categories = () => {
                 className="flex flex-col items-center gap-2 md:gap-4 flex-shrink-0 group"
               >
                 <div
-                  className={`w-24 h-24 md:w-36 md:h-36 rounded-full ${bgColor} flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105`}
+                  className={`w-24 h-24 md:w-36 md:h-36 rounded-full ${bgColor} flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 bg-cover bg-center`}
+                  style={
+                    imageUrl
+                      ? { backgroundImage: `url(${imageUrl})` }
+                      : undefined
+                  }
                 >
-                  <img
-                    src={imageUrl}
-                    alt={cat.category_name}
-                    className="w-14 h-20 md:w-20 md:h-28 object-cover mix-blend-multiply"
-                    onError={(e) => {
-                      (e.currentTarget.src =
-                        "https://placehold.co/150x150?text=No+Image");
-                    }}
-                  />
+                  {!imageUrl && (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-gray-400 text-xs md:text-sm">No Image</span>
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-gray-900 font-medium text-xs md:text-base text-center max-w-[100px] line-clamp-2">

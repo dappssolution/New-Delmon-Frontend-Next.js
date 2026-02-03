@@ -17,7 +17,6 @@ const ProductsGrid = () => {
             try {
                 // Fetch only 12 products for the home page
                 const response: ProductResponse = await homeApi.getPaginatedProducts(1, 10);
-                console.log(response.data,"ddddddddddddddddddata");
                 
                 if (response.success && response.data) {
                     const mappedProducts: Product[] = response.data.map((item: ProductData) => {
