@@ -48,6 +48,33 @@ export default function Header() {
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Scroll-based header visibility
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Handle scroll for header visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        // Always show header at top of page
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down & past threshold - hide header
+        setIsHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setIsHeaderVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   useEffect(() => {
     const fetchMainCategories = async () => {
       try {
@@ -141,9 +168,9 @@ export default function Header() {
 
 
   return (
-    <header className="w-full">
+    <header className={`w-full fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       {/* Top Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between py-3">
@@ -177,7 +204,7 @@ export default function Header() {
               >
                 <Search className="w-5 h-5 text-gray-700" />
               </button>
-              <Link href="/cart" className="relative p-2">
+              <Link href="/cart" className="relative p-2" id="header-cart-icon-mobile">
                 <ShoppingCart className="w-5 h-5 text-gray-700" />
                 <span className="absolute top-0 right-0 bg-green-700 text-white text-[10px] font-medium rounded-full w-4 h-4 flex items-center justify-center">
                   {cart?.cart_count || 0}
@@ -409,7 +436,7 @@ export default function Header() {
                 </svg>
                 <span className="text-[11px] font-medium">Vendor</span>
               </Link>
-              <Link href="/wishlist" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[50px] relative">
+              <Link href="/wishlist" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 min-w-[50px] relative" id="header-wishlist-icon">
                 <div className="relative">
                   <Heart className="w-5 h-5" />
                   {wishlist && wishlist.length > 0 && (
@@ -424,7 +451,7 @@ export default function Header() {
                 <User className="w-5 h-5" />
                 <span className="text-[11px] font-medium">Account</span>
               </Link>
-              <Link href="/cart" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 relative min-w-[50px]">
+              <Link href="/cart" className="flex flex-col items-center gap-1 text-gray-700 hover:text-green-700 relative min-w-[50px]" id="header-cart-icon">
                 <div className="relative">
                   <ShoppingCart className="w-5 h-5" />
                   <span className="absolute -top-1 -right-1 bg-green-700 text-white text-[9px] font-medium rounded-full w-3.5 h-3.5 flex items-center justify-center">

@@ -17,7 +17,7 @@ const ProductsGrid = () => {
             try {
                 // Fetch only 12 products for the home page
                 const response: ProductResponse = await homeApi.getPaginatedProducts(1, 10);
-                
+
                 if (response.success && response.data) {
                     const mappedProducts: Product[] = response.data.map((item: ProductData) => {
                         let finalPrice = item.selling_price;
@@ -66,14 +66,14 @@ const ProductsGrid = () => {
 
     if (loading) {
         return (
-            <section className="py-6 md:py-12 bg-gray-50">
+            <section className="py-6 md:py-12 ">
                 <Loading className="h-64" />
             </section>
         );
     }
 
     return (
-        <section className="py-6 md:py-12 bg-gray-50">
+        <section className="py-6 md:py-12 ">
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
@@ -83,7 +83,7 @@ const ProductsGrid = () => {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
