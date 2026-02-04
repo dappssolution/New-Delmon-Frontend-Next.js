@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
@@ -27,7 +27,6 @@ export interface Category {
 const Categories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -63,9 +62,6 @@ const Categories = () => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
   };
-
-  // Mobile: show 4 items collapsed, 8 items expanded
-  const mobileCategories = expanded ? categories.slice(0, 8) : categories.slice(0, 4);
 
   if (loading) {
     return (
@@ -187,49 +183,15 @@ const Categories = () => {
           </button>
         </div>
 
-        {/* Mobile: Expandable Grid */}
+        {/* Mobile: Horizontal Scrollable Row */}
         <div className="md:hidden">
-          {/* Categories Grid */}
-          <div
-            className={`grid grid-cols-4 gap-x-3 gap-y-4 overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]`}
-            style={{
-              maxHeight: expanded ? "400px" : "120px",
-            }}
-          >
-            {mobileCategories.map((cat, index) => (
-              <div
-                key={cat.id}
-                className="transition-all duration-300"
-                style={{
-                  opacity: expanded || index < 4 ? 1 : 0,
-                  transform: expanded || index < 4 ? 'translateY(0)' : 'translateY(10px)',
-                  transitionDelay: expanded ? `${(index - 4) * 50}ms` : '0ms',
-                }}
-              >
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+            {categories.map((cat) => (
+              <div key={cat.id} className="flex-shrink-0">
                 <CategoryItem cat={cat} size="mobile" />
               </div>
             ))}
           </div>
-
-          {/* See More / See Less Button - Full Width */}
-          {categories.length > 4 && (
-            <div className="mt-4 px-0">
-              <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-center gap-2 py-3 text-sm text-gray-600 font-medium  border border-gray-200 rounded-full   transition-all duration-300 hover:border-gray-300"
-              >
-                {expanded ? (
-                  <>
-                    see less <ChevronUp className="w-4 h-4 transition-transform duration-300" />
-                  </>
-                ) : (
-                  <>
-                    see more <ChevronDown className="w-4 h-4 transition-transform duration-300" />
-                  </>
-                )}
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </section>

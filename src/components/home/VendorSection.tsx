@@ -77,6 +77,9 @@ export default function VendorSection() {
     return (
         <section className="py-6 sm:py-8 md:py-10 lg:py-12 bg-white">
             <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6">
+                {/* Section Title */}
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Vendors List</h2>
+
                 {/* Grid with auto-fit rows to match tallest card */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 auto-rows-fr">
                     {vendors.map((vendor, index) => {

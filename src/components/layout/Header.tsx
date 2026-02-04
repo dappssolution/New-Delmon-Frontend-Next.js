@@ -89,8 +89,6 @@ export default function Header() {
     fetchMainCategories();
   }, []);
 
-  console.log("main categoryies:", categories);
-
   const handleLogout = () => {
     const isVendor = user?.role === "vendor";
     dispatch(logout());
@@ -482,7 +480,7 @@ export default function Header() {
       {/* Desktop Navigation */}
       <nav className="hidden lg:block bg-[#0d6838]">
         <div className="max-w-[1400px] mx-auto px-6">
-          <div className="flex items-center justify-center flex-wrap">
+          <div className="flex items-center justify-start overflow-x-auto scrollbar-hide">
             {/* View All Categories Button */}
             <button
               onClick={() => router.push('/all-categories')}

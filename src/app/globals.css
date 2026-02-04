@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-/* Custom Font - Okra Medium */
+/* Custom Font - Century Gothic */
 @font-face {
-  font-family: 'Okra Medium';
-  src: url('/Okra%20Medium/Okra%20Medium.ttf') format('truetype');
+  font-family: 'Century Gothic';
+  src: url('/century-gothic-sans-font/CenturyGothic.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -12,13 +12,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-okra: 'Okra Medium', Montserrat, sans-serif;
+  --font-century: 'Century Gothic', Montserrat, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Okra Medium', Montserrat, sans-serif;
+  --font-sans: 'Century Gothic', Montserrat, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -29,11 +29,11 @@
   }
 }
 
-/* Apply Okra Medium font globally to all elements */
+/* Apply Century Gothic font globally to all elements */
 html,
 body,
 * {
-  font-family: 'Okra Medium', Montserrat, sans-serif !important;
+  font-family: 'Century Gothic', Montserrat, sans-serif !important;
 }
 
 body {

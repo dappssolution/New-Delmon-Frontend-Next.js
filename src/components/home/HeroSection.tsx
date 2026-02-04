@@ -50,7 +50,7 @@ const HeroSection = () => {
     return (
       <section className="bg-white py-4 md:py-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="animate-pulse h-[160px] md:h-[220px] bg-gray-200 rounded-2xl" />
+          <div className="animate-pulse h-[160px] md:h-64 bg-gray-200 rounded-2xl" />
         </div>
       </section>
     );
@@ -98,86 +98,19 @@ const HeroSection = () => {
           </div>
         </div>
 
-         <div className="hidden md:flex gap-4 lg:gap-6 h-[220px]   banner-slide-section">
-           <div className="w-[40%] flex flex-col gap-4 lg:gap-6">
-            {/* Top Left Card */}
-            <div className="relative flex-1 overflow-hidden rounded-2xl lg:rounded-3xl">
-              <AnimatePresence mode="wait">
-                {banners.length > 0 && (
-                  <motion.div
-                    key={`top-${activeIndex}`}
-                    initial={{ x: 80, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -80, opacity: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      ease: [0.25, 0.46, 0.45, 0.94],
-                    }}
-                    className="absolute inset-0"
-                  >
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full h-full"
-                    >
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[activeIndex].banner_image}`}
-                        alt={banners[activeIndex].banner_title || "Banner"}
-                        className="w-full h-full object-cover"
-                      />
-                    </a>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Bottom Left Card */}
-            <div className="relative flex-1 overflow-hidden rounded-2xl lg:rounded-3xl">
-              <AnimatePresence mode="wait">
-                {banners.length > 1 && (
-                  <motion.div
-                    key={`bottom-${(activeIndex + 1) % banners.length}`}
-                    initial={{ x: 80, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -80, opacity: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.05,
-                      ease: [0.25, 0.46, 0.45, 0.94],
-                    }}
-                    className="absolute inset-0"
-                  >
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full h-full"
-                    >
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[(activeIndex + 1) % banners.length].banner_image}`}
-                        alt={banners[(activeIndex + 1) % banners.length].banner_title || "Banner"}
-                        className="w-full h-full object-cover"
-                      />
-                    </a>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Right Column - 60% width with 1 tall card */}
-          <div className="w-[60%] relative overflow-hidden rounded-2xl lg:rounded-3xl">
+        {/* Desktop Layout - Two equal columns with 2 images */}
+        <div className="hidden md:grid grid-cols-2 gap-4 lg:gap-6 h-64">
+          {/* Left Image */}
+          <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl">
             <AnimatePresence mode="wait">
-              {banners.length > 2 && (
+              {banners.length > 0 && (
                 <motion.div
-                  key={`main-${(activeIndex + 2) % banners.length}`}
-                  initial={{ x: 100, opacity: 0 }}
+                  key={`left-${activeIndex}`}
+                  initial={{ x: 80, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -100, opacity: 0 }}
+                  exit={{ x: -80, opacity: 0 }}
                   transition={{
-                    duration: 0.35,
-                    delay: 0.08,
+                    duration: 0.3,
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                   className="absolute inset-0"
@@ -189,8 +122,41 @@ const HeroSection = () => {
                     className="block w-full h-full"
                   >
                     <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[(activeIndex + 2) % banners.length].banner_image}`}
-                      alt={banners[(activeIndex + 2) % banners.length].banner_title || "Banner"}
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[activeIndex].banner_image}`}
+                      alt={banners[activeIndex].banner_title || "Banner"}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Right Image */}
+          <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl">
+            <AnimatePresence mode="wait">
+              {banners.length > 1 && (
+                <motion.div
+                  key={`right-${(activeIndex + 1) % banners.length}`}
+                  initial={{ x: 80, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -80, opacity: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: 0.05,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                  className="absolute inset-0"
+                >
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full h-full"
+                  >
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${banners[(activeIndex + 1) % banners.length].banner_image}`}
+                      alt={banners[(activeIndex + 1) % banners.length].banner_title || "Banner"}
                       className="w-full h-full object-cover"
                     />
                   </a>

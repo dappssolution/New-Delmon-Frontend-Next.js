@@ -54,8 +54,6 @@ export default function ShoppingCart() {
     const [localQuantities, setLocalQuantities] = useState<Record<number, number>>({});
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
 
-    console.log("cart products:", cart);
-
     useEffect(() => {
         if (cart?.cart_items) {
             const quantities: Record<number, number> = {};
