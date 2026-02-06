@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 /* Custom Font - Century Gothic */
-@font-face {
+/* @font-face {
   font-family: 'Century Gothic';
   src: url('/century-gothic-sans-font/CenturyGothic.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-}
+} */
 
 :root {
   --background: #ffffff;
@@ -33,7 +33,10 @@
 html,
 body,
 * {
-  font-family: 'Century Gothic', Montserrat, sans-serif !important;
+  /* font-family: 'Century Gothic', Montserrat, sans-serif !important; */
+  font-family: var(--font-montserrat), sans-serif !important;
+  /* font-family: var(--font-inter), sans-serif !important; */
+  /* font-family: var(--font-figtree), sans-serif !important; */
 }
 
 body {

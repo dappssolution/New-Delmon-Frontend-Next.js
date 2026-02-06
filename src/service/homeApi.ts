@@ -108,6 +108,11 @@ export const homeApi = {
       params: { query, page, per_page: perPage }
     });
     return res.data;
+  },
+
+  async getOtherPage() {
+    const res = await api.get('/page/other');
+    return res.data;
   }
 
 };

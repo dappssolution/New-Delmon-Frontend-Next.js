@@ -34,6 +34,7 @@ interface CategorySection {
 export default function MoreProducts() {
   const [categories, setCategories] = useState<CategorySection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Map API product to CategoryProduct
   const mapProduct = useCallback((item: ApiProduct): CategoryProduct => {
@@ -55,6 +56,14 @@ export default function MoreProducts() {
     };
   }, []);
 
+  // Timer for rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => prev + 1);
+    }, 3000); // Rotate every 3 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
@@ -62,43 +71,35 @@ export default function MoreProducts() {
         const response = await homeApi.getProducts();
         if (response.success && response.data) {
           const allProducts: ApiProduct[] = response.data;
-
-          // Filter products by category flags
-          const hotDeals = allProducts
-            .filter((p) => p.hot_deals === 1)
-            .map(mapProduct);
-
-          const specialOffers = allProducts
-            .filter((p) => p.special_offer === 1)
-            .map(mapProduct);
-
-          const recentlyAdded = allProducts
-            .filter((p) => p.new_product === 1)
-            .map(mapProduct);
-
-          const specialDeals = allProducts
-            .filter((p) => p.special_deals === 1)
-            .map(mapProduct);
-
-          // Fallback to general products if category is empty
           const generalProducts = allProducts.map(mapProduct);
+
+          // Helper to split general products for fallbacks to ensure variety
+          const getGeneralBucket = (offset: number, mod: number) =>
+            generalProducts.filter((_, i) => i % mod === offset);
+
+          // Get specific categories
+          const hotDeals = allProducts.filter((p) => p.hot_deals === 1).map(mapProduct);
+          const specialOffers = allProducts.filter((p) => p.special_offer === 1).map(mapProduct);
+          const recentlyAdded = allProducts.filter((p) => p.new_product === 1).map(mapProduct);
+          const specialDeals = allProducts.filter((p) => p.special_deals === 1).map(mapProduct);
 
           setCategories([
             {
               title: "Hot Deals",
-              products: hotDeals.length > 0 ? hotDeals.slice(0, 2) : generalProducts.slice(0, 2),
+              // Use specific list or bucket 0 of general
+              products: hotDeals.length > 0 ? hotDeals : getGeneralBucket(0, 4),
             },
             {
               title: "Special Offer",
-              products: specialOffers.length > 0 ? specialOffers.slice(0, 2) : generalProducts.slice(2, 4),
+              products: specialOffers.length > 0 ? specialOffers : getGeneralBucket(1, 4),
             },
             {
               title: "Recently Added",
-              products: recentlyAdded.length > 0 ? recentlyAdded.slice(0, 2) : generalProducts.slice(4, 6),
+              products: recentlyAdded.length > 0 ? recentlyAdded : getGeneralBucket(2, 4),
             },
             {
               title: "Special Deals",
-              products: specialDeals.length > 0 ? specialDeals.slice(0, 2) : generalProducts.slice(6, 8),
+              products: specialDeals.length > 0 ? specialDeals : getGeneralBucket(3, 4),
             },
           ]);
         }
@@ -116,7 +117,7 @@ export default function MoreProducts() {
   const ProductItem = ({ product }: { product: CategoryProduct }) => (
     <Link
       href={`/product/${encodeURIComponent(product.slug)}`}
-      className="flex gap-3 py-3 px-2 rounded-lg hover:bg-gray-50 transition-all duration-300 group cursor-pointer border-b border-gray-100 last:border-b-0"
+      className="flex gap-3 py-3 px-2 rounded-lg hover:bg-gray-50 transition-all duration-300 group cursor-pointer border-b border-gray-100 last:border-b-0 animate-fadeIn"
     >
       {/* Image */}
       <div className="w-14 h-14 md:w-[70px] md:h-[70px] bg-white rounded-lg flex-shrink-0 flex items-center justify-center p-1.5 overflow-hidden border border-gray-100">
@@ -181,23 +182,46 @@ export default function MoreProducts() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         {/* 4 columns on desktop, 2 on mobile */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-          {categories.map((category, index) => (
-            <div key={index} className="min-w-0">
-              {/* Category Header */}
-              <div className="mb-3 md:mb-4">
-                <h3 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 pb-2 border-b-2 border-[#006637]">
-                  {category.title}
-                </h3>
-              </div>
+          {categories.map((category, index) => {
+            // Calculate valid start index
+            // We want 2 items per page.
+            // If list has 5 items:
+            // 0: [0, 1]
+            // 1: [2, 3]
+            // 2: [4, 0] (wrap first)
 
-              {/* Products List - 2 products per column */}
-              <div>
-                {category.products.map((product) => (
-                  <ProductItem key={product.id} product={product} />
-                ))}
+            const total = category.products.length;
+            const itemsPerPage = 2;
+
+            // Base index for the current page
+            const pageIndex = currentIndex % Math.ceil(total / itemsPerPage || 1);
+            const startIdx = pageIndex * itemsPerPage;
+
+            // Get items, handling potential wrap manually or just slice safely
+            // Using modulo on indices allows cleaner wrapping
+            const item1 = category.products[(startIdx) % total];
+            const item2 = category.products[(startIdx + 1) % total];
+
+            const visibleProducts = [item1, item2].filter(Boolean); // Filter Boolean just in case total is 0
+
+            return (
+              <div key={index} className="min-w-0">
+                {/* Category Header */}
+                <div className="mb-3 md:mb-4">
+                  <h3 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 pb-2 border-b-2 border-[#006637]">
+                    {category.title}
+                  </h3>
+                </div>
+
+                {/* Products List - 2 products per column with Animation Key */}
+                <div key={currentIndex}>
+                  {visibleProducts.map((product, i) => (
+                    <ProductItem key={`${product.id}-${i}`} product={product} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
