@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Heart, ChevronRight, ShoppingCart, Truck, ShieldCheck, Share2, AlertCircle, CreditCard, Lock, Ruler } from "lucide-react";
+import { Heart, ChevronRight, ShoppingCart, Truck, ShieldCheck, Share2, AlertCircle, CreditCard, Lock, Ruler, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Loading from "../../../../components/common/Loading";
 import { homeApi } from "../../../../service/homeApi";
@@ -35,6 +35,29 @@ interface WholesalePrice {
     updated_at: string | null;
 }
 
+const ProductAccordion = ({ title, content, isOpen, onClick }: { title: string, content: string | React.ReactNode, isOpen: boolean, onClick: () => void }) => {
+    return (
+        <div className="border-b border-gray-200">
+            <button
+                className="w-full py-4 flex items-center justify-between text-left focus:outline-none"
+                onClick={onClick}
+            >
+                <span className="text-base font-medium text-gray-900">{title}</span>
+                {isOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+            </button>
+            {isOpen && (
+                <div className="pb-4 text-gray-600 leading-relaxed text-sm">
+                    {typeof content === 'string' ? (
+                        <div dangerouslySetInnerHTML={{ __html: content }} />
+                    ) : (
+                        content
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 export default function ProductDetailsPage() {
     const params = useParams();
     const slug = params.slug as string;
@@ -52,8 +75,10 @@ export default function ProductDetailsPage() {
     const [activeImage, setActiveImage] = useState("");
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [openAccordion, setOpenAccordion] = useState<string | null>("description");
 
     const isInWishlist = wishlist?.some(item => item.product_id === product?.id);
+    const isWishlistLoading = loadingProductId === product?.id;
 
     const handleWishlistToggle = async () => {
         if (!token) {
@@ -247,10 +272,15 @@ export default function ProductDetailsPage() {
                                     <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
                                         <button
                                             onClick={handleWishlistToggle}
+                                            disabled={isWishlistLoading}
                                             className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md border border-gray-100 bg-white transition-all hover:scale-105 cursor-pointer ${isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500'
                                                 }`}
                                         >
-                                            <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+                                            {isWishlistLoading ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+                                            )}
                                         </button>
                                         <button className="w-9 h-9 rounded-full flex items-center justify-center shadow-md border border-gray-100 bg-white text-gray-400 hover:text-[#006637] transition-all hover:scale-105 cursor-pointer">
                                             <Share2 className="w-4 h-4" />
@@ -399,18 +429,26 @@ export default function ProductDetailsPage() {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3 mt-2">
-                            <div className="w-20">
+                        <div className="flex gap-3 mt-2 justify-end items-end">
+                            <div className="w-24">
                                 <label className="text-[10px] font-bold text-gray-500 mb-1 block">Qty</label>
-                                <select
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Number(e.target.value))}
-                                    className="w-full h-11 border border-gray-300 rounded-lg px-2 text-sm font-bold text-gray-800 focus:outline-none focus:border-[#006637] focus:ring-1 focus:ring-[#006637] bg-white cursor-pointer"
-                                >
-                                    {[...Array(Math.min(10, parseInt(product.product_qty) || 10))].map((_, i) => (
-                                        <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                    ))}
-                                </select>
+                                <div className="w-full h-11 border border-gray-300 rounded-lg px-3 flex items-center justify-between bg-white text-gray-800 font-bold text-sm">
+                                    <span>{quantity}</span>
+                                    <div className="flex flex-col gap-0.5">
+                                        <button
+                                            onClick={() => setQuantity(q => q + 1)}
+                                            className="text-gray-400 hover:text-[#006637] transition-colors"
+                                        >
+                                            <ChevronUp className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                            className="text-gray-400 hover:text-[#006637] transition-colors"
+                                        >
+                                            <ChevronDown className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="flex-1">
@@ -422,7 +460,7 @@ export default function ProductDetailsPage() {
                                 >
                                     {cartLoading ? (
                                         <>
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                             <span>Adding...</span>
                                         </>
                                     ) : (
@@ -433,24 +471,45 @@ export default function ProductDetailsPage() {
                                     )}
                                 </button>
                             </div>
+
+                            <button
+                                onClick={handleWishlistToggle}
+                                disabled={isWishlistLoading}
+                                className={`w-11 h-11 rounded-lg flex items-center justify-center border transition-all ${isInWishlist
+                                    ? 'border-red-200 bg-red-50 text-red-500'
+                                    : 'border-gray-200 bg-white text-gray-400 hover:border-[#006637] hover:text-[#006637]'
+                                    }`}
+                            >
+                                {isWishlistLoading ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                                )}
+                            </button>
                         </div>
 
                         {/* Description & Specs */}
-                        <div className="mt-6 border-t border-gray-100 pt-4">
-                            <h3 className="text-base font-bold text-gray-900 mb-2">Description</h3>
-                            {product.long_description ? (
-                                <div className="prose prose-sm max-w-none text-gray-600 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: product.long_description }} />
-                            ) : (
-                                <p className="text-xs text-gray-500 italic">No description available.</p>
-                            )}
+                        {/* Description & Specs & Reviews */}
+                        <div className="mt-6 border-t border-gray-100">
+                            <ProductAccordion
+                                title="Description"
+                                content={product.long_description || "No description available."}
+                                isOpen={openAccordion === "description"}
+                                onClick={() => setOpenAccordion(openAccordion === "description" ? null : "description")}
+                            />
+                            <ProductAccordion
+                                title="Specification"
+                                content={product.specification || "No specifications available."}
+                                isOpen={openAccordion === "specification"}
+                                onClick={() => setOpenAccordion(openAccordion === "specification" ? null : "specification")}
+                            />
+                            <ProductAccordion
+                                title="Review"
+                                content={<div className="text-gray-500 italic">No reviews yet.</div>}
+                                isOpen={openAccordion === "review"}
+                                onClick={() => setOpenAccordion(openAccordion === "review" ? null : "review")}
+                            />
                         </div>
-
-                        {product.specification && (
-                            <div className="mt-4">
-                                <h3 className="text-base font-bold text-gray-900 mb-2">Specifications</h3>
-                                <div className="prose prose-sm max-w-none text-gray-600 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: product.specification }} />
-                            </div>
-                        )}
                     </div>
 
                     {/* Column 3: Sidebar - Trust, Delivery, Payment (20%) */}
@@ -530,7 +589,7 @@ export default function ProductDetailsPage() {
                             </Link>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
-                            {relatedProducts.slice(0, 5).map((prod) => (
+                            {relatedProducts.map((prod) => (
                                 <ProductCard key={prod.id} product={prod} />
                             ))}
                         </div>
