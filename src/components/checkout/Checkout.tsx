@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import { fetchCart, updateCartItem, removeFromCart, applyCoupon } from "@/src/redux/cart/cartThunk";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { resetCart } from "@/src/redux/cart/cartSlice";
 
@@ -96,7 +96,8 @@ function CheckoutForm() {
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
-  const [cardComplete, setCardComplete] = useState(false);
+
+  const isStripeMethod = true; // All methods now handled by PaymentElement
 
   useEffect(() => {
     fetchInitialData();
@@ -222,7 +223,6 @@ function CheckoutForm() {
   };
 
   const handleCardChange = (event: any) => {
-    setCardComplete(event.complete);
     if (event.error) {
       setCardError(event.error.message);
     } else {
@@ -236,14 +236,9 @@ function CheckoutForm() {
       return;
     }
 
-    if (paymentMethod === "stripe") {
+    if (isStripeMethod) {
       if (!stripe || !elements) {
         toast.error("Stripe is not loaded. Please refresh and try again.");
-        return;
-      }
-
-      if (!cardComplete) {
-        toast.error("Please complete your card details");
         return;
       }
     }
@@ -259,7 +254,7 @@ function CheckoutForm() {
         district_id: formData.district ? Number(formData.district) : undefined,
         state_id: formData.state ? Number(formData.state) : undefined,
         post_code: formData.zipCode,
-        payment_method: paymentMethod
+        payment_method: "stripe" // Backend expects 'stripe' for all Stripe-related methods
       };
 
       const response = await checkoutApi.placeOrder(payload);
@@ -269,37 +264,27 @@ function CheckoutForm() {
         return;
       }
 
-      if (paymentMethod === "stripe" && response.data.client_secret) {
-        const cardElement = elements?.getElement(CardElement);
+      if (isStripeMethod && response.data.client_secret) {
+        const result = (await stripe!.confirmPayment({
+          elements: elements!,
+          clientSecret: response.data.client_secret,
+          confirmParams: {
+            return_url: `${window.location.origin}/order-success`,
+            receipt_email: formData.email,
+          },
+          redirect: "if_required",
+        })) as any;
 
-        if (!cardElement) {
-          toast.error("Card element not found");
-          return;
-        }
-
-        const { error, paymentIntent } = await stripe!.confirmCardPayment(
-          response.data.client_secret,
-          {
-            payment_method: {
-              card: cardElement,
-              billing_details: {
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone,
-              },
-            },
-          }
-        );
+        const error = result.error;
+        const paymentIntent = result.paymentIntent;
 
         if (error) {
           toast.error(error.message || "Payment failed");
           return;
         }
 
-
         if (paymentIntent?.status === "succeeded") {
           const confirmResponse = await checkoutApi.confirmStripePayment(paymentIntent.id);
-
           if (confirmResponse.status) {
             toast.success("Payment successful! Order placed.");
             dispatch(resetCart());
@@ -589,34 +574,23 @@ function CheckoutForm() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-900">Payment</h2>
 
-              <div className="mb-6">
-                <div className="flex items-center gap-3 p-4 rounded-t-lg border border-gray-200 bg-blue-50/50 border-b-0">
-                  <div className="p-2 bg-white rounded-md border border-gray-100 shadow-sm">
-                    <CreditCard className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-gray-900 font-semibold text-sm">Credit/Debit Card</h3>
-                    <p className="text-xs text-gray-500">Secure payment via Stripe</p>
-                  </div>
-                  <div className="ml-auto flex items-center gap-2">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png" alt="Visa" className="h-6 object-contain" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-6 object-contain" />
-                  </div>
-                </div>
-
-                <div className="p-4 border border-gray-200 rounded-b-lg bg-white">
-                  <div className={`p-4 border ${cardError ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white transition-colors focus-within:border-blue-500 ring-1 focus-within:ring-blue-500/20 ring-transparent`}>
-                    <CardElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardChange} />
-                  </div>
+              <div className="space-y-3 mb-6">
+                <div className="p-1">
+                  <PaymentElement
+                    options={{
+                      layout: "tabs",
+                    }}
+                    onChange={handleCardChange}
+                  />
                   {cardError && (
                     <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-red-600"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
                       {cardError}
                     </p>
                   )}
-                  <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-gray-400 font-medium tracking-wide uppercase">
                     <Lock className="w-3 h-3" />
-                    <span>Your transaction is secured with 256-bit SSL encryption</span>
+                    <span>Secure 256-bit encrypted dynamic payment</span>
                   </div>
                 </div>
               </div>
@@ -624,7 +598,7 @@ function CheckoutForm() {
               {/* Place Order Button - Mobile */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
+                disabled={loading || (isStripeMethod && (!stripe || !elements))}
                 className="lg:hidden w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
@@ -634,8 +608,8 @@ function CheckoutForm() {
                   </>
                 ) : (
                   <>
-                    {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
-                    {paymentMethod === "stripe" ? "Pay Now" : "Place Order"}
+                    {isStripeMethod && <Lock className="w-4 h-4" />}
+                    {isStripeMethod ? "Pay Now" : "Place Order"}
                   </>
                 )}
               </button>
@@ -672,7 +646,7 @@ function CheckoutForm() {
                   <span className="font-semibold">AED {cart.cart_total.toFixed(2)}</span>
                 </div>
 
-                
+
 
                 {cart.coupon_discount && cart.coupon_discount > 0 && (
                   <div className="flex justify-between text-gray-700">
@@ -728,7 +702,7 @@ function CheckoutForm() {
               {/* Place Order Button - Desktop */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
+                disabled={loading || (isStripeMethod && (!stripe || !elements))}
                 className="hidden lg:flex w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center justify-center gap-2"
               >
                 {loading ? (
@@ -738,13 +712,13 @@ function CheckoutForm() {
                   </>
                 ) : (
                   <>
-                    {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
-                    {paymentMethod === "stripe" ? "Pay Now" : "Place Order"}
+                    {isStripeMethod && <Lock className="w-4 h-4" />}
+                    {isStripeMethod ? "Pay Now" : "Place Order"}
                   </>
                 )}
               </button>
 
-              {paymentMethod === "stripe" && (
+              {isStripeMethod && (
                 <p className="mt-3 text-xs text-center text-gray-500 flex items-center justify-center gap-1">
                   <Lock className="w-3 h-3" />
                   Your payment is secure and encrypted
@@ -760,8 +734,32 @@ function CheckoutForm() {
 
 // Wrapper component with Elements provider
 export default function Checkout() {
+  const { cart } = useAppSelector((state: RootState) => state.cart);
+
+  if (!cart) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  // Calculate total for Stripe (in cents)
+  const totalAmount = Math.round((cart.cart_total + 35 - (cart.discount_amount || 0)) * 100);
+
   return (
-    <Elements stripe={stripePromise}>
+    <Elements
+      stripe={stripePromise}
+      options={{
+        mode: "payment",
+        amount: totalAmount > 0 ? totalAmount : 100,
+        currency: "aed",
+        appearance: {
+          theme: 'stripe',
+          variables: { colorPrimary: '#2563eb' },
+        },
+      }}
+    >
       <CheckoutForm />
     </Elements>
   );
