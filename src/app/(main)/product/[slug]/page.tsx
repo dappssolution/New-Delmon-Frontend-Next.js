@@ -23,6 +23,16 @@ interface ProductImage {
     updated_at: string | null;
 }
 
+interface WholesalePrice {
+    id: number;
+    product_id: number;
+    min_qty: number;
+    max_qty: number;
+    price_per_peice: number;
+    created_at: string;
+    updated_at: string | null;
+}
+
 
 const ProductAccordion = ({ title, content, isOpen, onClick }: { title: string, content: string | React.ReactNode, isOpen: boolean, onClick: () => void }) => {
     return (
@@ -60,6 +70,7 @@ export default function ProductDetailsPage() {
     const [product, setProduct] = useState<ProductData | null>(null);
     const [productImages, setProductImages] = useState<ProductImage[]>([]);
     const [relatedProducts, setRelatedProducts] = useState<ProductCardType[]>([]);
+    const [wholesalePrices, setWholesalePrices] = useState<WholesalePrice[]>([]);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeImage, setActiveImage] = useState("");
@@ -122,6 +133,10 @@ export default function ProductDetailsPage() {
 
                     if (response.data.images && response.data.images.length > 0) {
                         setProductImages(response.data.images);
+                    }
+
+                    if (response.data.product.wholesale_prices && response.data.product.wholesale_prices.length > 0) {
+                        setWholesalePrices(response.data.product.wholesale_prices);
                     }
 
                     if (response.data.product.product_color) {
@@ -257,8 +272,21 @@ export default function ProductDetailsPage() {
         );
     }
 
+    const getWholesalePrice = (qty: number): number | null => {
+        if (!wholesalePrices || wholesalePrices.length === 0) return null;
+
+        const applicablePrice = wholesalePrices.find(
+            (wp) => qty >= wp.min_qty && qty <= wp.max_qty
+        );
+
+        return applicablePrice ? applicablePrice.price_per_peice : null;
+    };
+
     const hasDiscount = product.discount_price !== null;
-    const currentPrice = hasDiscount ? product.discount_price : product.selling_price;
+    const wholesalePrice = getWholesalePrice(quantity);
+    const currentPrice = wholesalePrice
+        ? wholesalePrice.toString()
+        : (hasDiscount ? product.discount_price : product.selling_price);
     const discountPercent = hasDiscount
         ? Math.round(((parseFloat(product.selling_price) - parseFloat(product.discount_price!)) / parseFloat(product.selling_price)) * 100)
         : 0;
@@ -382,15 +410,50 @@ export default function ProductDetailsPage() {
                             </h1>
 
                             {/* Price Section */}
-                            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3 mb-5 sm:mb-6">
-                                <span className="text-2xl sm:text-3xl font-bold text-[#006637]">AED {currentPrice}</span>
-                                {hasDiscount && (
-                                    <>
-                                        <span className="text-base sm:text-lg text-gray-400 line-through">AED {product.selling_price}</span>
-                                        <span className="text-xs sm:text-sm font-semibold text-red-500 bg-red-50 px-2 py-1 rounded-full">
-                                            Save {discountPercent}%
+                            <div className="mb-5 sm:mb-6">
+                                <div className="flex flex-wrap items-baseline gap-2 sm:gap-3 mb-3">
+                                    <span className="text-2xl sm:text-3xl font-bold text-[#006637]">AED {currentPrice}</span>
+                                    {wholesalePrice && (
+                                        <span className="text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                            Wholesale Price
                                         </span>
-                                    </>
+                                    )}
+                                    {!wholesalePrice && hasDiscount && (
+                                        <>
+                                            <span className="text-base sm:text-lg text-gray-400 line-through">AED {product.selling_price}</span>
+                                            <span className="text-xs sm:text-sm font-semibold text-red-500 bg-red-50 px-2 py-1 rounded-full">
+                                                Save {discountPercent}%
+                                            </span>
+                                        </>
+                                    )}
+                                    {!wholesalePrice && !hasDiscount && (
+                                        <span className="text-sm text-gray-500">Regular Price</span>
+                                    )}
+                                </div>
+
+                                {/* Wholesale Price Tiers */}
+                                {wholesalePrices.length > 0 && (
+                                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 sm:p-4">
+                                        <h4 className="text-sm font-semibold text-blue-900 mb-2">Wholesale Pricing</h4>
+                                        <div className="space-y-1.5">
+                                            {wholesalePrices.map((wp) => (
+                                                <div
+                                                    key={wp.id}
+                                                    className={`flex items-center justify-between text-xs sm:text-sm p-2 rounded-lg transition-colors ${quantity >= wp.min_qty && quantity <= wp.max_qty
+                                                            ? 'bg-blue-200 text-blue-900 font-semibold'
+                                                            : 'text-blue-700'
+                                                        }`}
+                                                >
+                                                    <span>
+                                                        {wp.min_qty} - {wp.max_qty} pieces
+                                                    </span>
+                                                    <span className="font-semibold">
+                                                        AED {wp.price_per_peice} each
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
 
