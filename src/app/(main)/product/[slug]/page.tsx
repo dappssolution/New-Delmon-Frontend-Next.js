@@ -46,7 +46,7 @@ const ProductAccordion = ({ title, content, isOpen, onClick }: { title: string, 
                 {isOpen ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
             </button>
             {isOpen && (
-                <div className="pb-4 text-gray-600 leading-relaxed text-sm">
+                <div className="pb-4 text-gray-600 leading-relaxed text-[11px] font-calibri">
                     {typeof content === 'string' ? (
                         <div dangerouslySetInnerHTML={{ __html: content }} />
                     ) : (

@@ -20,6 +20,7 @@
   --color-foreground: var(--foreground);
   --font-sans: 'Century Gothic', Montserrat, sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-calibri: Calibri, var(--font-carlito), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -192,4 +193,12 @@ body {
 
 .animate-scaleIn {
   animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Force Calibri font for specific sections */
+.font-calibri,
+.font-calibri * {
+  font-family: Calibri, var(--font-carlito), Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
 }

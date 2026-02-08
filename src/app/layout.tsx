@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Inter, Figtree } from "next/font/google";
+import { Montserrat, Inter, Figtree, Carlito } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "../components/providers/ReduxProvider";
 import { Toaster } from "sonner";
@@ -23,6 +23,13 @@ const figtree = Figtree({
   variable: "--font-figtree",
 });
 
+const carlito = Carlito({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-carlito",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "New Delmon Wholesale Goods LLC | Quality Products and Service",
   description: "New Delmon Wholesale Goods LLC | Quality Products and Service",
@@ -36,13 +43,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${montserrat.variable} ${inter.variable} ${figtree.variable} antialiased`}
+        className={`${montserrat.variable} ${inter.variable} ${figtree.variable} ${carlito.variable} antialiased`}
       >
         <ReduxProvider>
           <Toaster position="top-right" richColors />
           {children}
         </ReduxProvider>
       </body>
+
     </html>
   );
 }
