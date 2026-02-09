@@ -113,6 +113,16 @@ export const homeApi = {
   async getOtherPage() {
     const res = await api.get('/page/other');
     return res.data;
+  },
+
+  async getHomeData() {
+    const res = await api.get('/home');
+    return res.data;
+  },
+
+  async getHomeProducts() {
+    const res = await api.get('/products/home');
+    return res.data;
   }
 
 };
