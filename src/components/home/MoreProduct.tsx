@@ -68,40 +68,30 @@ export default function MoreProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await homeApi.getProducts();
+        const response = await homeApi.getHomeData();
         if (response.success && response.data) {
-          const allProducts: ApiProduct[] = response.data;
-          const generalProducts = allProducts.map(mapProduct);
+          const { hotdeals, new: newProducts, special_deals, special_offer } = response.data;
 
-          // Helper to split general products for fallbacks to ensure variety
-          const getGeneralBucket = (offset: number, mod: number) =>
-            generalProducts.filter((_, i) => i % mod === offset);
-
-          // Get specific categories
-          const hotDeals = allProducts.filter((p) => p.hot_deals === 1).map(mapProduct);
-          const specialOffers = allProducts.filter((p) => p.special_offer === 1).map(mapProduct);
-          const recentlyAdded = allProducts.filter((p) => p.new_product === 1).map(mapProduct);
-          const specialDeals = allProducts.filter((p) => p.special_deals === 1).map(mapProduct);
-
-          setCategories([
+          const newCategories = [
             {
               title: "Hot Deals",
-              // Use specific list or bucket 0 of general
-              products: hotDeals.length > 0 ? hotDeals : getGeneralBucket(0, 4),
+              products: (hotdeals || []).map(mapProduct),
             },
             {
               title: "Special Offer",
-              products: specialOffers.length > 0 ? specialOffers : getGeneralBucket(1, 4),
+              products: (special_offer || []).map(mapProduct),
             },
             {
               title: "Recently Added",
-              products: recentlyAdded.length > 0 ? recentlyAdded : getGeneralBucket(2, 4),
+              products: (newProducts || []).map(mapProduct),
             },
             {
               title: "Special Deals",
-              products: specialDeals.length > 0 ? specialDeals : getGeneralBucket(3, 4),
+              products: (special_deals || []).map(mapProduct),
             },
-          ]);
+          ].filter((cat) => cat.products.length > 0);
+
+          setCategories(newCategories);
         }
       } catch (error) {
         console.error("Failed to fetch products", error);
@@ -176,6 +166,8 @@ export default function MoreProducts() {
       </section>
     );
   }
+
+  if (categories.length === 0) return null;
 
   return (
     <section className="py-6 md:py-10">
