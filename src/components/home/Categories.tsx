@@ -122,7 +122,7 @@ const Categories = () => {
             </div>
           )}
         </div>
-        <p className={`text-gray-800 font-medium text-center line-clamp-2 transition-colors group-hover:text-[rgb(0,102,55)] ${size === "desktop" ? "text-sm lg:text-base max-w-[100px]" : "text-xs max-w-[80px]"}`}>
+        <p className={`text-gray-800 font-medium text-center line-clamp-2 transition-colors group-hover:text-[rgb(0,102,55)] capitalize ${size === "desktop" ? "text-sm lg:text-base max-w-[100px]" : "text-xs max-w-[80px]"}`}>
           {cat.category_name}
         </p>
       </Link>

@@ -505,7 +505,7 @@ export default function Header() {
                   onClick={() => router.push(`/main-category/${category.main_category_slug}`)}
                   className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap cursor-pointer"
                 >
-                  <span>{category.main_category_name}</span>
+                  <span className="capitalize">{category.main_category_name}</span>
                 </button>
               ))
             ) : (
@@ -553,7 +553,7 @@ export default function Header() {
                   }}
                   className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-medium border-b border-gray-100 last:border-0"
                 >
-                  <span>{category.main_category_name}</span>
+                  <span className="capitalize">{category.main_category_name}</span>
                 </button>
               ))
             ) : (

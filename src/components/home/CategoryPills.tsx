@@ -54,7 +54,7 @@ export default function CategoryPills() {
             <Link
               key={cat.id}
               href={`/category/${cat.category_slug}`}
-              className="px-3 md:px-5 py-1.5 md:py-2 border border-gray-300 rounded-full text-xs md:text-sm text-gray-700 hover:border-green-700 hover:text-green-700 transition-colors"
+              className="px-3 md:px-5 py-1.5 md:py-2 border border-gray-300 rounded-full text-xs md:text-sm text-gray-700 hover:border-green-700 hover:text-green-700 transition-colors capitalize"
             >
               {cat.category_name}
             </Link>
