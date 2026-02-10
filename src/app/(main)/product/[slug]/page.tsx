@@ -327,13 +327,21 @@ export default function ProductDetailsPage() {
                             <div className="flex items-center gap-3 text-xs text-gray-500">
                                 <span>Model: <span className="font-semibold text-gray-900">{product.product_code}</span></span>
                                 <div className="h-3 w-px bg-gray-300"></div>
-                                {product.status === 1 ? (
+                                {product.status === 1 && parseInt(product.product_qty) > 0 ? (
                                     <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                                         In Stock
                                     </span>
                                 ) : (
-                                    <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full">Out of Stock</span>
+                                    <span className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                        Out of Stock
+                                    </span>
+                                )}
+                                {product.status === 1 && parseInt(product.product_qty) > 0 && parseInt(product.product_qty) < 5 && (
+                                    <span className="text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-full text-[10px] uppercase">
+                                        Only {product.product_qty} left
+                                    </span>
                                 )}
                             </div>
                         </div>
@@ -441,9 +449,29 @@ export default function ProductDetailsPage() {
                         <div className="flex gap-3 mt-2 justify-end items-end">
                             <div className="w-24">
                                 <label className="text-[10px] font-bold text-gray-500 mb-1 block">Qty</label>
-                                <div className="w-full h-11 border border-gray-300 rounded-lg px-3 flex items-center justify-between bg-white text-gray-800 font-bold text-sm">
-                                    <span>{quantity}</span>
-                                    <div className="flex flex-col gap-0.5">
+                                <div className="w-full h-11 border border-gray-300 rounded-lg px-2 flex items-center justify-between bg-white text-gray-800 font-bold text-sm">
+                                    <input
+                                        type="number"
+                                        value={quantity}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value);
+                                            const maxQty = parseInt(product.product_qty) || 0;
+                                            if (isNaN(val) || val < 1) {
+                                                setQuantity(1);
+                                            } else if (maxQty > 0 && val > maxQty) {
+                                                setQuantity(maxQty);
+                                                toast.warning(`Only ${maxQty} items available in stock`);
+                                            } else {
+                                                setQuantity(val);
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            if (e.target.value === "") setQuantity(1);
+                                        }}
+                                        className="w-full bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
+                                        min="1"
+                                    />
+                                    <div className="flex flex-col gap-0.5 border-l border-gray-100 pl-1">
                                         <button
                                             onClick={() => {
                                                 const maxQty = parseInt(product.product_qty) || 0;

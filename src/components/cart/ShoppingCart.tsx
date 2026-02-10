@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/src/components/common";
 import { Trash2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import {
     fetchCart,
     updateCartItem,
@@ -14,7 +15,7 @@ import { clearCartError, clearCartMessage } from "@/src/redux/cart/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
 import Loading from "@/src/components/common/Loading";
-   
+
 // Debounce hook
 function useDebounce<T extends (...args: any[]) => void>(
     callback: T,
@@ -98,8 +99,17 @@ export default function ShoppingCart() {
     }, 500);
 
     const updateQuantity = (id: number, delta: number) => {
+        const item = cartItems.find(i => i.id === id);
+        const currentStock = item ? Number(item.product_stock || item.product?.product_qty || 0) : 0;
+
         const currentQty = localQuantities[id] || 1;
-        const newQuantity = Math.max(1, currentQty + delta);
+        const newQuantity = currentQty + delta;
+
+        if (newQuantity < 1) return;
+        if (newQuantity > currentStock && delta > 0) {
+            toast.error(`Only ${currentStock} items available in stock`);
+            return;
+        }
 
         setLocalQuantities(prev => ({
             ...prev,
@@ -121,6 +131,11 @@ export default function ShoppingCart() {
     const deliveryFee = subtotal >= 300 ? 0 : 35;
     const taxAmount = 0; // Tax calculation removed as per user request
     const total = subtotal + deliveryFee - discount; // Coupon discount removed from calculation as per user request
+
+    const isCartInvalid = cartItems.some(item => {
+        const stock = Number(item.product_stock || item.product?.product_qty || 0);
+        return stock <= 0 || (localQuantities[item.id] || item.qty) > stock;
+    });
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 text-black">
@@ -214,7 +229,8 @@ export default function ShoppingCart() {
                                                                 </span>
                                                                 <button
                                                                     onClick={() => updateQuantity(item.id, 1)}
-                                                                    className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
+                                                                    className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                                                    disabled={(localQuantities[item.id] || item.qty) >= Number(item.product_stock || item.product?.product_qty || 0)}
                                                                 >
                                                                     +
                                                                 </button>
@@ -223,6 +239,11 @@ export default function ShoppingCart() {
                                                                 <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                                                             )}
                                                         </div>
+                                                        {Number(item.product_stock || item.product?.product_qty || 0) <= 0 ? (
+                                                            <span className="text-red-500 text-[10px] font-bold mt-1 uppercase">Out of Stock</span>
+                                                        ) : Number(item.product_stock || item.product?.product_qty || 0) < 5 ? (
+                                                            <span className="text-orange-500 text-[10px] font-medium mt-1 uppercase">Only {item.product_stock || item.product?.product_qty} left</span>
+                                                        ) : null}
                                                         <div className="font-bold text-gray-900">
                                                             {item.total.toFixed(2)}
                                                         </div>
@@ -247,6 +268,11 @@ export default function ShoppingCart() {
                                                         <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
                                                             {item.name}
                                                         </h3>
+                                                        {Number(item.product_stock || item.product?.product_qty || 0) <= 0 ? (
+                                                            <span className="text-red-500 text-[10px] font-bold uppercase block mt-0.5">Out of Stock</span>
+                                                        ) : Number(item.product_stock || item.product?.product_qty || 0) < 5 ? (
+                                                            <span className="text-orange-500 text-[10px] font-medium uppercase block mt-0.5">Only {item.product_stock || item.product?.product_qty} left</span>
+                                                        ) : null}
                                                     </div>
                                                 </div>
 
@@ -276,7 +302,8 @@ export default function ShoppingCart() {
                                                             </span>
                                                             <button
                                                                 onClick={() => updateQuantity(item.id, 1)}
-                                                                className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600"
+                                                                className="w-8 h-full hover:bg-gray-100 transition-colors flex items-center justify-center text-gray-600 disabled:opacity-50"
+                                                                disabled={(localQuantities[item.id] || item.qty) >= Number(item.product_stock || item.product?.product_qty || 0)}
                                                             >
                                                                 +
                                                             </button>
@@ -360,10 +387,11 @@ export default function ShoppingCart() {
                                 {/* Checkout Button */}
                                 <Button
                                     fullWidth
-                                    className="py-3 rounded-full text-lg"
+                                    className="py-3 rounded-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                     onClick={() => window.location.href = "/checkout"}
+                                    disabled={isCartInvalid || loading}
                                 >
-                                    Check Out
+                                    {isCartInvalid ? "Stock Insufficient" : "Check Out"}
                                 </Button>
                             </div>
                         </div>

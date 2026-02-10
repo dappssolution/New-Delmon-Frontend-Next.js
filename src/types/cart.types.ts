@@ -49,6 +49,11 @@ export interface CartItem {
   img: string;
   created_at: string;
   updated_at: string;
+  product_stock?: string | number;
+  product?: {
+    id: number;
+    product_qty: string | number;
+  };
 }
 
 export interface ShippingConfig {

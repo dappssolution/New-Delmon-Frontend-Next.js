@@ -140,8 +140,17 @@ function CheckoutForm() {
   }, 500);
 
   const updateQuantity = (id: number, delta: number) => {
+    const item = cart?.cart_items.find(i => i.id === id);
+    const currentStock = item ? Number(item.product_stock || item.product?.product_qty || 0) : 0;
+
     const currentQty = localQuantities[id] || 1;
-    const newQuantity = Math.max(1, currentQty + delta);
+    const newQuantity = currentQty + delta;
+
+    if (newQuantity < 1) return;
+    if (newQuantity > currentStock && delta > 0) {
+      toast.error(`Only ${currentStock} items available in stock`);
+      return;
+    }
 
     setLocalQuantities(prev => ({
       ...prev,
@@ -182,6 +191,11 @@ function CheckoutForm() {
       setCardError(null);
     }
   };
+
+  const isCartInvalid = cart?.cart_items.some(item => {
+    const stock = Number(item.product_stock || item.product?.product_qty || 0);
+    return stock <= 0 || (localQuantities[item.id] || item.qty) > stock;
+  });
 
   const handlePlaceOrder = async () => {
     if (!formData.name || !formData.phone || !formData.email || !formData.address) {
@@ -383,6 +397,11 @@ function CheckoutForm() {
                             </div>
                           )}
                         </div>
+                        {Number(item.product_stock || item.product?.product_qty || 0) <= 0 ? (
+                          <span className="text-red-500 text-[10px] font-bold uppercase block mt-1">Out of Stock</span>
+                        ) : Number(item.product_stock || item.product?.product_qty || 0) < 5 ? (
+                          <span className="text-orange-500 text-[10px] font-medium uppercase block mt-1">Only {item.product_stock || item.product?.product_qty} left</span>
+                        ) : null}
                       </div>
                     </div>
 
@@ -402,7 +421,8 @@ function CheckoutForm() {
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, 1)}
-                            className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600"
+                            className="w-8 h-full hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-50"
+                            disabled={(localQuantities[item.id] || item.qty) >= Number(item.product_stock || item.product?.product_qty || 0)}
                           >
                             +
                           </button>
@@ -628,7 +648,7 @@ function CheckoutForm() {
               {/* Place Order Button - Mobile */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
+                disabled={loading || isCartInvalid || (paymentMethod === "stripe" && (!stripe || !elements))}
                 className="lg:hidden w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
@@ -636,6 +656,8 @@ function CheckoutForm() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Processing...
                   </>
+                ) : isCartInvalid ? (
+                  "Stock Insufficient"
                 ) : (
                   <>
                     {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
@@ -732,7 +754,7 @@ function CheckoutForm() {
               {/* Place Order Button - Desktop */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={loading || (paymentMethod === "stripe" && (!stripe || !elements))}
+                disabled={loading || isCartInvalid || (paymentMethod === "stripe" && (!stripe || !elements))}
                 className="hidden lg:flex w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center justify-center gap-2"
               >
                 {loading ? (
@@ -740,6 +762,8 @@ function CheckoutForm() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Processing...
                   </>
+                ) : isCartInvalid ? (
+                  "Stock Insufficient"
                 ) : (
                   <>
                     {paymentMethod === "stripe" && <Lock className="w-4 h-4" />}
