@@ -110,6 +110,7 @@ const Footer = () => {
                     alt="Delmon"
                     width={170}
                     height={60}
+                    style={{ height: "auto" }}
                     priority
                     className="object-contain"
                   />

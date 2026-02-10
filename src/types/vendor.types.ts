@@ -1,4 +1,4 @@
-import { DistrictData, DivisionData, StateData } from "./checkout.types"
+import { CountryData, EmirateData } from "./checkout.types"
 import { Category, ProductData } from "./product.types"
 
 export interface VendorDetailedResponse {
@@ -235,13 +235,12 @@ export interface OrdersGetResponse {
 export interface GetOrdersData {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
-  address: string
+  address: AddressDetail | string
   post_code: string
   notes: any
   payment_type: string
@@ -286,13 +285,12 @@ export interface OrderDetailData {
 export interface OrderDetail {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
-  address: string
+  address: AddressDetail | string
   post_code: string
   notes: any
   payment_type: string
@@ -320,34 +318,46 @@ export interface OrderDetail {
   status: string
   created_at: string
   updated_at: any
-  division: Division
-  district: District
-  state: State
+  country: CountryData
+  emirate: EmirateData
   user: User
 }
 
-export interface Division {
-  id: number
-  devision_name: string
-  created_at: string
-  updated_at: any
-}
 
-export interface District {
-  id: number
-  devision_id: number
-  district_name: string
-  created_at: string
-  updated_at: any
-}
 
-export interface State {
+export interface AddressDetail {
   id: number
-  devision_id: number
-  district_id: number
-  state_name: string
+  user_id: number
+  country_id: number
+  emirate_id: number
+  first_name: string
+  last_name: string | null
+  email: string
+  phone: string
+  address_type: string
+  building_details: string
+  city: string
+  address: string
+  post_code: string | null
+  longitude: string | null
+  latitude: string | null
   created_at: string
-  updated_at: any
+  updated_at: string
+  country_name?: string
+  emirate_name?: string
+  country?: {
+    id: number
+    name: string
+    created_at: string
+    updated_at: string | null
+  }
+  emirate?: {
+    id: number
+    country_id: number
+    name: string
+    created_at: string
+    updated_at: string | null
+  }
 }
 
 export interface User {
@@ -444,9 +454,8 @@ export interface UpdateOrderStatusResponse {
 export interface UpdateOrderStatusData {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
@@ -497,13 +506,12 @@ export interface GetReturnOrderResponse {
 export interface GetReturnOrderData {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
-  address: string
+  address: AddressDetail | string
   post_code: string
   notes: any
   payment_type: string
@@ -533,9 +541,8 @@ export interface GetReturnOrderData {
   updated_at: string
   vendor_items: VendorItem[]
   user: User
-  division: DivisionData
-  district: DistrictData
-  state: StateData
+  country: CountryData
+  emirate: EmirateData
 }
 
 export interface VendorItem {

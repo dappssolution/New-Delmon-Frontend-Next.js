@@ -18,7 +18,6 @@ export default function EditProduct({ productId }: { productId: string }) {
     const { products, loading: productsLoading } = useAppSelector((state: RootState) => state.vendor);
     const { brands, loading: brandsLoading } = useAppSelector((state: RootState) => state.brand);
     const { categories, loading: categoryLoading } = useAppSelector((state: RootState) => state.category);
-    const { subCategories, loading: subLoading } = useAppSelector((state: RootState) => state.subCategory);
 
     const [formData, setFormData] = useState({
         productName: '',
@@ -33,7 +32,6 @@ export default function EditProduct({ productId }: { productId: string }) {
         productQuantity: '',
         productBrand: '',
         productCategory: '',
-        productSubCategory: '',
         hotDeals: false,
         featured: false,
         specialOffer: false,
@@ -47,8 +45,6 @@ export default function EditProduct({ productId }: { productId: string }) {
     const [brandSearch, setBrandSearch] = useState("");
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [categorySearch, setCategorySearch] = useState("");
-    const [subOpen, setSubOpen] = useState(false);
-    const [subSearch, setSubSearch] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [lastProductId, setLastProductId] = useState<string | null>(null);
     const [currentThumbnail, setCurrentThumbnail] = useState<string | null>(null);
@@ -56,7 +52,6 @@ export default function EditProduct({ productId }: { productId: string }) {
     useEffect(() => {
         dispatch(fetchAllBrands());
         dispatch(fetchAllCategory());
-        dispatch(fetchAllSubCategories());
         dispatch(fetchVendorProducts({}));
     }, [dispatch]);
 
@@ -77,7 +72,6 @@ export default function EditProduct({ productId }: { productId: string }) {
                     productQuantity: product.product_qty || '',
                     productBrand: product.brand_id?.toString() || '',
                     productCategory: product.category_id?.toString() || '',
-                    productSubCategory: product.subcategory_id?.toString() || '',
                     hotDeals: Number(product.hot_deals) === 1,
                     featured: Number(product.featured) === 1,
                     specialOffer: Number(product.special_offer) === 1,
@@ -99,12 +93,6 @@ export default function EditProduct({ productId }: { productId: string }) {
     const filteredCategories = categories.filter((cat) =>
         cat.category_name.toLowerCase().includes(categorySearch.toLowerCase())
     );
-
-    const filteredSubCategories = subCategories
-        .filter(sub => sub.category_id?.toString() === formData.productCategory)
-        .filter(sub =>
-            sub.subcategory_name.toLowerCase().includes(subSearch.toLowerCase())
-        );
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -148,10 +136,6 @@ export default function EditProduct({ productId }: { productId: string }) {
             submitData.append('product_qty', formData.productQuantity);
             submitData.append('brand_id', formData.productBrand);
             submitData.append('category_id', formData.productCategory);
-
-            if (formData.productSubCategory) {
-                submitData.append('subcategory_id', formData.productSubCategory);
-            }
 
             submitData.append('hot_deals', formData.hotDeals ? '1' : '0');
             submitData.append('featured', formData.featured ? '1' : '0');
@@ -486,7 +470,7 @@ export default function EditProduct({ productId }: { productId: string }) {
                                             <div
                                                 key={cat.id}
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, productCategory: cat.id.toString(), productSubCategory: "" }));
+                                                    setFormData(prev => ({ ...prev, productCategory: cat.id.toString() }));
                                                     setCategoryOpen(false);
                                                 }}
                                                 className="px-4 py-2.5 text-sm text-gray-900 cursor-pointer hover:bg-green-50"
@@ -499,43 +483,6 @@ export default function EditProduct({ productId }: { productId: string }) {
                             )}
                         </div>
 
-                        <div className="relative">
-                            <label className="block text-sm font-medium text-gray-600 mb-2">Product Sub Category</label>
-                            <div
-                                onClick={() => formData.productCategory && setSubOpen(!subOpen)}
-                                className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white flex justify-between items-center cursor-pointer hover:border-gray-400 ${!formData.productCategory ? "bg-gray-50 text-gray-400 cursor-not-allowed" : "text-gray-900 border-gray-300"}`}
-                            >
-                                <span>{formData.productSubCategory ? subCategories.find(s => s.id.toString() === formData.productSubCategory)?.subcategory_name : "Select Sub Category"}</span>
-                                <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${subOpen ? 'rotate-90' : ''}`} />
-                            </div>
-                            {subOpen && formData.productCategory && (
-                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-xl overflow-hidden">
-                                    <input
-                                        type="text"
-                                        placeholder="Search sub category..."
-                                        value={subSearch}
-                                        onChange={(e) => setSubSearch(e.target.value)}
-                                        className="w-full px-4 py-3 border-b border-gray-100 text-sm focus:outline-none"
-                                    />
-                                    <div className="max-h-60 overflow-y-auto">
-                                        {subLoading && <div className="px-4 py-3 text-sm text-gray-500">Loading...</div>}
-                                        {filteredSubCategories.length === 0 && !subLoading && <div className="px-4 py-3 text-sm text-gray-400">No subcategories for this category</div>}
-                                        {filteredSubCategories.map((sub) => (
-                                            <div
-                                                key={sub.id}
-                                                onClick={() => {
-                                                    setFormData(prev => ({ ...prev, productSubCategory: sub.id.toString() }));
-                                                    setSubOpen(false);
-                                                }}
-                                                className="px-4 py-2.5 text-sm text-gray-900 cursor-pointer hover:bg-green-50"
-                                            >
-                                                {sub.subcategory_name}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-600 mb-2">Product Status</label>

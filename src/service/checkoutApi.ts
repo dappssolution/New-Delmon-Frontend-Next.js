@@ -1,8 +1,7 @@
 import api from "../lib/axios";
 import {
-    DivisionGetResponse,
-    DistrictGetResponse,
-    StateGetResponse,
+    CountryGetResponse,
+    EmirateGetResponse,
     OrderCreateResponse,
     StripeConfirmResponse,
 } from "../types/checkout.types";
@@ -12,26 +11,25 @@ export interface PlaceOrderPayload {
     shipping_phone: string;
     shipping_email: string;
     shipping_address: string;
-    devision_id?: number;
-    district_id?: number;
-    state_id?: number;
-    post_code?: string;
+    country_id: number;
+    emirate_id: number;
+    address_type: string;
+    building_details: string;
+    city: string;
+    longitude?: string;
+    latitude?: string;
     payment_method: string;
+    note?: string;
 }
 
 export const checkoutApi = {
-    async getDivisions() {
-        const res = await api.get<DivisionGetResponse>("/divisions");
+    async getCountries() {
+        const res = await api.get<CountryGetResponse>("/countries");
         return res.data.data;
     },
 
-    async getDistricts(divisionId: number) {
-        const res = await api.get<DistrictGetResponse>(`/districts/${divisionId}`);
-        return res.data.data;
-    },
-
-    async getStates(districtId: number) {
-        const res = await api.get<StateGetResponse>(`/states/${districtId}`);
+    async getEmirates() {
+        const res = await api.get<EmirateGetResponse>(`/emirates`);
         return res.data.data;
     },
 

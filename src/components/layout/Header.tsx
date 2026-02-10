@@ -484,7 +484,7 @@ export default function Header() {
             {/* View All Categories Button */}
             <button
               onClick={() => router.push('/all-categories')}
-              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700"
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer"
             >
               <span>All Categories</span>
             </button>
@@ -492,7 +492,7 @@ export default function Header() {
             {/* All Brands */}
             <button
               onClick={() => router.push('/all-brands')}
-              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700"
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer"
             >
               <span>All Brands</span>
             </button>
@@ -503,7 +503,7 @@ export default function Header() {
                 <button
                   key={category.id}
                   onClick={() => router.push(`/main-category/${category.main_category_slug}`)}
-                  className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap"
+                  className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap cursor-pointer"
                 >
                   <span>{category.main_category_name}</span>
                 </button>

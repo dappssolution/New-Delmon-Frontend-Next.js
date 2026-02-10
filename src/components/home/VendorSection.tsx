@@ -155,10 +155,11 @@ export default function VendorSection() {
                                         ) : (
                                             <div className="w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
                                                 <Image
-                                                    src="/delmon-logo.png"
+                                                    src="/delmon-logo-only.png"
                                                     alt={vendor.name}
                                                     width={80}
                                                     height={80}
+                                                    style={{ height: "auto" }}
                                                     className="object-contain opacity-50 group-hover:scale-105 transition-transform duration-500"
                                                 />
                                             </div>

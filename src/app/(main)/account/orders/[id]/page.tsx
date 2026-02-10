@@ -119,9 +119,8 @@ export default function OrderDetailsPage() {
                             { label: "Name", value: order.name },
                             { label: "Phone", value: order.phone },
                             { label: "Email", value: order.email },
-                            { label: "Division", value: order.division?.division_name },
-                            { label: "District", value: order.district?.district_name },
-                            { label: "State", value: order.state?.state_name },
+                            { label: "Country", value: typeof order.address === 'object' ? order.address.country_name : order.country?.name },
+                            { label: "Emirate", value: typeof order.address === 'object' ? order.address.emirate_name : order.emirate?.name },
                             { label: "Post code", value: order.post_code },
                             { label: "Order date", value: formatDate(order.order_date) },
                         ].map((detail, idx) => (
@@ -132,7 +131,9 @@ export default function OrderDetailsPage() {
                         ))}
                         <div className="flex flex-col py-2.5">
                             <span className="text-sm text-gray-500 mb-1">Address</span>
-                            <span className="text-sm font-medium text-gray-900">{order.address}</span>
+                            <span className="text-sm font-medium text-gray-900">
+                                {typeof order.address === 'object' ? order.address.address : order.address}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -163,10 +164,10 @@ export default function OrderDetailsPage() {
                         </div>
                         <div className="flex items-center justify-between pt-2">
                             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                        order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                            order.status.includes('return') ? 'bg-orange-100 text-orange-700' :
-                                                'bg-blue-100 text-blue-700'
+                                order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                    order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                        order.status.includes('return') ? 'bg-orange-100 text-orange-700' :
+                                            'bg-blue-100 text-blue-700'
                                 }`}>
                                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </span>

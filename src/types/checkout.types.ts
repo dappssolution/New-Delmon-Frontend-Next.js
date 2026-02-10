@@ -1,58 +1,44 @@
-export interface DivisionGetResponse {
+export interface CountryGetResponse {
   success: boolean
   message: string
-  data: DivisionData[]
+  data: CountryData[]
 }
 
-export interface DivisionData {
+export interface CountryData {
   id: number
-  devision_name: string
-  created_at: string
-  updated_at: any
+  name: string
+  created_at?: string
+  updated_at?: any
 }
 
-export interface DistrictGetResponse {
+export interface EmirateGetResponse {
   success: boolean
   message: string
-  data: DistrictData[]
+  data: EmirateData[]
 }
 
-export interface DistrictData {
+export interface EmirateData {
   id: number
-  devision_id: number
-  district_name: string
-  created_at: string
-  updated_at: any
-}
-
-export interface StateGetResponse {
-  success: boolean
-  message: string
-  data: StateData[]
-}
-
-export interface StateData {
-  id: number
-  devision_id: number
-  district_id: number
-  state_name: string
-  created_at: string
-  updated_at: any
+  country_id: number
+  name: string
+  created_at?: string
+  updated_at?: any
 }
 
 export interface OrderCreateResponse {
-  status: boolean
+  status: string
   message: string
   data: OrderData
 }
 
 export interface OrderData {
-  client_secret: string
-  payment_intent_id: string
-  amount: number
-  currency: string
+  order_id?: number
+  invoice_no?: string
+  client_secret?: string
+  payment_intent_id?: string
+  amount?: number
+  currency?: string
 }
-
 
 export interface StripeConfirmResponse {
   status: boolean

@@ -35,13 +35,12 @@ export interface GetUserOrdersResponse {
 export interface OrderData {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
-  address: string
+  address: AddressDetail | string
   post_code: string
   notes: any
   payment_type: string
@@ -86,13 +85,12 @@ export interface OrderDetailsData {
 export interface Order {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string
-  address: string
+  address: AddressDetail | string
   post_code: string
   notes: any
   payment_type: string
@@ -120,27 +118,59 @@ export interface Order {
   status: string
   created_at: string
   updated_at: any
-  division: any
-  district: District
-  state: State
+  country?: Country
+  emirate?: Emirate
   user: User
 }
 
-export interface District {
+export interface Country {
   id: number
-  devision_id: number
-  district_name: string
-  created_at: string
-  updated_at: any
+  name: string
+  created_at?: string
+  updated_at?: any
 }
 
-export interface State {
+export interface Emirate {
   id: number
-  devision_id: number
-  district_id: number
-  state_name: string
+  country_id: number
+  name: string
+  created_at?: string
+  updated_at?: any
+}
+
+export interface AddressDetail {
+  id: number
+  user_id: number
+  country_id: number
+  emirate_id: number
+  first_name: string
+  last_name: string | null
+  email: string
+  phone: string
+  address_type: string
+  building_details: string
+  city: string
+  address: string
+  post_code: string | null
+  longitude: string | null
+  latitude: string | null
   created_at: string
-  updated_at: any
+  updated_at: string
+  country_name?: string
+  emirate_name?: string
+  country?: {
+    id: number
+    name: string
+    created_at: string
+    updated_at: string | null
+  }
+  emirate?: {
+    id: number
+    country_id: number
+    name: string
+    created_at: string
+    updated_at: string | null
+  }
 }
 
 export interface User {
@@ -237,9 +267,8 @@ export interface GetReturnOrdersResponse {
 export interface ReturnOrderData {
   id: number
   user_id: number
-  division_id: number
-  district_id: number
-  state_id: number
+  country_id: number
+  emirate_id: number
   name: string
   email: string
   phone: string

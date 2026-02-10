@@ -33,6 +33,7 @@ export interface ProductData {
   contract_price: any
   discount_price: any
   specification?: string
+  specification_list?: string[]
   short_description: string
   long_description: string
   product_thambnail: string

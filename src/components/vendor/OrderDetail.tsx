@@ -100,16 +100,16 @@ export default function OrderDetail() {
                             <span className="text-sm text-gray-900">{order.email}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100">
-                            <span className="text-sm text-gray-700">Division</span>
-                            <span className="text-sm text-gray-900">{order.division?.devision_name}</span>
+                            <span className="text-sm text-gray-700">Country</span>
+                            <span className="text-sm text-gray-900">
+                                {typeof order.address === 'object' ? order.address.country_name : order.country?.name}
+                            </span>
                         </div>
                         <div className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100">
-                            <span className="text-sm text-gray-700">District</span>
-                            <span className="text-sm text-gray-900">{order.district?.district_name}</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100">
-                            <span className="text-sm text-gray-700">State</span>
-                            <span className="text-sm text-gray-900">{order.state?.state_name}</span>
+                            <span className="text-sm text-gray-700">Emirate</span>
+                            <span className="text-sm text-gray-900">
+                                {typeof order.address === 'object' ? order.address.emirate_name : order.emirate?.name}
+                            </span>
                         </div>
                         <div className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100">
                             <span className="text-sm text-gray-700">Post code</span>
@@ -121,7 +121,9 @@ export default function OrderDetail() {
                         </div>
                         <div className="grid grid-cols-2 gap-4 py-2">
                             <span className="text-sm text-gray-700">Address</span>
-                            <span className="text-sm text-gray-900">{order.address}</span>
+                            <span className="text-sm text-gray-900">
+                                {typeof order.address === 'object' ? order.address.address : order.address}
+                            </span>
                         </div>
                     </div>
                 </div>

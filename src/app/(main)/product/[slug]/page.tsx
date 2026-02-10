@@ -110,7 +110,7 @@ export default function ProductDetailsPage() {
             try {
                 const response = await homeApi.getProductBySlug(slug);
                 if (response.success && response.data) {
-                    setProduct(response.data.product);
+                    setProduct({ ...response.data.product, specification_list: response.data.specification_list });
                     setActiveImage(response.data.product.product_thambnail);
                     if (response.data.images && response.data.images.length > 0) {
                         setProductImages(response.data.images);
@@ -180,6 +180,15 @@ export default function ProductDetailsPage() {
 
     const handleAddToCart = async () => {
         if (!product) return;
+
+        // Check stock limit
+        const maxQty = parseInt(product.product_qty) || 0;
+
+        if (maxQty > 0 && quantity > maxQty) {
+            toast.warning(`Only ${maxQty} items available in stock`);
+            return;
+        }
+
         const payload: any = { qty: quantity };
         if (selectedColor) payload.color = selectedColor;
         if (selectedSize) payload.size = selectedSize;
@@ -436,7 +445,14 @@ export default function ProductDetailsPage() {
                                     <span>{quantity}</span>
                                     <div className="flex flex-col gap-0.5">
                                         <button
-                                            onClick={() => setQuantity(q => q + 1)}
+                                            onClick={() => {
+                                                const maxQty = parseInt(product.product_qty) || 0;
+                                                if (maxQty > 0 && quantity >= maxQty) {
+                                                    toast.warning(`Only ${maxQty} items available in stock`);
+                                                    return;
+                                                }
+                                                setQuantity(q => q + 1);
+                                            }}
                                             className="text-gray-400 hover:text-[#006637] transition-colors"
                                         >
                                             <ChevronUp className="w-3 h-3" />
@@ -455,7 +471,7 @@ export default function ProductDetailsPage() {
                                 <label className="text-[10px] font-bold text-transparent mb-1 block select-none">Add</label>
                                 <button
                                     onClick={handleAddToCart}
-                                    disabled={cartLoading || product.status === 0}
+                                    disabled={cartLoading || product.status === 0 || (parseInt(product.product_qty) || 0) <= 0}
                                     className="w-full h-11 bg-[#006637] hover:bg-[#005530] text-white text-sm md:text-base font-bold rounded-lg shadow-lg shadow-[#006637]/20 transition-all hover:shadow-[#006637]/40 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform cursor-pointer"
                                 >
                                     {cartLoading ? (
@@ -499,7 +515,17 @@ export default function ProductDetailsPage() {
                             />
                             <ProductAccordion
                                 title="Specification"
-                                content={product.specification || "No specifications available."}
+                                content={
+                                    product.specification_list && product.specification_list.length > 0 ? (
+                                        <ul className="list-disc list-inside space-y-1 pl-1">
+                                            {product.specification_list.map((spec, index) => (
+                                                <li key={index}>{spec}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        product.specification || "No specifications available."
+                                    )
+                                }
                                 isOpen={openAccordion === "specification"}
                                 onClick={() => setOpenAccordion(openAccordion === "specification" ? null : "specification")}
                             />

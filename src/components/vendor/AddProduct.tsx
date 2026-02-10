@@ -23,7 +23,6 @@ interface ProductFormData {
     productQuantity: string;
     productBrand: string;
     productCategory: string;
-    productSubCategory: string;
     hotDeals: boolean;
     featured: boolean;
     specialOffer: boolean;
@@ -46,7 +45,6 @@ export default function AddProductPage() {
         productQuantity: '',
         productBrand: '',
         productCategory: '',
-        productSubCategory: '',
         hotDeals: false,
         featured: false,
         specialOffer: false,
@@ -65,17 +63,11 @@ export default function AddProductPage() {
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [categorySearch, setCategorySearch] = useState("");
 
-    const { subCategories, loading: subLoading } =
-        useAppSelector((state: RootState) => state.subCategory);
-
-    const [subOpen, setSubOpen] = useState(false);
-    const [subSearch, setSubSearch] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         dispatch(fetchAllBrands());
         dispatch(fetchAllCategory());
-        dispatch(fetchAllSubCategories());
     }, [dispatch]);
 
     const filteredBrands = brands.filter((brand) =>
@@ -85,12 +77,6 @@ export default function AddProductPage() {
     const filteredCategories = categories.filter((cat) =>
         cat.category_name.toLowerCase().includes(categorySearch.toLowerCase())
     );
-
-    const filteredSubCategories = subCategories
-        .filter(sub => sub.category_id?.toString() === formData.productCategory)
-        .filter(sub =>
-            sub.subcategory_name.toLowerCase().includes(subSearch.toLowerCase())
-        );
 
 
 
@@ -146,10 +132,6 @@ export default function AddProductPage() {
             submitData.append('brand_id', formData.productBrand);
             submitData.append('category_id', formData.productCategory);
 
-            if (formData.productSubCategory) {
-                submitData.append('subcategory_id', formData.productSubCategory);
-            }
-
             // Add boolean fields (convert to 1/0)
             submitData.append('hot_deals', formData.hotDeals ? '1' : '0');
             submitData.append('featured', formData.featured ? '1' : '0');
@@ -187,7 +169,6 @@ export default function AddProductPage() {
                     productQuantity: '',
                     productBrand: '',
                     productCategory: '',
-                    productSubCategory: '',
                     hotDeals: false,
                     featured: false,
                     specialOffer: false,
@@ -341,7 +322,7 @@ Full HD display, Windows 11, and long battery life for everyday productivity."
                                         Choose File
                                     </span>
                                     <span className="text-gray-500">
-                                        {formData.mainThumbnail ? formData.mainThumbnail[0]?.name :  "Upload main laptop image (front view)"}
+                                        {formData.mainThumbnail ? formData.mainThumbnail[0]?.name : "Upload main laptop image (front view)"}
                                     </span>
                                 </label>
                             </div>
@@ -558,7 +539,6 @@ Full HD display, Windows 11, and long battery life for everyday productivity."
                                                     setFormData(prev => ({
                                                         ...prev,
                                                         productCategory: cat.id.toString(),
-                                                        productSubCategory: "" // reset subcategory if needed
                                                     }));
                                                     setCategoryOpen(false);
                                                     setCategorySearch("");
@@ -574,77 +554,6 @@ Full HD display, Windows 11, and long battery life for everyday productivity."
                         </div>
 
 
-                        {/* Product Sub Category */}
-                        <div className="relative">
-                            <label className="block text-sm font-medium text-gray-600 mb-2">
-                                Product Sub Category
-                            </label>
-
-                            <div
-                                onClick={() => {
-                                    if (!formData.productCategory) return;
-                                    setSubOpen(!subOpen);
-                                }}
-                                className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white flex justify-between items-center cursor-pointer
-      ${!formData.productCategory ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "text-gray-900 border-gray-300"}
-    `}
-                            >
-                                <span>
-                                    {formData.productSubCategory
-                                        ? subCategories.find(
-                                            s => s.id.toString() === formData.productSubCategory
-                                        )?.subcategory_name
-                                        : "Select Sub Category"}
-                                </span>
-                                <span className="text-gray-400">▾</span>
-                            </div>
-
-                            {subOpen && formData.productCategory && (
-                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-
-                                    {/* Search */}
-                                    <input
-                                        type="text"
-                                        placeholder="Search sub category..."
-                                        value={subSearch}
-                                        onChange={(e) => setSubSearch(e.target.value)}
-                                        className="w-full px-3 py-2 border-b border-gray-200 text-sm text-gray-900 bg-white focus:outline-none"
-                                    />
-
-                                    {/* List */}
-                                    <div className="max-h-56 overflow-y-auto">
-                                        {subLoading && (
-                                            <div className="px-4 py-2 text-sm text-gray-500">
-                                                Loading...
-                                            </div>
-                                        )}
-
-                                        {!subLoading && filteredSubCategories.length === 0 && (
-                                            <div className="px-4 py-2 text-sm text-gray-500">
-                                                No sub categories found
-                                            </div>
-                                        )}
-
-                                        {filteredSubCategories.map((sub) => (
-                                            <div
-                                                key={sub.id}
-                                                onClick={() => {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        productSubCategory: sub.id.toString(),
-                                                    }));
-                                                    setSubOpen(false);
-                                                    setSubSearch("");
-                                                }}
-                                                className="px-4 py-2 text-sm text-gray-900 cursor-pointer hover:bg-green-50"
-                                            >
-                                                {sub.subcategory_name}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
 
 
                         {/* Checkboxes */}
