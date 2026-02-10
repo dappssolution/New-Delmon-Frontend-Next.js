@@ -26,7 +26,7 @@ export interface EmirateData {
 }
 
 export interface OrderCreateResponse {
-  status: string
+  status: string | boolean
   message: string
   data: OrderData
 }

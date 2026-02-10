@@ -189,6 +189,13 @@ function CheckoutForm() {
       return;
     }
 
+    // Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     if (paymentMethod === "stripe") {
       if (!stripe || !elements) {
         toast.error("Stripe is not loaded. Please refresh and try again.");
@@ -221,7 +228,7 @@ function CheckoutForm() {
 
       const response = await checkoutApi.placeOrder(payload);
 
-      if (response.status !== "success") {
+      if (response.status !== "success" && response.status !== true) {
         toast.error(response.message || "Failed to place order");
         return;
       }
@@ -272,7 +279,13 @@ function CheckoutForm() {
       } else if (paymentMethod === "cash") {
         toast.success("Order placed successfully!");
         dispatch(resetCart());
-        router.push(`/order-success?order_id=${response.data?.order_id}`);
+        const orderId = response.data?.order_id;
+        if (orderId) {
+          router.push(`/order-success?order_id=${orderId}`);
+        } else {
+          console.error("Order ID not found in response:", response);
+          router.push("/account/orders");
+        }
       }
     } catch (error: any) {
       console.error("Error placing order:", error);
@@ -665,17 +678,17 @@ function CheckoutForm() {
 
 
 
-                {cart.coupon_discount && cart.coupon_discount > 0 && (
+                {Boolean(cart.coupon_discount && cart.coupon_discount > 0) && (
                   <div className="flex justify-between text-gray-700">
                     <span>Coupon ({cart.coupon_name})</span>
                     <span className="font-semibold text-green-600">{cart.coupon_discount}%</span>
                   </div>
                 )}
 
-                {cart.discount_amount && cart.discount_amount > 0 && (
+                {Boolean(cart.discount_amount && cart.discount_amount > 0) && (
                   <div className="flex justify-between text-gray-700">
                     <span>Discount</span>
-                    <span className="font-semibold text-green-600">-AED {cart.discount_amount.toFixed(2)}</span>
+                    <span className="font-semibold text-green-600">-AED {cart.discount_amount?.toFixed(2)}</span>
                   </div>
                 )}
 
