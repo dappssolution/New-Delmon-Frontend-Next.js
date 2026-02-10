@@ -72,6 +72,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
             price: hasDiscount ? `AED ${apiProduct.discount_price}` : `AED ${apiProduct.selling_price}`,
             oldPrice: hasDiscount ? `AED ${apiProduct.selling_price}` : undefined,
             image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${apiProduct.product_thambnail}`,
+            product_qty: apiProduct.product_qty,
             discount: discountPercent ? `${discountPercent}% Offer` : undefined,
             colors: colors.length > 0 ? colors : undefined,
             sizes: sizes.length > 0 ? sizes : undefined

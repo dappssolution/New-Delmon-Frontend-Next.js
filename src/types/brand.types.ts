@@ -19,6 +19,7 @@ export interface BrandProduct {
     discount_price: any
     brand_id: number
     category_id: number
+    product_qty: string
     product_size: string
     product_color: string
     brand: {

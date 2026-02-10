@@ -47,6 +47,7 @@ const ProductsGrid = () => {
                             price: `AED${finalPrice}`,
                             oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
                             image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
+                            product_qty: item.product_qty,
                             badge: badge,
                             colors: colors.length > 0 ? colors : undefined,
                             sizes: sizes.length > 0 ? sizes : undefined

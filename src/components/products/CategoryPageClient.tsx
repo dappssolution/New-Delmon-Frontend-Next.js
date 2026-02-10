@@ -20,6 +20,7 @@ export interface CategoryProductData {
     product_name: string
     product_slug: string
     product_thambnail: string
+    product_qty: string
     selling_price: string
     discount_price: any
     product_size?: string
@@ -108,6 +109,7 @@ const CategoryPageClient = ({ slug, categoryType }: CategoryPageClientProps) => 
             price: hasDiscount ? `AED ${apiProduct.discount_price}` : `AED ${apiProduct.selling_price}`,
             oldPrice: hasDiscount ? `AED ${apiProduct.selling_price}` : undefined,
             image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${apiProduct.product_thambnail}`,
+            product_qty: apiProduct.product_qty,
             discount: discountPercent ? `-${discountPercent}%` : undefined,
             colors: colors.length > 0 ? colors : undefined,
             sizes: sizes.length > 0 ? sizes : undefined

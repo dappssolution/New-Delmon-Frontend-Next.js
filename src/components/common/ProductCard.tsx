@@ -19,6 +19,7 @@ export interface Product {
     price: string;
     oldPrice?: string;
     image: string;
+    product_qty?: string | number;
     discount?: string;
     badge?: string;
     colors?: string[];
@@ -281,6 +282,12 @@ export default function ProductCard({
     const performAddToCart = async (payload: any = { qty: 1 }) => {
         if (isAdding) return;
 
+        const currentStock = parseInt(product.product_qty?.toString() || "0");
+        if (currentStock <= 0) {
+            toast.error("Product is currently out of stock");
+            return;
+        }
+
         setIsAdding(true);
 
         // Trigger fly animation
@@ -342,12 +349,25 @@ export default function ProductCard({
 
                         {/* Discount Badge - Bottom Left */}
                         {showBadge && discountBadge && (
-                            <div className="absolute bottom-[6px] left-[6px] md:bottom-3 md:left-3">
-                                <span className="bg-[#006637] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md">
+                            <div className="absolute bottom-[6px] left-[6px] md:bottom-3 md:left-3 z-10">
+                                <span className="bg-[#006637] text-white text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-md shadow-md uppercase">
                                     {discountBadge}
                                 </span>
                             </div>
                         )}
+
+                        {/* Stock Status - Top Right */}
+                        <div className="absolute top-2 right-2 flex flex-col gap-1 items-end z-10">
+                            {parseInt(product.product_qty?.toString() || "0") <= 0 ? (
+                                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm uppercase">
+                                    Out of Stock
+                                </span>
+                            ) : parseInt(product.product_qty?.toString() || "0") < 5 ? (
+                                <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm uppercase">
+                                    Only {product.product_qty} left
+                                </span>
+                            ) : null}
+                        </div>
                     </div>
                 </Link>
 
@@ -381,22 +401,33 @@ export default function ProductCard({
 
                     {/* Buttons Section */}
                     <div className="flex items-center gap-2">
-                        <button
-                            ref={buttonRef}
-                            onClick={handleAddToCart}
-                            disabled={isAdding}
-                            className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-xs md:text-sm font-bold py-2.5 md:py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                            {isAdding ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <>
-                                    <ShoppingCart className="w-4 h-4" />
-                                    <span className="hidden md:inline">Add to Cart</span>
-                                    <span className="md:hidden">Cart</span>
-                                </>
-                            )}
-                        </button>
+                        {parseInt(product.product_qty?.toString() || "0") <= 0 ? (
+                            <button
+                                disabled
+                                className="flex-1 bg-gray-100 text-gray-400 text-xs md:text-sm font-bold py-2.5 md:py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed border border-gray-200"
+                            >
+                                <X className="w-4 h-4" />
+                                <span className="hidden md:inline">Out of Stock</span>
+                                <span className="md:hidden">Sold Out</span>
+                            </button>
+                        ) : (
+                            <button
+                                ref={buttonRef}
+                                onClick={handleAddToCart}
+                                disabled={isAdding}
+                                className="flex-1 bg-[#006637] hover:bg-[#004d2a] text-white text-xs md:text-sm font-bold py-2.5 md:py-3 px-3 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                                {isAdding ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="w-4 h-4" />
+                                        <span className="hidden md:inline">Add to Cart</span>
+                                        <span className="md:hidden">Cart</span>
+                                    </>
+                                )}
+                            </button>
+                        )}
 
                         <button
                             ref={wishlistButtonRef}
