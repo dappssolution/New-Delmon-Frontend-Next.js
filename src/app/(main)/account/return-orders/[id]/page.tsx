@@ -136,10 +136,32 @@ export default function ReturnOrderDetailsPage() {
                         </div>
                         <div className="pt-3 border-t border-gray-50">
                             <p className="text-gray-500 mb-1">Address</p>
-                            <p className="font-medium text-gray-900">
-                                {order.address}<br />
-                                {order.state?.state_name}, {order.district?.district_name}, {order.post_code}
-                            </p>
+                            <div className="font-medium text-gray-900">
+                                {typeof order.address === 'object' ? (
+                                    <>
+                                        <p>{order.address.address}</p>
+                                        <p>
+                                            {[
+                                                order.address.building_details,
+                                                order.address.city,
+                                                order.address.emirate_name || order.emirate?.name,
+                                                order.address.country_name || order.country?.name
+                                            ].filter(Boolean).join(', ')}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>{order.address}</p>
+                                        <p>
+                                            {[
+                                                order.emirate?.name,
+                                                order.country?.name,
+                                                order.post_code
+                                            ].filter(Boolean).join(', ')}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
