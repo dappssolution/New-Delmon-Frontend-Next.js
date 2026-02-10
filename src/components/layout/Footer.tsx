@@ -98,17 +98,17 @@ const Footer = () => {
             <div className="col-span-1 lg:col-span-2 space-y-6">
               {/* Logo */}
               <div className="w-48 h-16 rounded-md flex items-center justify-start relative -ml-2">
-                (
+                
                   <Image
-                    src="/delmon white.png"
+                    src="/IMG_6042-k.PNG"
                     alt="Delmon"
-                    width={170}
+                    width={170} 
                     height={60}
                     style={{ height: "auto" }}
                     priority
                     className="object-contain"
                   /> 
-                )
+                
               </div>
 
               <p className="text-gray-100 text-sm leading-relaxed max-w-lg">
