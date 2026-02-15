@@ -82,9 +82,9 @@ export default function AllBrandsPage() {
                     All Brands
                 </h1>
 
-                {/* Alphabet Filter */}
+                {/* Alphabet Filter - Commented out as requested */}
+                {/* 
                 <div className="mb-8">
-                    {/* First row - Numbers and A-P */}
                     <div className="flex flex-wrap gap-2 mb-2 justify-center">
                         {alphabet.slice(0, 17).map((letter) => {
                             const isAvailable = availableLetters.includes(letter);
@@ -108,7 +108,6 @@ export default function AllBrandsPage() {
                         })}
                     </div>
 
-                    {/* Second row - Q-Z */}
                     <div className="flex flex-wrap gap-2 justify-center">
                         {alphabet.slice(17).map((letter) => {
                             const isAvailable = availableLetters.includes(letter);
@@ -132,73 +131,48 @@ export default function AllBrandsPage() {
                         })}
                     </div>
                 </div>
+                */}
 
-                {/* Brands Display */}
-                <div className="space-y-8">
-                    {Object.entries(displayBrands)
-                        .sort(([a], [b]) => a.localeCompare(b))
-                        .map(([letter, letterBrands]) => (
-                            <div key={letter}>
-                                {/* Letter Header */}
-                                <div className="mb-4">
-                                    <button className="w-10 h-10 bg-orange-500 text-white rounded-md font-bold text-lg">
-                                        {letter}
-                                    </button>
-                                </div>
-
-                                {/* Brand Grid */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                    {letterBrands.map((brand) => (
-                                        <Link
-                                            key={brand.id}
-                                            href={`/brand/${brand.brand_slug}`}
-                                            className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center justify-center group h-full"
-                                        >
-                                            {/* Brand Logo */}
-                                            <div className="w-full h-32 flex items-center justify-center mb-4 relative">
-                                                {brand.brand_image ? (
-                                                    <Image
-                                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
-                                                        alt={brand.brand_name}
-                                                        fill
-                                                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                                                        unoptimized={true}
-                                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
-                                                    />
-                                                ) : (
-                                                    <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-md">
-                                                        {brand.brand_name.charAt(0)}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Brand Name */}
-                                            <p className="text-center text-base font-semibold text-gray-800 group-hover:text-orange-600 transition-colors line-clamp-2">
-                                                {brand.brand_name}
-                                            </p>
-                                        </Link>
-                                    ))}
-                                </div>
+                {/* Brands Display - Flattened Grid */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                    {brandsData?.brands.map((brand) => (
+                        <Link
+                            key={brand.id}
+                            href={`/brand/${brand.brand_slug}`}
+                            className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col items-center justify-center group h-full"
+                        >
+                            {/* Brand Logo */}
+                            <div className="w-full h-20 flex items-center justify-center mb-2 relative">
+                                {brand.brand_image ? (
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
+                                        alt={brand.brand_name}
+                                        fill
+                                        className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
+                                        unoptimized={true}
+                                        sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 12vw"
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                                        {brand.brand_name.charAt(0)}
+                                    </div>
+                                )}
                             </div>
-                        ))}
+
+                            {/* Brand Name */}
+                            <p className="text-center text-[10px] sm:text-xs font-semibold text-gray-800 group-hover:text-orange-600 transition-colors line-clamp-2">
+                                {brand.brand_name}
+                            </p>
+                        </Link>
+                    ))}
                 </div>
 
                 {/* Empty State */}
-                {Object.keys(displayBrands).length === 0 && (
+                {(!brandsData?.brands || brandsData.brands.length === 0) && (
                     <div className="text-center py-20">
                         <p className="text-xl text-gray-600 mb-4">
-                            {selectedLetter
-                                ? `No brands found for letter "${selectedLetter}"`
-                                : "No brands available"}
+                            No brands available
                         </p>
-                        {selectedLetter && (
-                            <button
-                                onClick={() => setSelectedLetter(null)}
-                                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                            >
-                                Show All Brands
-                            </button>
-                        )}
                     </div>
                 )}
             </div>

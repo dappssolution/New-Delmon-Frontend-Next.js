@@ -9,6 +9,7 @@ import Loading from "../../../../components/common/Loading";
 import { homeApi } from "../../../../service/homeApi";
 import ProductCard, { Product as ProductCardType } from "../../../../components/common/ProductCard";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
+import { RootState } from "@/src/redux/store";
 import { addToCart } from "@/src/redux/cart/cartThunk";
 import { clearCartError, clearCartMessage } from "@/src/redux/cart/cartSlice";
 import { addToWishlist, removeFromWishlist } from "@/src/redux/wishlist/wishlistThunk";
@@ -62,9 +63,9 @@ export default function ProductDetailsPage() {
     const params = useParams();
     const slug = params.slug as string;
     const dispatch = useAppDispatch();
-    const { loading: cartLoading, error: cartError, message: cartMessage } = useAppSelector((state) => state.cart);
-    const { token } = useAppSelector((state) => state.auth);
-    const { wishlist, loadingProductId, error: wishlistError, message: wishlistMessage } = useAppSelector((state) => state.wishlist);
+    const { loading: cartLoading, error: cartError, message: cartMessage } = useAppSelector((state: RootState) => state.cart);
+    const { token } = useAppSelector((state: RootState) => state.auth);
+    const { wishlist, loadingProductId, error: wishlistError, message: wishlistMessage } = useAppSelector((state: RootState) => state.wishlist);
 
     const [product, setProduct] = useState<ProductData | null>(null);
     const [productImages, setProductImages] = useState<ProductImage[]>([]);
@@ -320,7 +321,7 @@ export default function ProductDetailsPage() {
                                     {product.brand.brand_name}
                                 </Link>
                             )}
-                            <h1 className="text-xl md:text-2xl lg:text-3xl text-gray-800 font-medium leading-tight mb-2">
+                            <h1 className="text-base md:text-lg lg:text-xl text-gray-800 font-medium leading-tight mb-2">
                                 {product.product_name}
                             </h1>
 
@@ -352,7 +353,7 @@ export default function ProductDetailsPage() {
                         <div className="flex flex-col gap-1.5">
                             <div className="flex items-baseline gap-2">
                                 <Image src="/price-icon.png" alt="AED" width={30} height={20} className="w-8 h-6 object-contain self-start mt-1.5" unoptimized />
-                                <span className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">{currentPrice}</span>
+                                <span className="text-xl lg:text-2xl font-bold text-gray-900 tracking-tight">{currentPrice}</span>
                                 <span className="text-[10px] text-gray-400 self-end mb-1.5 font-medium">Inclusive of VAT</span>
                             </div>
 
