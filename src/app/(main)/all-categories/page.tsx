@@ -25,7 +25,7 @@ export default function CategoriesPage() {
     const fetchCategories = async (page: number) => {
         setLoading(true);
         try {
-            const data = await homeApi.getAllCategories(10, page);
+            const data = await homeApi.getAllCategories(50, page);
             setCategoriesData(data);
         } catch (error) {
             console.error("Error fetching categories:", error);

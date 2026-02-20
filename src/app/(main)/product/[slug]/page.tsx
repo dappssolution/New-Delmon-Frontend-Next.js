@@ -146,6 +146,7 @@ export default function ProductDetailsPage() {
                                 oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
                                 image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
                                 badge,
+                                product_qty: item.product_qty,
                                 colors: item.product_color?.split(',').map(c => c.trim()).filter(Boolean),
                                 sizes: item.product_size?.split(',').map(s => s.trim()).filter(Boolean)
                             };
@@ -317,11 +318,11 @@ export default function ProductDetailsPage() {
                         {/* Title & Brand */}
                         <div>
                             {product.brand && (
-                                <Link href="#" className="text-[#006637] text-xs font-bold hover:underline uppercase tracking-wide mb-1.5 block">
+                                <Link href="#" className="text-[#006637] text-[12px] font-bold hover:underline uppercase tracking-wide mb-1.5 block">
                                     {product.brand.brand_name}
                                 </Link>
                             )}
-                            <h1 className="text-base md:text-lg lg:text-xl text-gray-800 font-medium leading-tight mb-2">
+                            <h1 className="text-[12px] md:text-[13px] lg:text-[14px] text-gray-800 font-medium leading-tight mb-2">
                                 {product.product_name}
                             </h1>
 
@@ -351,10 +352,10 @@ export default function ProductDetailsPage() {
 
                         {/* Price Block */}
                         <div className="flex flex-col gap-1.5">
-                            <div className="flex items-baseline gap-2">
-                                <Image src="/price-icon.png" alt="AED" width={30} height={20} className="w-8 h-6 object-contain self-start mt-1.5" unoptimized />
+                            <div className="flex items-center gap-2">
+                                <Image src="/price-icon.png" alt="AED" width={20} height={10} className="w-5.5 h-5.5 object-contain" unoptimized />
                                 <span className="text-xl lg:text-2xl font-bold text-gray-900 tracking-tight">{currentPrice}</span>
-                                <span className="text-[10px] text-gray-400 self-end mb-1.5 font-medium">Inclusive of VAT</span>
+                                <span className="text-[8px] text-gray-400 self-end mb-1.5 font-medium">Inclusive of VAT</span>
                             </div>
 
                             {hasDiscount && !wholesalePrice && (
