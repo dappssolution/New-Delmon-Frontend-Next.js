@@ -12,7 +12,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
-
+ 
 const BrandsSection = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +96,7 @@ const BrandsSection = () => {
                 <div className="group block">
                   <div className="relative rounded-2xl p-3 md:p-4">
                     <div className="flex items-center justify-center">
+                  
                       <img
                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                         alt={brand.brand_name}
