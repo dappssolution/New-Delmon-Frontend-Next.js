@@ -134,7 +134,7 @@ function CheckoutForm() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (selectedAddressId) setSelectedAddressId(null);
+    // if (selectedAddressId && name !== "note") setSelectedAddressId(null);
   };
 
   const handleSelectAddress = (addr: AddressDetail) => {
@@ -264,7 +264,8 @@ function CheckoutForm() {
         building_details: formData.building_details,
         city: formData.city,
         payment_method: paymentMethod,
-        note: formData.note
+        note: formData.note,
+        address_id: selectedAddressId
       };
 
       const response = await checkoutApi.placeOrder(payload);

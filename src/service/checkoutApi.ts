@@ -21,6 +21,7 @@ export interface PlaceOrderPayload {
     latitude?: string;
     payment_method: string;
     note?: string;
+    address_id?: number | null;
 }
 
 export const checkoutApi = {
