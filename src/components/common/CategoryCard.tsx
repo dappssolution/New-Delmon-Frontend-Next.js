@@ -16,7 +16,7 @@ export default function CategoryCard({ name, slug, image, type = "subcategory" }
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
                 <div className="aspect-square bg-gray-100 flex items-center justify-center p-4">
                     {image ? (
-                        <Image
+                        <Image 
                             src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${image}`}
                             alt={name}
                             width={200}

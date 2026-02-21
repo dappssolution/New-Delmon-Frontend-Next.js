@@ -47,7 +47,7 @@ export interface Meta {
     total: number
     current_loaded: number
     loaded: number
-    prev_page: any
+    prev_page: any 
     next_page: number
     current_page: number
     last_page: number

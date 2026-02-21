@@ -320,9 +320,9 @@ export default function ProductDetailsPage() {
                             {product.brand && (
                                 <Link href="#" className="text-[#006637] text-[12px] font-bold hover:underline uppercase tracking-wide mb-1.5 block">
                                     {product.brand.brand_name}
-                                </Link>
+                                </Link> 
                             )}
-                            <h1 className="text-[12px] md:text-[13px] lg:text-[14px] text-gray-800 font-medium leading-tight mb-2">
+                            <h1 className="text-[12px] md:text-[17px] lg:text-[17px] text-gray-900 font-bold leading-tight mb-2">
                                 {product.product_name}
                             </h1>
 
@@ -331,7 +331,7 @@ export default function ProductDetailsPage() {
                                 <div className="h-3 w-px bg-gray-300"></div>
                                 {product.status === 1 && parseInt(product.product_qty) > 0 ? (
                                     <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                                         In Stock
                                     </span>
                                 ) : (

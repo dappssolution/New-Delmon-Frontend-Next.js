@@ -100,7 +100,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
                     <span className="text-gray-900">Brands</span>
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-8"> 
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">Brands</h1>
                     <p className="text-green-700 text-sm">Discover products based on your favorite brand</p>
                 </div>
