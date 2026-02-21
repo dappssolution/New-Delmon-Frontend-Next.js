@@ -215,7 +215,7 @@ export default function ProductCard({
             setTimeout(() => {
                 wishlistIcon.style.transform = 'scale(1)';
             }, 900);
-
+ 
             // Cleanup
             setTimeout(() => {
                 flyingEl.remove();
@@ -329,7 +329,7 @@ export default function ProductCard({
 
         performAddToCart(payload);
     };
-
+ 
     const stopPropagation = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -367,7 +367,7 @@ export default function ProductCard({
                                     Only {product.product_qty} left
                                 </span>
                             ) : null}
-                        </div>
+                        </div> 
                     </div>
                 </Link>
 

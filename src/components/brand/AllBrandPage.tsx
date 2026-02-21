@@ -17,7 +17,7 @@ export default function AllBrandsPage() {
     useEffect(() => {
         fetchBrands();
     }, []);
-
+ 
     const fetchBrands = async () => {
         try {
             setLoading(true);
@@ -79,7 +79,7 @@ export default function AllBrandsPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Page Title */}
                 <h1 className="text-3xl font-bold mb-8 text-gray-900 text-center">
-                    All Brands
+                    All Brands 
                 </h1>
 
                 {/* Alphabet Filter - Commented out as requested */}
