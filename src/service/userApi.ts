@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { GetOrderDetailsResponse, GetProfileResponse, GetReturnOrdersResponse, GetUserOrdersResponse } from "../types/user.types";
+import { GetDashboardDataResponse, GetOrderDetailsResponse, GetProfileResponse, GetReturnOrdersResponse, GetUserOrdersResponse } from "../types/user.types";
 
 export const getUserProfile = () => {
     return api.get<GetProfileResponse>("/profile");
@@ -45,3 +45,7 @@ export const returnOrder = async (id: number, reason: string) => {
     const res = await api.post(`/user/order/return/${id}`, { return_reason: reason });
     return res.data;
 }
+export const getDashboardData = async () => {
+    const res = await api.get<GetDashboardDataResponse>("/dashboard");
+    return res.data;
+};
