@@ -327,7 +327,7 @@ export default function ProductDetailsPage() {
                             </h1>
 
                             <div className="flex items-center gap-3 text-xs text-gray-500">
-                                <span>Model: <span className="font-semibold text-gray-900">{product.product_code}</span></span>
+                                 <span>Model: <span className="font-semibold text-gray-900">{product.product_code}</span></span>
                                 <div className="h-3 w-px bg-gray-300"></div>
                                 {product.status === 1 && parseInt(product.product_qty) > 0 ? (
                                     <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-1">

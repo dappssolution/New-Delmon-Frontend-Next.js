@@ -587,7 +587,7 @@ function CheckoutForm() {
 
               <div className="mb-6">
                 <div className="mb-6 space-y-3">
-                  {/* Cash on Delivery Option */}
+                  {/* Cash on Delivery Option */} 
                   <div
                     className={`flex items-center gap-3 p-4 rounded-lg border transition-all cursor-pointer ${paymentMethod === 'cash' ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
                     onClick={() => setPaymentMethod('cash')}
@@ -775,7 +775,7 @@ function CheckoutForm() {
               {paymentMethod === "stripe" && (
                 <p className="mt-3 text-xs text-center text-gray-500 flex items-center justify-center gap-1">
                   <Lock className="w-3 h-3" />
-                  Your payment is secure and encrypted
+                  Your payment is secure and encrypted 
                 </p>
               )}
             </div>

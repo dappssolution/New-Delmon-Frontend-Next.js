@@ -10,7 +10,7 @@ export default function ArtBanner () {
             />
             <div className="text-center">
               <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-1 md:mb-2">
-                Gear Up And Always
+                Gear Up And Always 
               </h2>
               <h2 className="text-2xl md:text-4xl font-bold text-gray-900">
                 Art & Craft Making
