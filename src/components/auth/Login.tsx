@@ -121,9 +121,8 @@ export default function LoginPage() {
                 ? "Manage your products, orders, and sales in one place. Grow your business with Delmon."
                 : (
                   <>
-                    anjjkjh knhnferji iufjinreol ioen <br />
-                    clwnfip woniopvn ioe wnokwop <br />
-                    wipopo
+                    We’re glad to see you again. <br />
+                    Log in to explore products, manage your cart, and enjoy a better shopping experience.
                   </>
                 )
               }

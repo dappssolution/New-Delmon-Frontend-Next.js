@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Trash2, Loader2, CreditCard, Lock } from "lucide-react";
+import { Trash2, Loader2, CreditCard, Lock, X, MapPin, ChevronRight } from "lucide-react";
 import { checkoutApi } from "@/src/service/checkoutApi";
 import { CountryData, EmirateData, AddressDetail } from "@/src/types/checkout.types";
 import { toast } from "sonner";
@@ -78,6 +78,7 @@ function CheckoutForm() {
 
   const [localQuantities, setLocalQuantities] = useState<Record<number, number>>({});
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -152,6 +153,7 @@ function CheckoutForm() {
     });
 
     // Scroll to form if needed or just provide visual feedback
+    setIsAddressModalOpen(false);
     toast.success("Address selected");
   };
 
@@ -434,7 +436,7 @@ function CheckoutForm() {
                     </div>
 
                     {/* Quantity Controls & Price */}
-                    <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-24 sm:pl-0">
+                    <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-0 sm:pl-0">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center border border-gray-300 rounded-md h-8 text-gray-900">
                           <button
@@ -461,7 +463,7 @@ function CheckoutForm() {
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <div className="w-20 text-right font-semibold text-gray-900 whitespace-nowrap">
+                        <div className="min-w-fit text-right font-semibold text-gray-900 whitespace-nowrap">
                           AED {(item.price * (localQuantities[item.id] || item.qty)).toFixed(2)}
                         </div>
 
@@ -481,43 +483,157 @@ function CheckoutForm() {
             </div>
 
 
-            {/* Saved Addresses Section */}
+            {/* Saved Addresses Section - Compact View */}
             {savedAddresses.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold mb-4 text-gray-900">Choose from Saved Addresses</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {savedAddresses.map((addr) => (
-                    <div
-                      key={addr.id}
-                      onClick={() => handleSelectAddress(addr)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-all group relative ${selectedAddressId === addr.id
-                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                        }`}
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Delivery Address</h2>
+                  {selectedAddressId && (
+                    <button
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="text-blue-600 text-sm font-medium hover:underline flex items-center gap-1"
                     >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${selectedAddressId === addr.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-                          }`}>
-                          {addr.address_type}
-                        </span>
-                        {selectedAddressId === addr.id && (
-                          <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                      Change <ChevronRight className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                {selectedAddressId ? (
+                  (() => {
+                    const addr = savedAddresses.find(a => a.id === selectedAddressId);
+                    if (!addr) return null;
+                    return (
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <MapPin className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-gray-900">{addr.first_name} {addr.last_name}</span>
+                            <span className="px-2 py-0.5 bg-blue-600 text-white rounded text-[10px] font-bold uppercase">
+                              {addr.address_type}
+                            </span>
                           </div>
-                        )}
+                          <p className="text-sm text-gray-600 line-clamp-1">{addr.address}</p>
+                          <p className="text-sm text-gray-600">
+                            {addr.city}, {addr.emirate_name || emirates.find(e => e.id === addr.emirate_id)?.name}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">{addr.phone}</p>
+                        </div>
                       </div>
-                      <p className="font-semibold text-gray-900 text-sm">
-                        {addr.first_name} {addr.last_name}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-1 line-clamp-1">{addr.address}</p>
-                      <p className="text-xs text-gray-600">
-                        {addr.city}, {addr.emirate_name || emirates.find(e => e.id === addr.emirate_id)?.name}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">{addr.phone}</p>
+                    );
+                  })()
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {savedAddresses.slice(0, 2).map((addr, index) => (
+                        <div
+                          key={addr.id}
+                          className={`p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-gray-50 transition-all flex flex-col h-full ${index === 1 ? 'hidden md:flex' : 'flex'}`}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase">
+                              {addr.address_type}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-gray-900 text-sm">
+                              {addr.first_name} {addr.last_name}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">{addr.address}</p>
+                            <p className="text-xs text-gray-600">
+                              {addr.city}, {addr.emirate_name || emirates.find(e => e.id === addr.emirate_id)?.name}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleSelectAddress(addr)}
+                            className="mt-4 w-full py-2 bg-white border border-blue-600 text-blue-600 rounded-lg text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                          >
+                            Select Address
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+
+                    {/* Select Another Button */}
+                    <button
+                      onClick={() => setIsAddressModalOpen(true)}
+                      className="w-full h-[50px] border border-gray-300 rounded-lg text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 group text-sm font-medium"
+                    >
+                      <MapPin className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                      Select from Another Saved Addresses
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Address Selection Modal */}
+            {isAddressModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+                  {/* Modal Header */}
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Select Delivery Address</h3>
+                      <p className="text-sm text-gray-500 mt-1">Choose an address from your saved list</p>
+                    </div>
+                    <button
+                      onClick={() => setIsAddressModalOpen(false)}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="p-6 overflow-y-auto flex-1 space-y-4">
+                    {savedAddresses.map((addr) => (
+                      <div
+                        key={addr.id}
+                        onClick={() => handleSelectAddress(addr)}
+                        className={`p-4 border rounded-xl cursor-pointer transition-all group relative ${selectedAddressId === addr.id
+                          ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                          : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                          }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${selectedAddressId === addr.id
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                            }`}>
+                            {addr.address_type}
+                          </span>
+                          {selectedAddressId === addr.id && (
+                            <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
+                              <div className="w-2 h-2 rounded-full bg-white"></div>
+                            </div>
+                          )}
+                        </div>
+                        <p className="font-bold text-gray-900">
+                          {addr.first_name} {addr.last_name}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">{addr.address}</p>
+                        <p className="text-sm text-gray-600">
+                          {addr.city}, {addr.emirate_name || emirates.find(e => e.id === addr.emirate_id)?.name}
+                        </p>
+                        <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                          {addr.phone}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+                    <button
+                      onClick={() => setIsAddressModalOpen(false)}
+                      className="px-6 py-2 bg-gray-900 text-white rounded-lg font-semibold hover:bg-black transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
