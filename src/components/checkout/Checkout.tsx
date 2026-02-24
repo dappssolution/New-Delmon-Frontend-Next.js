@@ -561,7 +561,7 @@ function CheckoutForm() {
                       className="w-full h-[50px] border border-gray-300 rounded-lg text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 group text-sm font-medium"
                     >
                       <MapPin className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                      Select from Another Saved Addresses
+                      Select Another Address
                     </button>
                   </div>
                 )}
