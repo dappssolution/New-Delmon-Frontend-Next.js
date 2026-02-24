@@ -301,3 +301,16 @@ export interface ReturnOrderData {
   created_at: string
   updated_at: string
 }
+export interface GetDashboardDataResponse {
+  success: boolean
+  message?: string
+  data: DashboardData
+}
+
+export interface DashboardData {
+  total_orders: number
+  pending_orders: number
+  return_orders: number
+  wishlist_count: number
+  recent_orders: OrderData[]
+}

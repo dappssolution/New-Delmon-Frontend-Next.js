@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Trash2, Loader2, CreditCard, Lock } from "lucide-react";
 import { checkoutApi } from "@/src/service/checkoutApi";
-import { CountryData, EmirateData } from "@/src/types/checkout.types";
+import { CountryData, EmirateData, AddressDetail } from "@/src/types/checkout.types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
@@ -73,6 +73,8 @@ function CheckoutForm() {
 
   const { cart, loading: cartLoading } = useAppSelector((state: RootState) => state.cart);
   const [emirates, setEmirates] = useState<EmirateData[]>([]);
+  const [savedAddresses, setSavedAddresses] = useState<AddressDetail[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
 
   const [localQuantities, setLocalQuantities] = useState<Record<number, number>>({});
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
@@ -113,9 +115,15 @@ function CheckoutForm() {
   const fetchInitialData = async () => {
     try {
       setInitialLoading(true);
-      const emiratesData = await checkoutApi.getEmirates();
+      const [emiratesData, addressesData] = await Promise.all([
+        checkoutApi.getEmirates(),
+        checkoutApi.getSavedAddresses()
+      ]);
       await dispatch(fetchCart());
       setEmirates(emiratesData);
+      if (addressesData.status) {
+        setSavedAddresses(addressesData.data);
+      }
     } catch (error) {
       console.error("Error fetching initial data:", error);
     } finally {
@@ -126,6 +134,25 @@ function CheckoutForm() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // if (selectedAddressId && name !== "note") setSelectedAddressId(null);
+  };
+
+  const handleSelectAddress = (addr: AddressDetail) => {
+    setSelectedAddressId(addr.id);
+    setFormData({
+      name: `${addr.first_name} ${addr.last_name || ""}`.trim(),
+      phone: addr.phone,
+      email: addr.email,
+      address: addr.address,
+      emirate: String(addr.emirate_id),
+      note: formData.note,
+      address_type: addr.address_type,
+      building_details: addr.building_details,
+      city: addr.city
+    });
+
+    // Scroll to form if needed or just provide visual feedback
+    toast.success("Address selected");
   };
 
   // Debounced API call
@@ -237,7 +264,8 @@ function CheckoutForm() {
         building_details: formData.building_details,
         city: formData.city,
         payment_method: paymentMethod,
-        note: formData.note
+        note: formData.note,
+        address_id: selectedAddressId
       };
 
       const response = await checkoutApi.placeOrder(payload);
@@ -372,7 +400,7 @@ function CheckoutForm() {
 
                       <div className="flex-1 min-w-0 pt-1">
                         <div className="flex justify-between items-start gap-2">
-                          <h3 className="font-medium text-gray-900 text-sm mb-2 truncate">
+                          <h3 className="font-medium text-gray-900 text-sm mb-2 line-clamp-2">
                             {item.name}
                           </h3>
                           <button
@@ -451,6 +479,48 @@ function CheckoutForm() {
                 ))}
               </div>
             </div>
+
+
+            {/* Saved Addresses Section */}
+            {savedAddresses.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold mb-4 text-gray-900">Choose from Saved Addresses</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {savedAddresses.map((addr) => (
+                    <div
+                      key={addr.id}
+                      onClick={() => handleSelectAddress(addr)}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all group relative ${selectedAddressId === addr.id
+                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                        }`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${selectedAddressId === addr.id
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                          }`}>
+                          {addr.address_type}
+                        </span>
+                        {selectedAddressId === addr.id && (
+                          <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                          </div>
+                        )}
+                      </div>
+                      <p className="font-semibold text-gray-900 text-sm">
+                        {addr.first_name} {addr.last_name}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-1">{addr.address}</p>
+                      <p className="text-xs text-gray-600">
+                        {addr.city}, {addr.emirate_name || emirates.find(e => e.id === addr.emirate_id)?.name}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">{addr.phone}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Address Form */}
             <div className="bg-white rounded-lg border-2 border-blue-500 p-6">

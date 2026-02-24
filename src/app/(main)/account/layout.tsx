@@ -156,7 +156,7 @@ export default function AccountLayout({
           <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] gap-6 lg:gap-8">
             {/* Desktop Sidebar - Hidden on mobile */}
             <aside className="hidden md:block">
-              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden sticky top-24">
+              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-gray-50 flex items-center gap-3 bg-gray-50/50">
                   <div className="w-10 h-10 bg-green-700 rounded-xl flex items-center justify-center shadow-lg shadow-green-100">
                     <LayoutDashboard className="w-5 h-5 text-white" />

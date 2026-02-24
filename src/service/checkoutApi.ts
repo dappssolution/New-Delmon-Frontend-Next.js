@@ -4,6 +4,7 @@ import {
     EmirateGetResponse,
     OrderCreateResponse,
     StripeConfirmResponse,
+    AddressResponse,
 } from "../types/checkout.types";
 
 export interface PlaceOrderPayload {
@@ -20,6 +21,7 @@ export interface PlaceOrderPayload {
     latitude?: string;
     payment_method: string;
     note?: string;
+    address_id?: number | null;
 }
 
 export const checkoutApi = {
@@ -46,6 +48,11 @@ export const checkoutApi = {
             "/checkout/stripe/confirm",
             { payment_intent_id: paymentIntentId }
         );
+        return res.data;
+    },
+
+    async getSavedAddresses() {
+        const res = await api.get<AddressResponse>("/addresses");
         return res.data;
     },
 };
