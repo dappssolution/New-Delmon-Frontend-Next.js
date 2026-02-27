@@ -58,3 +58,19 @@ export interface BrandMeta {
     description: string
     keywords: string
 }
+
+export interface BrandCategoriesResponse {
+    success: boolean
+    message: string
+    data: {
+        brand: BrandInfo;
+        categories: BrandCategory[];
+    }
+}
+
+export interface BrandCategory {
+    id: number
+    category_name: string
+    category_slug: string
+    category_image?: string
+}

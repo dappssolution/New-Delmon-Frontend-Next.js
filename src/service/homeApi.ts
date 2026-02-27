@@ -93,6 +93,11 @@ export const homeApi = {
     return res.data;
   },
 
+  async getBrandCategories(slug: string) {
+    const res = await api.get(`/brand/${slug}/categories`);
+    return res.data;
+  },
+
   async getVendors(perPage: number = 10, page: number = 1) {
     const res = await api.get(`/vendors?per_page=${perPage}&page=${page}`);
     return res.data;
