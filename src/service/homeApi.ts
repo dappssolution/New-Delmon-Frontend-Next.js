@@ -56,6 +56,7 @@ export const homeApi = {
       per_page?: number;
       simple?: boolean;
       page: number;
+      brand?: string;
     }
   ) {
     const res = await api.get(
@@ -65,6 +66,7 @@ export const homeApi = {
           simple: params?.simple ?? true,
           per_page: params?.per_page ?? 10,
           page: params?.page ?? 1,
+          brand: params?.brand,
         },
       }
     );

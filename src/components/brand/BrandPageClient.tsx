@@ -47,6 +47,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
                             per_page: 12,
                             simple: true,
                             page: currentPage,
+                            brand: slug,
                         }
                     );
                     if (res.success && res.data) {
@@ -70,6 +71,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
 
                 const brandsRes = await homeApi.getBrands();
                 if (brandsRes.success && brandsRes.data?.brands) {
+
                     setAllBrands(brandsRes.data.brands);
                 }
             } catch (error) {
