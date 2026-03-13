@@ -15,25 +15,11 @@ type Banner = {
 };
 
 
-const HeroSection = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
   const [page, setPage] = useState(0);
-  const [infoIndex, setInfoIndex] = useState(0);
 
   const paginate = useCallback(() => {
     setPage((prev) => prev + 1);
-  }, []);
-
-  useEffect(() => {
-    async function getBanners() {
-      try {
-        const res = await homeApi.getBanners();
-        setBanners(res.data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getBanners();
   }, []);
 
   useEffect(() => {
@@ -43,8 +29,6 @@ const HeroSection = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [banners.length, paginate]);
-
-
 
   if (!banners.length) {
     return (

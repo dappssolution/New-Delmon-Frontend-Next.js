@@ -8,64 +8,50 @@ import { ProductData, ProductResponse } from "../../types/product.types";
 import { ArrowRight } from "lucide-react";
 import Loading from "../common/Loading";
 
-const ProductsGrid = () => {
+const ProductsGrid = ({ initialProducts = [] }: { initialProducts?: any[] }) => {
     const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                // Fetch only 12 products for the home page
-                const response: ProductResponse = await homeApi.getPaginatedProducts(1, 10);
+        if (!initialProducts || initialProducts.length === 0) return;
+        
+        const mappedProducts: Product[] = initialProducts.slice(0, 10).map((item: any) => {
+            let finalPrice = item.selling_price;
+            let oldPrice = undefined;
+            let badge = undefined;
 
-                if (response.success && response.data) {
-                    const mappedProducts: Product[] = response.data.map((item: ProductData) => {
-                        let finalPrice = item.selling_price;
-                        let oldPrice = undefined;
-                        let badge = undefined;
+            if (item.discount_price) {
+                finalPrice = item.discount_price;
+                oldPrice = item.selling_price;
 
-                        if (item.discount_price) {
-                            finalPrice = item.discount_price;
-                            oldPrice = item.selling_price;
-
-                            const sell = parseFloat(item.selling_price);
-                            const disc = parseFloat(item.discount_price);
-                            if (sell > 0) {
-                                const percent = Math.round(((sell - disc) / sell) * 100);
-                                badge = `${percent}% Off`;
-                            }
-                        }
-
-                        const colors = item.product_color ? item.product_color.split(',').map(c => c.trim()).filter(Boolean) : [];
-                        const sizes = item.product_size ? item.product_size.split(',').map(s => s.trim()).filter(Boolean) : [];
-
-                        return {
-                            id: item.id,
-                            slug: item.product_slug,
-                            category: item.category?.category_name || "Uncategorized",
-                            title: item.product_name,
-                            price: `AED${finalPrice}`,
-                            oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
-                            image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
-                            product_qty: item.product_qty,
-                            badge: badge,
-                            colors: colors.length > 0 ? colors : undefined,
-                            sizes: sizes.length > 0 ? sizes : undefined
-                        };
-                    });
-                    setProducts(mappedProducts);
+                const sell = parseFloat(item.selling_price);
+                const disc = parseFloat(item.discount_price);
+                if (sell > 0) {
+                    const percent = Math.round(((sell - disc) / sell) * 100);
+                    badge = `${percent}% Off`;
                 }
-            } catch (error) {
-                console.error("Failed to fetch products", error);
-            } finally {
-                setLoading(false);
             }
-        };
 
-        fetchProducts();
-    }, []);
+            const colors = item.product_color ? item.product_color.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+            const sizes = item.product_size ? item.product_size.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
 
-    if (loading) {
+            return {
+                id: item.id,
+                slug: item.product_slug,
+                category: item.category?.category_name || "Uncategorized",
+                title: item.product_name,
+                price: `AED${finalPrice}`,
+                oldPrice: oldPrice ? `AED${oldPrice}` : undefined,
+                image: `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${item.product_thambnail}`,
+                product_qty: item.product_qty,
+                badge: badge,
+                colors: colors.length > 0 ? colors : undefined,
+                sizes: sizes.length > 0 ? sizes : undefined
+            };
+        });
+        setProducts(mappedProducts);
+    }, [initialProducts]);
+
+    if (!initialProducts || initialProducts.length === 0) {
         return (
             <section className="py-6 md:py-12 ">
                 <Loading className="h-64" />

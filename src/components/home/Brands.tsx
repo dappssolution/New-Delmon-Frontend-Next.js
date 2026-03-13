@@ -13,37 +13,10 @@ import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
  
-const BrandsSection = () => {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+const BrandsSection = ({ brands = [] }: { brands?: Brand[] }) => {
   const swiperRef = useRef<any>(null);
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const res = await homeApi.getBrands();
-        if (res.success && res.data?.brands) {
-          setBrands(res.data.brands);
-        }
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrands();
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="py-10 md:py-14 bg-gradient-to-b from-gray-50 to-white">
-        <Loading />
-      </section>
-    );
-  }
-
-  if (brands.length === 0) {
+  if (!brands || brands.length === 0) {
     return null;
   }
 

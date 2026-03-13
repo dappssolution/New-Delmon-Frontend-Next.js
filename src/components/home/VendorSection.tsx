@@ -23,56 +23,8 @@ const cardColors = [
     },
 ];
 
-export default function VendorSection() {
-    const [vendors, setVendors] = useState<VendorGetData[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchVendors = async () => {
-            try {
-                const res = await homeApi.getVendors(3, 1);
-                setVendors(res.data || []);
-            } catch (error) {
-                console.error("Error fetching vendors:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchVendors();
-    }, []);
-
-    if (loading) {
-        return (
-            <section className="py-6 sm:py-8 md:py-10 lg:py-12 bg-white">
-                <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-                        {[...Array(3)].map((_, idx) => (
-                            <div
-                                key={idx}
-                                className="rounded-xl sm:rounded-2xl overflow-hidden animate-pulse"
-                                style={{
-                                    backgroundColor: idx === 0 ? "#f5efe6" : idx === 1 ? "#fce8ec" : "#e8edf5"
-                                }}
-                            >
-                                <div className="flex p-4 sm:p-5 md:p-6">
-                                    <div className="flex-1 space-y-3">
-                                        <div className="h-5 bg-gray-200/50 rounded w-16" />
-                                        <div className="h-5 bg-gray-200/50 rounded w-3/4" />
-                                        <div className="h-4 bg-gray-200/50 rounded w-1/2" />
-                                        <div className="h-9 bg-gray-200/50 rounded-full w-28 mt-4" />
-                                    </div>
-                                    <div className="w-24 sm:w-28 md:w-32 lg:w-36 bg-gray-200/30 rounded-lg h-20" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    if (vendors.length === 0) return null;
+export default function VendorSection({ vendors = [] }: { vendors?: VendorGetData[] }) {
+    if (!vendors || vendors.length === 0) return null;
 
     return (
         <section className="py-6 sm:py-8 md:py-10 lg:py-12 bg-white">

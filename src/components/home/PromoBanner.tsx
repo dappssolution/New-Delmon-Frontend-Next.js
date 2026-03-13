@@ -31,9 +31,7 @@ const swipePower = (offset: number, velocity: number) => {
   return Math.abs(offset) * velocity;
 };
 
-export default function PromoBanner() {
-  const [sliders, setSliders] = useState<SliderData[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function PromoBanner({ sliders = [] }: { sliders?: SliderData[] }) {
   const [[page, direction], setPage] = useState([0, 0]);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -53,23 +51,6 @@ export default function PromoBanner() {
   const totalPages = Math.ceil(sliders.length / itemsPerPage);
 
   const sliderIndex = ((page % totalPages) + totalPages) % totalPages;
-
-  useEffect(() => {
-    const fetchSliders = async () => {
-      try {
-        const res = await homeApi.getSlider();
-        if (res.success && res.data) {
-          setSliders(res.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch sliders", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSliders();
-  }, []);
 
   const paginate = useCallback((newDirection: number) => {
     setPage([page + newDirection, newDirection]);
@@ -92,24 +73,7 @@ export default function PromoBanner() {
 
   const whatsappUrl = "https://wa.me/971559817240";
 
-  if (loading) {
-    return (
-      <section className="py-6">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-52 md:h-64 rounded-3xl bg-gray-100 animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (sliders.length === 0) return null;
+  if (!sliders || sliders.length === 0) return null;
 
   return (
     <section className="py-4 md:py-8 overflow-hidden">

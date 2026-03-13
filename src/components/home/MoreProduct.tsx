@@ -31,9 +31,8 @@ interface CategorySection {
   products: CategoryProduct[];
 }
 
-export default function MoreProducts() {
+export default function MoreProducts({ homeData }: { homeData?: any }) {
   const [categories, setCategories] = useState<CategorySection[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Map API product to CategoryProduct
@@ -64,44 +63,33 @@ export default function MoreProducts() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch products
+  // Process data
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await homeApi.getHomeData();
-        if (response.success && response.data) {
-          const { hotdeals, new: newProducts, special_deals, special_offer } = response.data;
+    if (!homeData) return;
+    
+    const { hotdeals, new: newProducts, special_deals, special_offer } = homeData;
 
-          const newCategories = [
-            {
-              title: "Hot Deals",
-              products: (hotdeals || []).map(mapProduct),
-            },
-            {
-              title: "Special Offer",
-              products: (special_offer || []).map(mapProduct),
-            },
-            {
-              title: "Recently Added",
-              products: (newProducts || []).map(mapProduct),
-            },
-            {
-              title: "Special Deals",
-              products: (special_deals || []).map(mapProduct),
-            },
-          ].filter((cat) => cat.products.length > 0);
+    const newCategories = [
+      {
+        title: "Hot Deals",
+        products: (hotdeals || []).map(mapProduct),
+      },
+      {
+        title: "Special Offer",
+        products: (special_offer || []).map(mapProduct),
+      },
+      {
+        title: "Recently Added",
+        products: (newProducts || []).map(mapProduct),
+      },
+      {
+        title: "Special Deals",
+        products: (special_deals || []).map(mapProduct),
+      },
+    ].filter((cat) => cat.products.length > 0);
 
-          setCategories(newCategories);
-        }
-      } catch (error) {
-        console.error("Failed to fetch products", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, [mapProduct]);
+    setCategories(newCategories);
+  }, [homeData, mapProduct]);
 
   // Product card for this section
   const ProductItem = ({ product }: { product: CategoryProduct }) => (
@@ -138,34 +126,6 @@ export default function MoreProducts() {
       </div>
     </Link>
   );
-
-  if (loading) {
-    return (
-      <section className="py-6 md:py-10">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-5 bg-gray-200 rounded w-24 mb-4"></div>
-                <div className="space-y-3">
-                  {[1, 2].map((j) => (
-                    <div key={j} className="flex gap-3 py-3">
-                      <div className="w-14 h-14 md:w-[70px] md:h-[70px] bg-gray-200 rounded-lg"></div>
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 bg-gray-200 rounded w-full"></div>
-                        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-16"></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (categories.length === 0) return null;
 

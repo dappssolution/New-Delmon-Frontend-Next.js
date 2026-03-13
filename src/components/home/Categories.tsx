@@ -24,27 +24,10 @@ export interface Category {
   meta_keywords: string;
 }
 
-const Categories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+const Categories = ({ categories = [] }: { categories?: Category[] }) => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await homeApi.getCategories("category");
-        setCategories(res.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const handlePrev = () => {
     if (swiperInstance) {
@@ -63,32 +46,7 @@ const Categories = () => {
     setIsEnd(swiper.isEnd);
   };
 
-  if (loading) {
-    return (
-      <section className="py-6 md:py-10 bg-white">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          {/* Desktop Loading */}
-          <div className="hidden md:flex gap-6 overflow-hidden">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-3">
-                <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-full bg-gray-100 animate-pulse" />
-                <div className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-          {/* Mobile Loading */}
-          <div className="md:hidden grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 rounded-full bg-gray-100 animate-pulse" />
-                <div className="h-3 w-12 bg-gray-100 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (!categories || !categories.length) return null;
 
   if (!categories?.length) return null;
 
