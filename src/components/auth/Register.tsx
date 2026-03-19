@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { authApi } from "@/src/service/authApi";
+import { getGuestId } from "@/src/utils/guestId";
 
 export default function RegisterPage() {
     const dispatch = useAppDispatch();
@@ -94,7 +95,8 @@ export default function RegisterPage() {
 
     const handleGoogleLogin = async () => {
         try {
-            const response = await authApi.getGoogleAuthUrl();
+            const guest_id = getGuestId();
+            const response = await authApi.getGoogleAuthUrl(guest_id);
             if (response.url) {
                 window.location.href = response.url;
             } else {

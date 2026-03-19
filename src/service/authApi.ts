@@ -22,8 +22,10 @@ export const authApi = {
         return res.data;
     },
 
-    async getGoogleAuthUrl() {
-        const res = await api.get("/auth/google/url");
+    async getGoogleAuthUrl(guest_id?: string) {
+        const res = await api.get("/auth/google/url", {
+            params: { guest_id }
+        });
         return res.data;
     },
 }

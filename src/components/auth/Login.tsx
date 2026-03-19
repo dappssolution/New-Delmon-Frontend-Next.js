@@ -11,6 +11,7 @@ import { RootState } from "@/src/redux/store";
 import { loginUser } from "@/src/redux/auth/authThunk";
 import FormInput from "@/src/components/common/FormInput";
 import { authApi } from "@/src/service/authApi";
+import { getGuestId } from "@/src/utils/guestId";
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
@@ -45,7 +46,8 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const response = await authApi.getGoogleAuthUrl();
+      const guest_id = getGuestId();
+      const response = await authApi.getGoogleAuthUrl(guest_id);
       if (response.url) {
         window.location.href = response.url;
       } else {
