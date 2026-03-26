@@ -582,7 +582,7 @@ export default function ProductDetailsPage() {
 
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-2">
-                                        <span className="bg-[#feee00] text-black text-[9px] font-bold px-1.5 py-0.5 rounded-sm shrink-0 mt-0.5">
+                                        <span className="bg-[#feef1a] text-black text-[9px] font-bold px-1.5 py-0.5 rounded-sm shrink-0 mt-0.5">
                                             EXPRESS
                                         </span>
                                         <p className="text-[11px] text-gray-600 leading-snug">
