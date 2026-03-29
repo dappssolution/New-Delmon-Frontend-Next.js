@@ -6,6 +6,7 @@ export default function ArtBanner () {
             <img
               src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=300"
               alt="Art"
+              loading="lazy"
               className="h-32 md:h-56 object-contain hidden md:block"
             />
             <div className="text-center">
@@ -19,6 +20,7 @@ export default function ArtBanner () {
             <img
               src="https://images.unsplash.com/photo-1513705153412-e7e8faa06a78?w=300"
               alt="Pencils"
+              loading="lazy"
               className="h-32 md:h-56 object-contain hidden md:block"
             />
           </div>
