@@ -126,6 +126,7 @@ export default function PromoBanner({ sliders = [] }: { sliders?: SliderData[] }
                     <img
                       src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${slider.slider_image}`}
                       alt={slider.slider_title}
+                      loading="lazy"
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   </a>

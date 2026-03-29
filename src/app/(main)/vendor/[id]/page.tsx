@@ -103,7 +103,7 @@ export default function VendorDetailView() {
     return (
         <div className="bg-white min-h-screen">
             {/* Breadcrumb */}
-            <div className="bg-gray-50 border-b border-gray-100">
+            <div className="bg-white border-b border-gray-100">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4">
                     <nav className="flex items-center text-xs md:text-sm text-gray-500 font-medium">
                         <Link href="/" className="hover:text-green-700 transition-colors">Delmon</Link>

@@ -12,6 +12,9 @@ import {
   Menu,
   X,
   LogIn,
+  Tag,
+  Zap,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -167,6 +170,28 @@ export default function Header() {
 
   return (
     <header className={`w-full fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      {/* Announcement Bar */}
+      <div className="bg-[#0b5c30] text-white overflow-hidden relative border-b border-[#094725]">
+        <div className="flex whitespace-nowrap animate-marquee w-max py-1.5 sm:py-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex gap-8 md:gap-14 px-4 md:px-7 items-center shrink-0">
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                Mega Offers: Get up to 50% Off!
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                Flash Sale: Free Shipping Over AED 5000
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                New Arrivals: Explore Latest Equipment
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Top Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -525,7 +550,7 @@ export default function Header() {
                 router.push('/all-categories');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b border-gray-100"
             >
               <span>All Categories</span>
               <ChevronDown className="w-4 h-4" />
@@ -537,7 +562,7 @@ export default function Header() {
                 router.push('/all-brands');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b border-gray-100"
             >
               <span>All Brands</span>
               <ChevronDown className="w-4 h-4" />

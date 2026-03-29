@@ -5,6 +5,7 @@ import {
   Tag,
   Layers,
   RefreshCcw,
+  Award,
 } from "lucide-react";
 
 const FEATURES = [
@@ -43,13 +44,20 @@ const FEATURES = [
     iconBg: "bg-gray-400",
     icon: RefreshCcw,
   },
+  {
+    title: "Quality products",
+    description: "100% Guaranteed",
+    bgColor: "bg-purple-200",
+    iconBg: "bg-purple-400",
+    icon: Award,
+  },
 ];
 
 export default function FeaturesSection() {
   return (
     <section className="bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {FEATURES.map((feature, index) => {
             const Icon = feature.icon;
 

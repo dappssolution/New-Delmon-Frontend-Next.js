@@ -9,9 +9,13 @@ import HeroSection from "../../components/home/HeroSection";
 import MoreProducts from "../../components/home/MoreProduct";
 import PromoBanner from "../../components/home/PromoBanner";
 import VendorSection from "../../components/home/VendorSection";
+import GoogleReviews from "../../components/home/GoogleReviews";
+import WhyChooseUs from "../../components/home/WhyChooseUs";
+import StatsBanner from "../../components/home/StatsBanner";
+import NewsletterBanner from "../../components/home/NewsletterBanner";
 import { FadeIn } from "../../components/common";
 import { homeApi } from "../../service/homeApi";
-import Loading from "../../components/common/Loading";
+import HomeSkeleton from "../../components/home/HomeSkeleton";
 
 export default function Home() {
   const [homeData, setHomeData] = useState<any>(null);
@@ -34,11 +38,7 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="w-full bg-white min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <HomeSkeleton />;
   }
 
   if (!homeData) return null;
@@ -76,6 +76,22 @@ export default function Home() {
       {/* Category Pills */}
       <FadeIn delay={0.8}>
         <CategoryPills categories={homeData.categories} />
+      </FadeIn>
+       {/* Why Choose Us */}
+      <FadeIn delay={0.75}>
+        <WhyChooseUs />
+      </FadeIn>
+        {/* Stats Banner */}
+      <FadeIn delay={0.72}>
+        <StatsBanner />
+      </FadeIn>
+      {/* Google Reviews */}
+      <FadeIn delay={0.9}>
+        <GoogleReviews />
+      </FadeIn>
+      {/* Newsletter Banner */}
+      <FadeIn delay={1.0}>
+        <NewsletterBanner />
       </FadeIn>
     </div>
   );

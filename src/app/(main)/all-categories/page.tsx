@@ -122,7 +122,7 @@ export default function CategoriesPage() {
                     {/* Main Content */}
                     <main className="flex-1">
                         {!isAnyCategoryExpanded ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {categoriesData.data.map((mainCategory) => (
                                     <Link href={`/main-category/${mainCategory.main_category_slug}`}
                                         key={mainCategory.id}
@@ -133,6 +133,7 @@ export default function CategoriesPage() {
                                                 <img
                                                     src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${mainCategory.main_category_image}`}
                                                     alt={mainCategory.main_category_name}
+                                                    loading="lazy"
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -164,7 +165,7 @@ export default function CategoriesPage() {
                                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                                                     {mainCategory.main_category_name}
                                                 </h2>
-                                                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {mainCategory.categories.map((category) => (
                                                         <Link
                                                             key={category.id}
@@ -176,6 +177,7 @@ export default function CategoriesPage() {
                                                                     <img
                                                                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${category.category_image}`}
                                                                         alt={category.category_name}
+                                                                        loading="lazy"
                                                                         className="w-full h-full object-cover"
                                                                     />
                                                                 ) : (
