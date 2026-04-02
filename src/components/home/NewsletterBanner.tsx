@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -6,7 +7,7 @@ import { ChevronRight } from "lucide-react";
 const NewsletterBanner = () => {
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault();
 
     const subject = "Enquiry from Website";
@@ -35,7 +36,7 @@ Thank you.`;
         {/* Left Content Area */}
         <div className="w-full lg:w-[55%] xl:w-[50%] px-6 py-12 md:px-12 lg:py-20 flex flex-col justify-center relative z-10">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-            Join our mailing list to receive future exclusive offers!
+            Join our mailing list to receive future exclusive offers! 
           </h2>
           <p className="text-white/80 text-sm md:text-base leading-relaxed mb-8 max-w-lg">
             Stay updated with <span className="font-semibold">Newdelmon Goods Wholesalers LLC</span>. From bulk discounts to special promotions and new product arrivals, get it all delivered straight to your inbox.
