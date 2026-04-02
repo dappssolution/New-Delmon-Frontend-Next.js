@@ -224,7 +224,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
             
             <p className="text-gray-600 text-xs sm:text-sm text-center md:text-left order-3 md:order-1 flex-1">
-              {footerData?.copyright ? footerData.copyright.replace('Powered by :', 'Powered by:') : "2005-2024, ©All Right Reserved. Powered by: Newdelmon Goods Wholesalers LLC"}
+              ©All Right Reserved. Powered by : Newdelmon Goods Wholesalers LLC
             </p>
 
             {/* Accepted Payment Methods */}
