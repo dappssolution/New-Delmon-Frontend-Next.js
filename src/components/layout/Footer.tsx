@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
 import { RootState } from "@/src/redux/store";
-import { logout } from "@/src/redux/auth/authSlice";
+import { logout } from "@/src/redux/auth/authSlice"; 
 import { resetCart } from "@/src/redux/cart/cartSlice";
 import { resetWishlist } from "@/src/redux/wishlist/wishlistSlice";
 import { useRouter } from "next/navigation";
@@ -112,7 +112,7 @@ const Footer = () => {
               </div>
 
               <p className="text-gray-100 text-sm leading-relaxed max-w-lg">
-                In <span className="font-semibold text-white">{footerData?.site_title || "Newdelmon"}</span>, We are a
+                In <span className="font-semibold text-white">{ "Newdelmon Goods Wholesalers LLC"}</span>, We are a
                 locally owned and operated business committed to providing our
                 customers with top-quality products. If you have any suggestions
                 or feedback, please feel free to contact us.
@@ -224,7 +224,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
             
             <p className="text-gray-600 text-xs sm:text-sm text-center md:text-left order-3 md:order-1 flex-1">
-              {footerData?.copyright ? footerData.copyright.replace('Powered by :', 'Powered by:') : "2005-2024, ©All Right Reserved. Powered by: Newdelmon Wholesalers Co.LLC"}
+              {footerData?.copyright ? footerData.copyright.replace('Powered by :', 'Powered by:') : "2005-2024, ©All Right Reserved. Powered by: Newdelmon Goods Wholesalers LLC"}
             </p>
 
             {/* Accepted Payment Methods */}
@@ -242,15 +242,7 @@ const Footer = () => {
                 <div className="w-[18px] h-[18px] rounded-full bg-[#F79E1B] absolute right-[5px] opacity-90 mix-blend-multiply" />
               </div>
 
-              {/* Amex */}
-              <div className="w-[46px] h-[30px] bg-[#2E77D0] rounded shadow-sm flex items-center justify-center text-white text-[10px] font-bold tracking-wide cursor-default hover:-translate-y-0.5 transition-transform ring-1 ring-black/5">
-                AMEX
-              </div>
-
-              {/* Apple Pay */}
-              <div className="w-[46px] h-[30px] bg-black rounded shadow-sm flex items-center justify-center text-white cursor-default hover:-translate-y-0.5 transition-transform ring-1 ring-black/5 font-semibold text-[13px] tracking-tight">
-                Pay
-              </div>
+          
               
               {/* Noon */}
               <div className="w-[46px] h-[30px] bg-[#FEE000] rounded shadow-sm flex items-center justify-center text-black text-[13px] font-black tracking-tight cursor-default hover:-translate-y-0.5 transition-transform ring-1 ring-black/5">
@@ -339,7 +331,7 @@ const Footer = () => {
         </a>
 
         {/* WhatsApp Floating Button */}
-        {footerData?.cell && (
+        {footerData?.cell && (  
           <a
             href={`https://wa.me/${footerData.cell.replace(/\s+/g, '').replace('+', '')}?text=${encodeURIComponent("Hello New Delmon Team, I would like to inquire about your products.")}`}
             target="_blank"
