@@ -120,7 +120,7 @@ export default function PromoBanner({ sliders = [] }: { sliders?: SliderData[] }
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative rounded-3xl h-full w-full flex items-center overflow-hidden bg-white cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
+                    className="relative h-full w-full flex items-center overflow-hidden bg-white cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
                   >
                     {/* Image */}
                     <img

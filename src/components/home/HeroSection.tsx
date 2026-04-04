@@ -34,7 +34,7 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
     return (
       <section className="bg-white py-4 md:py-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="animate-pulse h-[160px] md:h-64 bg-gray-200 rounded-2xl" />
+          <div className="animate-pulse h-[160px] md:h-64 bg-gray-200" />
         </div>
       </section>
     );
@@ -48,7 +48,7 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
     <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         {/* Mobile Layout - Single Banner with reduced height */}
-        <div className="md:hidden relative h-[160px] overflow-hidden rounded-2xl">
+        <div className="md:hidden relative h-[160px] overflow-hidden">
           <div className="absolute inset-0">
             {banners.map((banner, index) => (
               <motion.div
@@ -86,7 +86,7 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
         <div className="hidden md:grid grid-cols-3 gap-4 lg:gap-6 h-[400px]">
           {/* Left Column - 2 Stacked Images */}
           <div className="col-span-1 grid grid-rows-2 gap-4 lg:gap-6 h-full">
-            <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <div className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <AnimatePresence mode="wait">
                 {banners.length > 0 && (
                   <motion.div
@@ -114,7 +114,7 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
               </AnimatePresence>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <div className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <AnimatePresence mode="wait">
                 {banners.length > 1 && (
                   <motion.div
@@ -144,7 +144,7 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
           </div>
 
           {/* Right Column - 1 Large Image */}
-          <div className="col-span-2 relative overflow-hidden rounded-2xl lg:rounded-3xl shadow-sm hover:shadow-md transition-shadow h-full">
+          <div className="col-span-2 relative overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full">
             <AnimatePresence mode="wait">
               {banners.length > 0 && (
                 <motion.div
