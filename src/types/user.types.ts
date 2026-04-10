@@ -314,3 +314,13 @@ export interface DashboardData {
   wishlist_count: number
   recent_orders: OrderData[]
 }
+
+export interface OnboardingStatusResponse {
+  status: string;
+  data: {
+    has_primary_address: boolean;
+    has_trn: boolean;
+    has_phone: boolean;
+    should_show_onboard: boolean;
+  };
+}

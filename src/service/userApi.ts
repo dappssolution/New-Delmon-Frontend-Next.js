@@ -1,5 +1,5 @@
 import api from "../lib/axios";
-import { GetDashboardDataResponse, GetOrderDetailsResponse, GetProfileResponse, GetReturnOrdersResponse, GetUserOrdersResponse } from "../types/user.types";
+import { GetDashboardDataResponse, GetOrderDetailsResponse, GetProfileResponse, GetReturnOrdersResponse, GetUserOrdersResponse, OnboardingStatusResponse } from "../types/user.types";
 
 export const getUserProfile = () => {
     return api.get<GetProfileResponse>("/profile");
@@ -47,5 +47,15 @@ export const returnOrder = async (id: number, reason: string) => {
 }
 export const getDashboardData = async () => {
     const res = await api.get<GetDashboardDataResponse>("/dashboard");
+    return res.data;
+};
+
+export const getOnboardingStatus = async () => {
+    const res = await api.get<OnboardingStatusResponse>("/user/onboarding-status");
+    return res.data;
+};
+
+export const completeOnboarding = async (data: any) => {
+    const res = await api.post("/onboard", data);
     return res.data;
 };

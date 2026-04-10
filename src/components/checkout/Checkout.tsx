@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Trash2, Loader2, CreditCard, Lock, X, MapPin, ChevronRight } from "lucide-react";
 import { checkoutApi } from "@/src/service/checkoutApi";
+import { getOnboardingStatus } from "@/src/service/userApi";
 import { CountryData, EmirateData, AddressDetail } from "@/src/types/checkout.types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -89,7 +90,9 @@ function CheckoutForm() {
     note: "",
     address_type: "home",
     building_details: "",
-    city: ""
+    city: "",
+    trn_number: "",
+    save_as_primary: false
   });
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [loading, setLoading] = useState(false);
@@ -98,6 +101,7 @@ function CheckoutForm() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
   const [cardComplete, setCardComplete] = useState(false);
+  const [hasTrn, setHasTrn] = useState(true);
 
   useEffect(() => {
     fetchInitialData();
@@ -116,14 +120,23 @@ function CheckoutForm() {
   const fetchInitialData = async () => {
     try {
       setInitialLoading(true);
-      const [emiratesData, addressesData] = await Promise.all([
+      const [emiratesData, addressesData, onboardingStatus] = await Promise.all([
         checkoutApi.getEmirates(),
-        checkoutApi.getSavedAddresses()
+        checkoutApi.getSavedAddresses(),
+        getOnboardingStatus()
       ]);
       await dispatch(fetchCart());
       setEmirates(emiratesData);
+      setHasTrn(onboardingStatus.data.has_trn);
       if (addressesData.status) {
         setSavedAddresses(addressesData.data);
+        
+        // Auto-select primary address
+        const primaryAddr = addressesData.data.find((a: any) => a.is_primary);
+        const defaultSelected = primaryAddr || addressesData.data[0];
+        if (defaultSelected) {
+          handleSelectAddress(defaultSelected);
+        }
       }
     } catch (error) {
       console.error("Error fetching initial data:", error);
@@ -149,7 +162,9 @@ function CheckoutForm() {
       note: formData.note,
       address_type: addr.address_type,
       building_details: addr.building_details,
-      city: addr.city
+      city: addr.city,
+      trn_number: (addr as any).trn_number || "",
+      save_as_primary: (addr as any).is_primary || false
     });
 
     // Scroll to form if needed or just provide visual feedback
@@ -267,7 +282,9 @@ function CheckoutForm() {
         city: formData.city,
         payment_method: paymentMethod,
         note: formData.note,
-        address_id: selectedAddressId
+        address_id: selectedAddressId,
+        trn_number: formData.trn_number,
+        is_primary: formData.save_as_primary
       };
 
       const response = await checkoutApi.placeOrder(payload);
@@ -750,6 +767,33 @@ function CheckoutForm() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                     required
                   />
+                </div>
+
+                {formData.address_type.toLowerCase() === 'office' && !hasTrn && (
+                  <div className="md:col-span-2 animate-in slide-in-from-top-1 duration-200">
+                    <input
+                      type="text"
+                      name="trn_number"
+                      placeholder="TRN Number *"
+                      value={formData.trn_number}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-[#8fccab] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="md:col-span-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600">
+                    <input
+                      type="checkbox"
+                      name="save_as_primary"
+                      checked={formData.save_as_primary}
+                      onChange={(e) => setFormData(prev => ({ ...prev, save_as_primary: e.target.checked }))}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    Save as primary address
+                  </label>
                 </div>
 
 

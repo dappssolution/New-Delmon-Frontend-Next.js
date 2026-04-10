@@ -22,6 +22,8 @@ export interface PlaceOrderPayload {
     payment_method: string;
     note?: string;
     address_id?: number | null;
+    trn_number?: string;
+    is_primary?: boolean;
 }
 
 export const checkoutApi = {

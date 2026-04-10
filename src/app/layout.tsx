@@ -3,6 +3,7 @@ import { Montserrat, Inter, Figtree, Carlito } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "../components/providers/ReduxProvider";
 import { Toaster } from "sonner";
+import OnboardingPopup from "../components/common/OnboardingPopup";
 
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700"],
@@ -47,6 +48,7 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <Toaster position="top-right" richColors />
+          <OnboardingPopup />
           {children}
         </ReduxProvider>
       </body>
