@@ -44,7 +44,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
                         "category",
                         selectedCategory,
                         {
-                            per_page: 12,
+                            per_page: 15,
                             simple: true,
                             page: currentPage,
                             brand: slug,
@@ -56,7 +56,7 @@ const BrandPageClient = ({ slug }: BrandPageClientProps) => {
                     }
                 } else {
                     const res: BrandProductsResponse = await homeApi.getBrandProducts(slug, {
-                        per_page: 12,
+                        per_page: 15,
                         simple: true,
                         page: currentPage,
                     });

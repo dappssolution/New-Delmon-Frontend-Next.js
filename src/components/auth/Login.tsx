@@ -64,6 +64,8 @@ export default function LoginPage() {
         toast.success("Login Successful!");
       } else {
         toast.success("Login Successful! Please verify your email.");
+        router.push("/verify-email/0/0");
+        return;
       }
 
       const redirectPath = searchParams.get("redirect");

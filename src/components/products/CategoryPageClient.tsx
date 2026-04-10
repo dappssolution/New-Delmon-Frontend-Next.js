@@ -73,7 +73,7 @@ const CategoryPageClient = ({ slug, categoryType }: CategoryPageClientProps) => 
                     categoryType,
                     slug,
                     {
-                        per_page: 12,
+                        per_page: 15,
                         simple: true,
                         page: currentPage,
                     }

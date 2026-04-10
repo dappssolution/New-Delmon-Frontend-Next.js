@@ -10,7 +10,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/src/redux/store";
 
 export default function OnboardingPopup() {
-    const { token, user } = useSelector((state: RootState) => state.auth);
+    const { token } = useSelector((state: RootState) => state.auth);
+    const { profile } = useSelector((state: RootState) => state.user);
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [statusLoading, setStatusLoading] = useState(true);
@@ -33,11 +34,11 @@ export default function OnboardingPopup() {
     });
 
     useEffect(() => {
-        if (token && user?.email_verified_at) {
+        if (token && profile?.email_verified_at) {
             checkStatus();
             fetchEmirates();
         }
-    }, [token, user?.email_verified_at]);
+    }, [token, profile?.email_verified_at]);
 
     const checkStatus = async () => {
         try {
@@ -47,9 +48,9 @@ export default function OnboardingPopup() {
                 setHasPhone(!!res.data.has_phone);
                 setFormData(prev => ({
                     ...prev,
-                    phone: user?.phone || "",
-                    first_name: user?.name || "",
-                    email: user?.email || "",
+                    phone: profile?.phone || "",
+                    first_name: profile?.name || "",
+                    email: profile?.email || "",
                 }));
             }
         } catch (error) {
