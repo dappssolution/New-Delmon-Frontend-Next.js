@@ -12,7 +12,7 @@ export const homeApi = {
     return res.data;
   },
 
-  async getPaginatedProducts(page: number = 1, limit: number = 12, params: any = {}) {
+  async getPaginatedProducts(page: number = 1, limit: number = 10, params: any = {}) {
     const queryParams = new URLSearchParams({
       page: page.toString(),
       per_page: limit.toString(),
@@ -110,7 +110,7 @@ export const homeApi = {
     return res.data;
   },
 
-  async searchProducts(query: string, page: number = 1, perPage: number = 12) {
+  async searchProducts(query: string, page: number = 1, perPage: number = 10) {
     const res = await api.get<SearchProductResponse>(`/search-products`, {
       params: { query, page, per_page: perPage }
     });
