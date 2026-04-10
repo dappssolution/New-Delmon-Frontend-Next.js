@@ -4,6 +4,7 @@ import "./globals.css";
 import ReduxProvider from "../components/providers/ReduxProvider";
 import { Toaster } from "sonner";
 import OnboardingPopup from "../components/common/OnboardingPopup";
+import SmoothScroller from "../components/providers/SmoothScroller";
 
 const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700"],
@@ -47,9 +48,11 @@ export default function RootLayout({
         className={`${montserrat.variable} ${inter.variable} ${figtree.variable} ${carlito.variable} antialiased`}
       >
         <ReduxProvider>
-          <Toaster position="top-right" richColors />
-          <OnboardingPopup />
-          {children}
+          <SmoothScroller>
+            <Toaster position="top-right" richColors />
+            <OnboardingPopup />
+            {children}
+          </SmoothScroller>
         </ReduxProvider>
       </body>
 

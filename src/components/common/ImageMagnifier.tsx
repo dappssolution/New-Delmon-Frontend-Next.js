@@ -16,7 +16,7 @@ export default function ImageMagnifier({
     src,
     width,
     height,
-    zoomLevel = 2.5,
+    zoomLevel = 2.2,
     alt,
     className = "",
 }: ImageMagnifierProps) {

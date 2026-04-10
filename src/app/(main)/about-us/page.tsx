@@ -37,7 +37,7 @@ export default function AboutUsPage() {
                             <span className="font-semibold text-green-600">trusted</span>{" "}
                             destination for quality products, curated collections, and a
                             seamless shopping experience. From everyday essentials to special
-                            finds, we bring you products you can rely upon more.
+                            finds, we bring you products you can rely upon more. 
                         </p>
 
                         <div className="flex flex-wrap gap-4 mb-10">

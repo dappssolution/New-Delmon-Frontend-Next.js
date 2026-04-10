@@ -11,7 +11,7 @@ export default function MainLayout({
   return (
     <>
       <Header />
-      <main className="pt-[56px] lg:pt-[140px]">{children}</main>
+      <main className="pt-[95px] lg:pt-[160px]">{children}</main>
       <FeaturesSection />
       <Footer />
     </>

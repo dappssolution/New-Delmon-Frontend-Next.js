@@ -344,6 +344,7 @@ export default function ProductCard({
                         <img
                             src={product.image}
                             alt={product.title}
+                            loading="lazy"
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
 
@@ -490,7 +491,7 @@ export default function ProductCard({
                             {/* Product Info Card */}
                             <div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
                                 <div className="w-24 h-24 bg-white rounded-xl flex items-center justify-center p-2 shadow-sm">
-                                    <img src={product.image} alt={product.title} className="w-full h-full object-contain" />
+                                    <img src={product.image} alt={product.title} loading="lazy" className="w-full h-full object-contain" />
                                 </div>
                                 <div className="flex flex-col justify-center">
                                     <span className="flex items-center gap-1 text-2xl font-bold text-[#006637]">

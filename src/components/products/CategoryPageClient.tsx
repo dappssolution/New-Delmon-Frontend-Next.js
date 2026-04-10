@@ -137,8 +137,8 @@ const CategoryPageClient = ({ slug, categoryType }: CategoryPageClientProps) => 
     return (
         <div className="bg-white min-h-screen pb-12">
             {/* Header / Breadcrumb area */}
-            <div className="bg-gray-50 border-b border-gray-100">
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
+            <div className="bg-white border-b">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-4 md:py-8">
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                         <Link href="/" className="hover:text-green-700">Delmon</Link>
                         <ChevronRight className="w-4 h-4" />
@@ -172,7 +172,7 @@ const CategoryPageClient = ({ slug, categoryType }: CategoryPageClientProps) => 
                             <Loading className="h-64" />
                         ) : products.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5">
                                     {products.map(apiProduct => (
                                         <ProductCard
                                             key={apiProduct.id}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   Search,
   Scale,
@@ -8,10 +8,15 @@ import {
   User,
   ShoppingCart,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Phone,
   Menu,
   X,
   LogIn,
+  Tag,
+  Zap,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -51,11 +56,45 @@ export default function Header() {
   // Scroll-based header visibility
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  // Desktop nav scroll arrows
+  const navScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateNavScrollState = useCallback(() => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    updateNavScrollState();
+    el.addEventListener('scroll', updateNavScrollState, { passive: true });
+    window.addEventListener('resize', updateNavScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateNavScrollState);
+      window.removeEventListener('resize', updateNavScrollState);
+    };
+  }, [updateNavScrollState, categories]);
+
+  const scrollNav = (direction: 'left' | 'right') => {
+    const el = navScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === 'left' ? -300 : 300, behavior: 'smooth' });
+  };
 
   // Handle scroll for header visibility
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+
+      // Announcement bar: only show at the very top
+      setIsAtTop(currentScrollY < 10);
 
       if (currentScrollY < 10) {
         // Always show header at top of page
@@ -167,6 +206,32 @@ export default function Header() {
 
   return (
     <header className={`w-full fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      {/* Announcement Bar - only visible at top of page */}
+      <div
+        className={`bg-[#0b5c30] text-white overflow-hidden relative border-b border-[#094725] transition-all duration-300 ease-in-out ${
+          isAtTop ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="flex whitespace-nowrap animate-marquee w-max py-1.5 sm:py-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex gap-8 md:gap-14 px-4 md:px-7 items-center shrink-0">
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                Mega Offers: Get up to 50% Off!
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                Flash Sale: Free Shipping Over AED 5000
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium tracking-wide uppercase">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffeb3b]" />
+                New Arrivals: Explore Latest Equipment
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Top Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -478,13 +543,29 @@ export default function Header() {
       </div>
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:block bg-[#0d6838]">
-        <div className="max-w-[1400px] mx-auto px-6">
-          <div className="flex items-center justify-start overflow-x-auto scrollbar-hide">
+      <nav className="hidden lg:block bg-[#0d6838] relative">
+
+        {/* Left scroll arrow */}
+        <button
+          onClick={() => scrollNav('left')}
+          className={`absolute left-0 top-0 bottom-0 z-10 flex items-center justify-center w-10 bg-linear-to-r from-[#0d6838] to-transparent transition-opacity duration-200 ${
+            canScrollLeft ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-label="Scroll categories left"
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </button>
+
+        <div className="max-w-[1400px] mx-auto">
+          {/* Scrollable nav strip */}
+          <div
+            ref={navScrollRef}
+            className="flex items-center justify-start overflow-x-auto scrollbar-hide px-6"
+          >
             {/* View All Categories Button */}
             <button
               onClick={() => router.push('/all-categories')}
-              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer"
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer shrink-0"
             >
               <span>All Categories</span>
             </button>
@@ -492,7 +573,7 @@ export default function Header() {
             {/* All Brands */}
             <button
               onClick={() => router.push('/all-brands')}
-              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer"
+              className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-semibold tracking-wide hover:bg-green-800 whitespace-nowrap border-r border-green-700 cursor-pointer shrink-0"
             >
               <span>All Brands</span>
             </button>
@@ -503,16 +584,39 @@ export default function Header() {
                 <button
                   key={category.id}
                   onClick={() => router.push(`/main-category/${category.main_category_slug}`)}
-                  className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap cursor-pointer"
+                  className="flex items-center gap-1.5 text-white px-3 xl:px-4 py-3.5 text-[13px] font-medium tracking-wide hover:bg-green-800 whitespace-nowrap cursor-pointer shrink-0"
                 >
                   <span className="capitalize">{category.main_category_name.toLowerCase()}</span>
                 </button>
               ))
             ) : (
-              <div className="text-white py-3.5 text-[13px]">Loading categories...</div>
+              // Skeleton loading placeholders for categories
+              [...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center px-3 xl:px-4 py-3.5 shrink-0"
+                >
+                  <div
+                    className="h-3 rounded bg-green-700/60 animate-pulse"
+                    style={{ width: `${60 + (i % 3) * 20}px` }}
+                  />
+                </div>
+              ))
             )}
           </div>
         </div>
+
+        {/* Right scroll arrow */}
+        <button
+          onClick={() => scrollNav('right')}
+          className={`absolute right-0 top-0 bottom-0 z-10 flex items-center justify-center w-10 bg-linear-to-l from-[#0d6838] to-transparent transition-opacity duration-200 ${
+            canScrollRight ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-label="Scroll categories right"
+        >
+          <ChevronRight className="w-5 h-5 text-white" />
+        </button>
+
       </nav>
 
       {/* Mobile Menu */}
@@ -525,7 +629,7 @@ export default function Header() {
                 router.push('/all-categories');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b border-gray-100"
             >
               <span>All Categories</span>
               <ChevronDown className="w-4 h-4" />
@@ -537,7 +641,7 @@ export default function Header() {
                 router.push('/all-brands');
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b-2 border-green-700"
+              className="w-full flex items-center justify-between py-3 text-gray-900 text-sm font-semibold border-b border-gray-100"
             >
               <span>All Brands</span>
               <ChevronDown className="w-4 h-4" />
@@ -557,7 +661,15 @@ export default function Header() {
                 </button>
               ))
             ) : (
-              <div className="py-3 text-gray-500 text-sm">Loading categories...</div>
+              // Skeleton loading placeholders for mobile categories
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center py-3 border-b border-gray-100">
+                  <div
+                    className="h-3 rounded bg-gray-200 animate-pulse"
+                    style={{ width: `${80 + (i % 3) * 30}px` }}
+                  />
+                </div>
+              ))
             )}
 
             <div className="flex items-center gap-4 py-4 border-t border-gray-200 mt-2">

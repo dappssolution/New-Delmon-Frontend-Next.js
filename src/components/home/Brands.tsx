@@ -73,6 +73,7 @@ const BrandsSection = ({ brands = [] }: { brands?: Brand[] }) => {
                       <img
                         src={`${process.env.NEXT_PUBLIC_IMAGE_BASE}/${brand.brand_image}`}
                         alt={brand.brand_name}
+                        loading="lazy"
                         style={{ height: "80px", width: "auto" }}
                         className="object-contain"
                       />
