@@ -24,6 +24,7 @@ export interface Category {
   meta_keywords: string;
 }
 
+
 const Categories = ({ categories = [] }: { categories?: Category[] }) => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
@@ -46,8 +47,6 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
     setIsEnd(swiper.isEnd);
   };
 
-  if (!categories || !categories.length) return null;
-
   if (!categories?.length) return null;
 
   const CategoryItem = ({ cat, size = "desktop" }: { cat: Category; size?: "desktop" | "mobile" }) => {
@@ -57,9 +56,9 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
         : `${process.env.NEXT_PUBLIC_IMAGE_BASE}/${cat.category_image}`
       : null;
 
-    const sizeClasses = size === "desktop"
-      ? "w-28 h-28 lg:w-32 lg:h-32"
-      : "w-16 h-16 sm:w-20 sm:h-20";
+     const sizeClasses = size === "desktop"
+       ? "w-20 h-20 lg:w-24 lg:h-24"
+       : "w-16 h-16 sm:w-20 sm:h-20";
 
     return (
       <Link
@@ -87,6 +86,21 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
     );
   };
 
+  // Placeholder extra category to show an additional item at the end
+  const extraCategory: Category = {
+    id: 9999,
+    main_category_id: 0,
+    category_name: "Extra",
+    category_slug: "extra",
+    category_image: undefined,
+    created_at: "",
+    updated_at: "",
+    meta_title: "",
+    meta_description: "",
+    meta_keywords: "",
+  };
+  const displayCategories = [...categories, extraCategory];
+
   return (
     <section className="py-6 md:py-10 bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -95,22 +109,23 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
           {/* Left Navigation Arrow */}
           <button
             onClick={handlePrev}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:bg-gray-50 ${isBeginning ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            disabled={isBeginning}
+            className="category-prev absolute -left-12 top-[40px] lg:top-[48px] -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Previous categories"
           >
             <ChevronLeft className="w-5 h-5 text-gray-600" />
           </button>
 
-          {/* Swiper */}
-          <div className="px-12">
+          {/* Swiper — edge-to-edge alignment */}
+          <div className="-mx-4 sm:-mx-6 px-4 sm:px-6">
             <Swiper
               modules={[Navigation, FreeMode]}
-              spaceBetween={24}
-              slidesPerView="auto"
-              freeMode={{
-                enabled: true,
-                sticky: false,
-                momentumBounce: false,
+              spaceBetween={12}
+              slidesPerView={9}
+              slidesPerGroup={9}
+              navigation={{
+                prevEl: ".category-prev",
+                nextEl: ".category-next",
               }}
               speed={500}
               onSwiper={(swiper) => {
@@ -119,12 +134,10 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
                 setIsEnd(swiper.isEnd);
               }}
               onSlideChange={handleSlideChange}
-              onReachBeginning={() => setIsBeginning(true)}
-              onReachEnd={() => setIsEnd(true)}
               className="categories-swiper"
             >
-              {categories.map((cat) => (
-                <SwiperSlide key={cat.id} style={{ width: "auto" }}>
+              {displayCategories.map((cat) => (
+                <SwiperSlide key={cat.id}>
                   <CategoryItem cat={cat} size="desktop" />
                 </SwiperSlide>
               ))}
@@ -134,7 +147,8 @@ const Categories = ({ categories = [] }: { categories?: Category[] }) => {
           {/* Right Navigation Arrow */}
           <button
             onClick={handleNext}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:bg-gray-50 ${isEnd ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            disabled={isEnd}
+            className="category-next absolute -right-12 top-[40px] lg:top-[48px] -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-300 hover:shadow-xl hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Next categories"
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />
