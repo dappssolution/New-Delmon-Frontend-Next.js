@@ -47,8 +47,8 @@ const HeroSection = ({ banners = [] }: { banners?: Banner[] }) => {
   return (
     <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        {/* Mobile Layout - Single Banner with reduced height */}
-        <div className="md:hidden relative h-[160px] overflow-hidden">
+        {/* Mobile Layout - Single Banner with aspect ratio to prevent cropping */}
+        <div className="md:hidden relative w-full aspect-[1600/786] overflow-hidden">
           <div className="absolute inset-0">
             {banners.map((banner, index) => (
               <motion.div

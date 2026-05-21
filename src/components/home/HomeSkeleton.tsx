@@ -19,7 +19,7 @@ const HeroSectionSkeleton = () => {
     <section className="bg-white py-4 md:py-8">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         {/* Mobile Layout */}
-        <div className="md:hidden relative h-[160px] overflow-hidden rounded-2xl animate-shimmer" />
+        <div className="md:hidden relative w-full aspect-[1600/786] overflow-hidden rounded-2xl animate-shimmer" />
 
         {/* Desktop Layout - Based on Figma (1/3 stacked left, 2/3 large right) */}
         <div className="hidden md:grid grid-cols-3 gap-4 lg:gap-6 h-[400px]">
